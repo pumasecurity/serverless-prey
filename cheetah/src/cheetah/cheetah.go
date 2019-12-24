@@ -3,7 +3,7 @@ References:
 https://github.com/sathish09/rev2go
 https://gist.github.com/yougg/b47f4910767a74fcfe1077d21568070e
 */
-package p
+package cheetah
 
 import (
 	"bufio"
@@ -28,7 +28,7 @@ func respondWithError(w http.ResponseWriter, errMsg string) {
 	fmt.Fprintf(w, "%s", responseJson)
 }
 
-func HelloWorld(w http.ResponseWriter, r *http.Request) {
+func Cheetah(w http.ResponseWriter, r *http.Request) {
 	timeout, _ := strconv.ParseUint(os.Getenv("X_GOOGLE_FUNCTION_TIMEOUT_SEC"), 10, 64)
 
 	// For some reason, a timeout doesn't send a response. Force a response by exiting the process.

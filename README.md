@@ -1,8 +1,8 @@
 # Puma Scan Serverless Prey
 
-Serverless Prey contains vulnerable serverless functions (FaaS) for GCP Functions, Azure Functions, and AWS Lambda.
+Serverless Prey is a collection of serverless functions (FaaS) for GCP Functions, Azure Functions, and AWS Lambda. Once launched to the environment and invoked, these functions establish a TCP reverse shell for the purposes of introspecting the container runtimes of the various function runtimes.
 
-The functions are launched into the environment. Using the functions, researchers can reverse engineer the execution environment, determine where secrets are stored, learn to extract data, and identify monitoring / incident response data points.
+This repository also contains research performed using these functions, including documentation on where secrets are stored, how to extract sensitive data, and identify monitoring / incident response data points.
 
 ## Contributors
 

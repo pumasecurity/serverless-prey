@@ -19,11 +19,15 @@ pwd
 /srv/files
 
 ls -al
-total 2
-drwxr-xr-x 2 root root    0 Dec 24 04:51 .
-drwxr-xr-x 2 root root    0 Dec 24 04:51 ..
--rw-r--r-- 1 root root 1685 Dec 24 04:51 function.go
--rw-r--r-- 1 root root   33 Dec 24 04:51 go.mod
+total 165
+drwxr-xr-x 2 root root      0 Dec 24 18:28 .
+drwxr-xr-x 2 root root      0 Dec 24 18:28 ..
+-rw-r--r-- 1 root root    252 Dec 24 18:28 Makefile
+-rw-r--r-- 1 root root   1688 Dec 24 18:28 cheetah.go
+-rw------- 1 root root     24 Dec 24 18:28 go.mod
+drwxr-xr-x 2 root root      0 Dec 24 18:28 node_modules
+-rw-r--r-- 1 root root 166598 Dec 24 18:28 package-lock.json
+-rw-r--r-- 1 root root    907 Dec 24 18:28 package.json
 
 ls -al /srv
 total 6
@@ -61,41 +65,41 @@ cat /srv/vendor/gcfeventhelper/event.go
 
 ```
 env
-FUNCTION_IDENTITY=brandonevans@appspot.gserviceaccount.com
-DEBIAN_FRONTEND=noninteractive
-X_GOOGLE_WORKER_PORT=8091
-X_GOOGLE_SUPERVISOR_INTERNAL_PORT=8081
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-X_GOOGLE_GCLOUD_PROJECT=brandonevans
-GCP_PROJECT=brandonevans
-FUNCTION_REGION=us-central1
-X_GOOGLE_FUNCTION_NAME=reverseShell
-ENTRY_POINT=HelloWorld
-PWD=/srv/files/
-X_GOOGLE_GCP_PROJECT=brandonevans
-NODE_ENV=production
-HOME=/root
-FUNCTION_NAME=reverseShell
-X_GOOGLE_FUNCTION_TRIGGER_TYPE=HTTP_TRIGGER
-GCLOUD_PROJECT=brandonevans
-X_GOOGLE_FUNCTION_IDENTITY=brandonevans@appspot.gserviceaccount.com
+X_GOOGLE_FUNCTION_TIMEOUT_SEC=60
 X_GOOGLE_FUNCTION_MEMORY_MB=256
 FUNCTION_TIMEOUT_SEC=60
-X_GOOGLE_FUNCTION_REGION=us-central1
-CODE_LOCATION=/srv
-PORT=8080
-X_GOOGLE_ENTRY_POINT=HelloWorld
-X_GOOGLE_CODE_LOCATION=/srv
+FUNCTION_MEMORY_MB=256
 X_GOOGLE_LOAD_ON_START=false
-X_GOOGLE_FUNCTION_VERSION=28
+HOME=/root
+X_GOOGLE_FUNCTION_TRIGGER_TYPE=HTTP_TRIGGER
+PORT=8080
+ENTRY_POINT=Cheetah
 X_GOOGLE_SUPERVISOR_HOSTNAME=169.254.8.129
 FUNCTION_TRIGGER_TYPE=HTTP_TRIGGER
-X_GOOGLE_CONTAINER_LOGGING_ENABLED=true
-WORKER_PORT=8091
-SUPERVISOR_HOSTNAME=169.254.8.129
+X_GOOGLE_FUNCTION_NAME=Cheetah
+X_GOOGLE_GCLOUD_PROJECT=brandonevans
+FUNCTION_NAME=Cheetah
 SUPERVISOR_INTERNAL_PORT=8081
-X_GOOGLE_FUNCTION_TIMEOUT_SEC=60
-FUNCTION_MEMORY_MB=256
+X_GOOGLE_GCP_PROJECT=brandonevans
+X_GOOGLE_FUNCTION_REGION=us-central1
+X_GOOGLE_ENTRY_POINT=Cheetah
+FUNCTION_REGION=us-central1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+X_GOOGLE_WORKER_PORT=8091
+CODE_LOCATION=/srv
+SUPERVISOR_HOSTNAME=169.254.8.129
+WORKER_PORT=8091
+DEBIAN_FRONTEND=noninteractive
+X_GOOGLE_FUNCTION_IDENTITY=brandonevans@appspot.gserviceaccount.com
+X_GOOGLE_CONTAINER_LOGGING_ENABLED=true
+GCLOUD_PROJECT=brandonevans
+FUNCTION_IDENTITY=brandonevans@appspot.gserviceaccount.com
+X_GOOGLE_CODE_LOCATION=/srv
+PWD=/srv/files/
+GCP_PROJECT=brandonevans
+X_GOOGLE_SUPERVISOR_INTERNAL_PORT=8081
+X_GOOGLE_FUNCTION_VERSION=2
+NODE_ENV=production
 ```
 
 The supervisor service is definitely going to be a point of interest:

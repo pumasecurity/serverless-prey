@@ -1,6 +1,6 @@
 # Puma Prey Panther
 
-Panther is a NodeJS function running in AWS with vulnerabilities such as command injection, local file inclusion, and path traversal.
+Panther is a Node.js function that can be deployed to the AWS to establish a TCP reverse shell for the purposes of introspecting the Lambda container runtime.
 
 ## Serverless AWS NodeJS Template
 

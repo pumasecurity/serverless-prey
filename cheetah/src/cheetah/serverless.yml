@@ -1,0 +1,27 @@
+service: cheetah
+
+provider:
+  name: google
+  runtime: go111
+  region: us-central1
+  # The GCF credentials can be a little tricky to set up. Luckily we've documented this for you here:
+  # https://serverless.com/framework/docs/providers/google/guide/credentials/
+  project: YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID
+  credentials: /ABSOLUTE/PATH/TO/.gcloud/keyfile.json
+
+plugins:
+  - serverless-google-cloudfunctions
+
+# needs more granular excluding in production as only the serverless provider npm
+# package should be excluded (and not the whole node_modules directory)
+package:
+  exclude:
+    - .gitignore
+    - .git/**
+
+functions:
+  cheetah:
+    handler: Cheetah
+    events:
+      - http: cheetah
+    timeout: 60s

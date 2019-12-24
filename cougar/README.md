@@ -1,6 +1,6 @@
 # Puma Prey Cougar
 
-Cougar is an Azure function written in C# with vulnerabilities such as command injection, local file inclusion, and path traversal. Using these vulnerabilities, we can inspect the execution environment, extract access keys, test persistence in warn environments, and more.
+Cougar is a C# function that can be deployed to the Azure to establish a TCP reverse shell for the purposes of introspecting the Azure Functions container runtime.
 
 ## Install Azure Functions Core Tools
 
