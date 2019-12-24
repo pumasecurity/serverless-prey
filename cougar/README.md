@@ -2,7 +2,7 @@
 
 Cougar is an Azure function written in C# with vulnerabilities such as command injection, local file inclusion, and path traversal. Using these vulnerabilities, we can inspect the execution environment, extract access keys, test persistence in warn environments, and more.
 
-## Instal Azure Functions Core Tools
+## Install Azure Functions Core Tools
 
 Details here: [https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 

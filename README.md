@@ -6,6 +6,6 @@ The functions are launched into the environment. Using the functions, researcher
 
 ## Contributors
 
-Eric Johnson - Principal Security Engineer, Puma Security
+[Eric Johnson](https://github.com/ejohn20) - Principal Security Engineer, Puma Security
 
-Brandon Evans
+[Brandon Evans](https://github.com/BrandonE) - Senior Application Security Engineer, Asurion
