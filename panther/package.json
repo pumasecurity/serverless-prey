@@ -1,0 +1,32 @@
+{
+  "name": "panther",
+  "version": "1.0.0",
+  "description": "Panther is a Node.js function that can be deployed to the AWS to establish a TCP reverse shell for the purposes of introspecting the Lambda container runtime.",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pumasecurity/serverless-prey.git"
+  },
+  "keywords": [
+    "serverless",
+    "security",
+    "amazon",
+    "functions",
+    "aws",
+    "lambda",
+    "javascript",
+    "node"
+  ],
+  "author": "Brandon Evans",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/pumasecurity/serverless-prey/issues"
+  },
+  "homepage": "https://github.com/pumasecurity/serverless-prey#readme",
+  "devDependencies": {
+    "serverless": "^1.60.4"
+  }
+}
