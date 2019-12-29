@@ -9,7 +9,7 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 
 ## Creating The Function
 
-```
+```bash
 export GOPATH=/PATH/TO/cheetah
 cd /PATH/TO/cheetah/src/cheetah
 make
@@ -17,7 +17,7 @@ make
 
 Follow the steps at the top of the `serverless.yml` file to generate a credentials file. Modify the `serverless.yml` file to point to your GCP project ID and the **absolute path** of the credentials file.
 
-```
+```bash
 npm install
 serverless deploy
 ```
@@ -26,19 +26,19 @@ serverless deploy
 
 Set up a TCP listener for your reverse shell, such as with [Netcat](http://netcat.sourceforge.net/):
 
-```
+```bash
 nc -l 4444
 ```
 
 To make your listener accessible from the public internet, consider using a service like [ngrok](https://ngrok.com/):
 
-```
+```bash
 ngrok tcp 4444
 ```
 
 Navigate to your function, supplying your connection details:
 
-```
+```bash
 curl 'http://us-central1-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.net/Cheetah?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER'
 ```
 
@@ -46,13 +46,13 @@ Your listener will now act as a reverse shell for the duration of the function i
 
 ## Teardown
 
-```
+```bash
 serverless remove
 ```
 
 ## Linting
 
-```
+```bash
 npm run lint
 ```
 

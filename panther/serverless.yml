@@ -6,6 +6,9 @@ provider:
   apiKeys:
     - panther
 
+plugins:
+  - serverless-offline
+
 functions:
   panther:
     handler: handler.panther
