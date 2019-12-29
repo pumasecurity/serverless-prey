@@ -3,6 +3,8 @@ service: panther
 provider:
   name: aws
   runtime: nodejs12.x
+  apiKeys:
+    - panther
 
 functions:
   panther:
@@ -11,6 +13,7 @@ functions:
       - http:
           path: panther
           method: get
+          private: true
           request:
             parameters:
               querystring:
