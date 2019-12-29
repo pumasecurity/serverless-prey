@@ -39,7 +39,7 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// For some reason, a timeout doesn't send a response. Force a response by exiting the process.
-	time.AfterFunc(time.Duration(timeout) * time.Second, func() {
+	time.AfterFunc(time.Duration(timeout)*time.Second, func() {
 		os.Exit(0)
 	})
 
