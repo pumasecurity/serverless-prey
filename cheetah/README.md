@@ -2,7 +2,12 @@
 
 Cheetah is a Go function that can be deployed to the Google Cloud Platform to establish a TCP reverse shell for the purposes of introspecting the Cloud Functions container runtime.
 
-## Getting Started
+## Installing Prerequisites
+
+* [Node.js / NPM](https://nodejs.org/en/download/)
+* [Serverless Framework](https://serverless.com/framework/docs/providers/aws/guide/installation#installing-the-serverless-framework)
+
+## Creating The Function
 
 ```
 export GOPATH=/PATH/TO/cheetah
@@ -43,6 +48,12 @@ Your listener will now act as a reverse shell for the duration of the function i
 
 ```
 serverless remove
+```
+
+## Linting
+
+```
+npm run lint
 ```
 
 ## Serverless Go Template

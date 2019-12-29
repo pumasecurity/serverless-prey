@@ -4,6 +4,7 @@
   "description": "Panther is a Node.js function that can be deployed to the AWS to establish a TCP reverse shell for the purposes of introspecting the Lambda container runtime.",
   "main": "handler.js",
   "scripts": {
+    "lint": "npx eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,6 +28,9 @@
   },
   "homepage": "https://github.com/pumasecurity/serverless-prey#readme",
   "devDependencies": {
-    "serverless": "^1.60.4"
+    "eslint": "6.8.0",
+    "eslint-config-airbnb-base": "14.0.0",
+    "eslint-plugin-import": "2.19.1",
+    "serverless": "1.60.4"
   }
 }

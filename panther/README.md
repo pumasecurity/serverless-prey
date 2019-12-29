@@ -2,6 +2,12 @@
 
 Panther is a Node.js function that can be deployed to the AWS to establish a TCP reverse shell for the purposes of introspecting the Lambda container runtime.
 
+## Installing Prerequisites
+
+* [AWS Command Line Interface](https://aws.amazon.com/cli/)
+* [Node.js / NPM](https://nodejs.org/en/download/)
+* [Serverless Framework](https://serverless.com/framework/docs/providers/aws/guide/installation#installing-the-serverless-framework)
+
 ## Getting Started
 
 ```
@@ -37,6 +43,13 @@ Your listener will now act as a reverse shell for the duration of the function i
 
 ```
 serverless remove
+```
+
+## Linting
+
+```
+go get -u golang.org/x/lint/golint
+npm run lint
 ```
 
 ## Serverless AWS NodeJS Template

