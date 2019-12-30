@@ -5,7 +5,6 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 ## Installing Prerequisites
 
 * [Node.js / NPM](https://nodejs.org/en/download/)
-* [Serverless Framework](https://serverless.com/framework/docs/providers/aws/guide/installation#installing-the-serverless-framework)
 
 ## Creating The Function
 
@@ -19,7 +18,7 @@ Follow the steps at the top of the `serverless.yml` file to generate a credentia
 
 ```bash
 npm install
-serverless deploy
+npx serverless deploy
 ```
 
 ## Usage
@@ -47,7 +46,7 @@ Your listener will now act as a reverse shell for the duration of the function i
 ## Teardown
 
 ```bash
-serverless remove
+npx serverless remove
 ```
 
 ## Linting
