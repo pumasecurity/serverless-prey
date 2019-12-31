@@ -6,7 +6,7 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 
 * [Node.js / NPM](https://nodejs.org/en/download/)
 
-## Creating The Function
+## Deploying The Function
 
 ```bash
 export GOPATH=/PATH/TO/cheetah
@@ -21,7 +21,7 @@ npm install
 npx serverless deploy
 ```
 
-## Usage
+## Testing in GCP
 
 Set up a TCP listener for your reverse shell, such as with [Netcat](http://netcat.sourceforge.net/):
 

