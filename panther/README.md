@@ -6,7 +6,6 @@ Panther is a Node.js function that can be deployed to the AWS to establish a TCP
 
 * [AWS Command Line Interface](https://aws.amazon.com/cli/)
 * [Node.js / NPM](https://nodejs.org/en/download/)
-* [Serverless Framework](https://serverless.com/framework/docs/providers/aws/guide/installation#installing-the-serverless-framework)
 
 ## Getting Started
 
@@ -14,7 +13,7 @@ Panther is a Node.js function that can be deployed to the AWS to establish a TCP
 cd /PATH/TO/panther
 aws configure
 npm install
-serverless deploy
+npx serverless deploy
 ```
 
 Record the API key provided in the output:
@@ -56,7 +55,7 @@ Your listener will now act as a reverse shell for the duration of the function i
 ## Teardown
 
 ```bash
-serverless remove
+npx serverless remove
 ```
 
 ## Running Locally
