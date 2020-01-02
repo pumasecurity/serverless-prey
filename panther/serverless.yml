@@ -5,9 +5,48 @@ provider:
   runtime: nodejs12.x
   apiKeys:
     - panther
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: arn:aws:s3:::panther-${env:BUCKET_SUFFIX}
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: arn:aws:s3:::panther-${env:BUCKET_SUFFIX}/*
+    - Effect: Allow
+      Action:
+        - ssm:*
+      Resource:
+        - Fn::Join:
+          - ':'
+          - - arn:aws:ssm
+            - ${self:provider.region}
+            - Ref: AWS::AccountId
+            - parameter/panther/*
 
 plugins:
   - serverless-offline
+  - serverless-s3-sync
+
+custom:
+  s3Sync:
+    - bucketName: panther-${env:BUCKET_SUFFIX}
+      bucketPrefix: assets/ # optional 
+      localDir: assets # required 
+
+resources:
+  Resources:
+    bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: panther-${env:BUCKET_SUFFIX}
+        AccessControl: Private
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          IgnorePublicAcls: true
+          BlockPublicPolicy: true
+          RestrictPublicBuckets: true
 
 functions:
   panther:
