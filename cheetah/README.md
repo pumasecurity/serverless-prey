@@ -7,7 +7,9 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 * [Node.js / NPM](https://nodejs.org/en/download/)
 * [Serverless Framework](https://serverless.com/framework/docs/providers/aws/guide/installation#installing-the-serverless-framework)
 
-## Creating The Function
+## Deploying The Function
+
+# Serverless Framework
 
 ```bash
 export GOPATH=/PATH/TO/cheetah
@@ -20,6 +22,15 @@ Follow the steps at the top of the `serverless.yml` file to generate a credentia
 ```bash
 npm install
 serverless deploy
+```
+
+# Native GCloud Commanmds
+
+Configure `gcloud` in the Terminal to authentication as the deployment service account. Then, deploy the function.
+
+```
+gcloud auth activate-service-account --key-file ~/.gcloud/keyfile.json
+gcloud functions deploy cheetah --entry-point Cheetah --runtime go111 --trigger-http --service-account=xxx@xxx
 ```
 
 ## Usage

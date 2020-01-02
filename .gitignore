@@ -457,4 +457,4 @@ __pycache__/
 env/
 .env/
 .venv/
-.vscode
+*.vscode
