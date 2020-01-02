@@ -65,16 +65,10 @@ namespace Puma.Security.Functions.Azure
                 return Responses.error("Must provide the host and port for the target TCP server as query parameters.", HttpStatusCode.BadRequest);
             }
 
+            //Parse port number
             int portNum;
-
-            try
-            {
-                portNum = int.Parse(port);
-            }
-            catch (Exception err)
-            {
-                return Responses.error(err.ToString(), HttpStatusCode.BadRequest);
-            }
+            if(!int.TryParse(port, out portNum))
+                return Responses.error("Port number must be an integer.", HttpStatusCode.BadRequest);
 
             try
             {
