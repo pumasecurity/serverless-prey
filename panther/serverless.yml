@@ -14,7 +14,7 @@ functions:
     handler: handler.panther
     events:
       - http:
-          path: panther
+          path: api/Panther
           method: get
           private: true
           request:

@@ -23,5 +23,5 @@ functions:
   cheetah:
     handler: Cheetah
     events:
-      - http: cheetah
+      - http: http
     timeout: 60s
