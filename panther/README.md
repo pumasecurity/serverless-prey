@@ -53,7 +53,7 @@ To make your listener accessible from the public internet, consider using a serv
 ngrok tcp 4444
 ```
 
-Navigate to your function, supplying your connection details and API key:
+Invoke your function, supplying your connection details and API key:
 
 ```bash
 curl 'https://YOUR_API_GATEWAY_ID.execute-api.us-east-1.amazonaws.com/dev/api/Panther?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER' -H 'X-API-Key: YOUR_API_KEY'
