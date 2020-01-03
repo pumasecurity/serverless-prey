@@ -27,7 +27,7 @@ npx serverless deploy
 
 To deploy natively without the serverless framework, configure `gcloud` in the Terminal to authentication as the deployment service account. Then, deploy the function.
 
-```
+```bash
 gcloud auth activate-service-account --key-file ~/.gcloud/keyfile.json
 gcloud functions deploy cheetah --entry-point Cheetah --runtime go111 --trigger-http --service-account=xxx@xxx
 ```
