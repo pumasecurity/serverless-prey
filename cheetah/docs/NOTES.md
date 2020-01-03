@@ -201,5 +201,18 @@ Download the object from the bucket:
 
 ```bash
 export GOOGLE_BUCKET_ITEM=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_PROJECT_BUCKET/o" | jq -r '.items[0].selfLink')
-curl -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_BUCKET_ITEM?alt=media" --output ~/Downloads/img2.jpg
+curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_BUCKET_ITEM?alt=media" --output ~/Downloads/img2.jpg
+```
+
+List the secrets in the project:
+
+```bash
+curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets
+```
+
+Dump the secret value:
+
+```
+export SECRET_NAME=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets | jq -r '.secrets[0].name')
+curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
 ```
