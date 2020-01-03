@@ -1,0 +1,9 @@
+# Server configurations
+server:
+  host: "10.42.42.42"
+  port: 8000
+
+# Database credentials
+database:
+  user: "cheetah_user"
+  pass: "QnV0IHVuaWNvcm5zIGFwcGFyZW50bHkgZG8gZXhpc3Qu"
