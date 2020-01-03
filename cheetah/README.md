@@ -46,7 +46,7 @@ To make your listener accessible from the public internet, consider using a serv
 ngrok tcp 4444
 ```
 
-Navigate to your function, supplying your connection details:
+Invoke your function, supplying your connection details:
 
 ```bash
 curl 'http://us-central1-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.net/Cheetah?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER'

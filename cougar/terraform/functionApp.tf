@@ -30,7 +30,7 @@ data "azurerm_storage_account_sas" "sas" {
 resource "azurerm_function_app" "functionApp" {
   name                      = "cougar${var.UniqueString}"
   location                  = var.ResourceGroupLocation
-  resource_group_name       = var.ResourceGroupName
+  resource_group_name       = azurerm_resource_group.cougar.name
   app_service_plan_id       = azurerm_app_service_plan.appServicePlan.id
   storage_connection_string = azurerm_storage_account.functionStorageAccount.primary_connection_string
   version                   = "beta"

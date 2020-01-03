@@ -5,12 +5,6 @@ variable "UniqueString" {
   type = string
 }
 
-variable "ResourceGroupName" {
-  description = "The name of the resource group containing the Cougar resources."
-  type = string
-  default = "Cougar"
-}
-
 variable "ResourceGroupLocation" {
   description = "The location of the resource group containing the Cougar resources."
   type = string
