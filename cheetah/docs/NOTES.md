@@ -257,3 +257,41 @@ curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.go
   }
 }
 ```
+
+## Persistence
+
+Persisting a malware payload into the runtime environment:
+
+```
+echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /tmp/malware.sh
+cat /tmp/malware.sh
+X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
+```
+
+Waiting approximately 1 minute:
+
+```
+cat /tmp/malware.sh
+X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
+```
+
+Waiting approximately 2 minutes:
+
+```
+cat /tmp/malware.sh
+X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
+```
+
+Waiting approximately 3 minutes:
+
+cat /tmp/malware.sh
+cat: /tmp/malware.sh: No such file or directory
+
+## Monitoring &amp; Incident Response
+
+See the [Cloud Functions Monitoring](https://cloud.google.com/functions/docs/monitoring/) documents for details.
+
+Stackdriver services captures and stores function logs, error reporting, and records metrics. The Stackdriver GUI is (surprise) in beta at the time of this writing.
+
+Instrumenting the function with audit logging statements, such as follows will write logs to the Stackdriver Logging service.
+
