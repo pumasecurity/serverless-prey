@@ -18,16 +18,18 @@ Exploring through the filesystem:
 pwd
 /srv/files
 
-ls -al
-total 165
-drwxr-xr-x 2 root root      0 Dec 24 18:28 .
-drwxr-xr-x 2 root root      0 Dec 24 18:28 ..
--rw-r--r-- 1 root root    252 Dec 24 18:28 Makefile
--rw-r--r-- 1 root root   1688 Dec 24 18:28 cheetah.go
--rw------- 1 root root     24 Dec 24 18:28 go.mod
-drwxr-xr-x 2 root root      0 Dec 24 18:28 node_modules
--rw-r--r-- 1 root root 166598 Dec 24 18:28 package-lock.json
--rw-r--r-- 1 root root    907 Dec 24 18:28 package.json
+ls -la
+total 167
+drwxr-xr-x 2 root root      0 Jan  3 16:49 .
+drwxr-xr-x 2 root root      0 Jan  3 16:49 ..
+-rw-r--r-- 1 root root    268 Jan  3 16:49 Makefile
+-rw-r--r-- 1 root root   1898 Jan  3 16:49 cheetah.go
+-rw-r--r-- 1 root root    178 Jan  3 16:49 cheetah.yaml
+-rw-r--r-- 1 root root    170 Jan  3 16:49 go.mod
+-rw-r--r-- 1 root root   1798 Jan  3 16:49 go.sum
+-rw-r--r-- 1 root root 166598 Jan  3 16:49 package-lock.json
+-rw-r--r-- 1 root root    939 Jan  3 16:49 package.json
+-rw-r--r-- 1 root root    710 Jan  3 16:49 serverless.yml
 
 ls -al /srv
 total 6
@@ -61,6 +63,19 @@ cat /srv/vendor/gcfeventhelper/event.go
 // an event from supervisor (both legacy and current API) and returns GCF-specific
 // metadata and event data.
 ...
+```
+
+```
+cat cheetah.yaml
+# Server configurations
+server:
+  host: "10.42.42.42"
+  port: 8000
+
+# Database credentials
+database:
+  user: "cheetah_user"
+  pass: "QnV0IHVuaWNvcm5zIGFwcGFyZW50bHkgZG8gZXhpc3Qu"
 ```
 
 ```
@@ -201,7 +216,7 @@ Download the object from the bucket:
 
 ```bash
 export GOOGLE_BUCKET_ITEM=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_PROJECT_BUCKET/o" | jq -r '.items[0].selfLink')
-curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_BUCKET_ITEM?alt=media" --output ~/Downloads/img2.jpg
+curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_BUCKET_ITEM?alt=media" --output ~/Downloads/cheetah.jpg
 ```
 
 List the secrets in the project:
@@ -215,4 +230,30 @@ Dump the secret value:
 ```
 export SECRET_NAME=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets | jq -r '.secrets[0].name')
 curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
+```
+
+By default this returns a *403* from the service account running the function:
+
+```
+{
+  "error": {
+    "code": 403,
+    "message": "Permission 'secretmanager.versions.access' denied for resource 'projects/123/secrets/cheetah-database-pass/versions/1' (or it may not exist).",
+    "status": "PERMISSION_DENIED"
+  }
+}
+```
+
+It appears this is not included the default editor role permissions. You have to explicitly grant the service account the Secret Manager Secret Accessor (secretmanager.versions.access) permission to view the secret value. Then, running the command returns the following:
+
+
+```
+curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
+
+{
+  "name": "projects/123/secrets/cheetah-database-pass/versions/1",
+  "payload": {
+    "data": "UW5WMElIVnVhV052Y201eklHRndjR0Z5Wlc1MGJIa2daRzhnWlhocGMzUXU="
+  }
+}
 ```
