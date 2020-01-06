@@ -79,6 +79,27 @@ database:
 ```
 
 ```
+cat /etc/os-release
+NAME="Ubuntu"
+VERSION="18.04.2 LTS (Bionic Beaver)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 18.04.2 LTS"
+VERSION_ID="18.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=bionic
+UBUNTU_CODENAME=bionic
+```
+
+```
+echo "test" > test.txt
+/bin/sh: 5: cannot create test.txt: Read-only file system
+```
+
+```
 env
 X_GOOGLE_FUNCTION_TIMEOUT_SEC=60
 X_GOOGLE_FUNCTION_MEMORY_MB=256

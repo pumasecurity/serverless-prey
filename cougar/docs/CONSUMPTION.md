@@ -4,7 +4,7 @@ Running under a consumption based Azure function (cold starts). Included a SP at
 
 ## Function Invocation
 
-https://pumapreycougar.azurewebsites.net/api/cougar?code=XXXXX&ip=&port=
+https://pumapreycougar.azurewebsites.net/api/cougar?code=XXXXX&host=&port=
 
 ## Execution Environment
 
