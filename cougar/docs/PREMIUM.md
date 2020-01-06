@@ -713,11 +713,15 @@ function.deps.json
 ```
 
 ```
-ls /home/site/wwwroot
-Cougar
-Cougar.deps.json
-bin
-host.json
+ls -la /home/site/wwwroot
+total 136
+drwxr-xr-x 1 app app   4096 Jan  6 16:43 .
+drwxr-xr-x 1 app app   4096 Nov 23 05:12 ..
+drwxr-xr-x 2 app app   4096 Jan  6 16:43 Cougar
+-rw-r--r-- 1 app app 114189 Jan  6 10:43 Cougar.deps.json
+-rw-r--r-- 1 app app    158 Jan  5 21:10 appsettings.json
+drwxr-xr-x 2 app app   4096 Jan  6 16:43 bin
+-rw-r--r-- 1 app app     26 Jan  3 13:06 host.json
 ```
 
 ```

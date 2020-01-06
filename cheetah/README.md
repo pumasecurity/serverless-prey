@@ -5,6 +5,7 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 ## Installing Prerequisites
 
 * [Node.js / NPM](https://nodejs.org/en/download/)
+* [Function Deployment Service Account](https://cloud.google.com/functions/docs/concepts/iam#cloud_functions_service_account)
 
 ## Deploying The Function
 
@@ -29,7 +30,21 @@ To deploy natively without the serverless framework, configure `gcloud` in the T
 
 ```bash
 gcloud auth activate-service-account --key-file ~/.gcloud/keyfile.json
-gcloud functions deploy cheetah --entry-point Cheetah --runtime go111 --trigger-http --service-account=xxx@xxx
+gcloud functions deploy cheetah --entry-point Cheetah --runtime go111 --trigger-http --service-account=XXXXXXXXX-compute@developer.gserviceaccount.com
+```
+
+## Deploying Assets
+
+Create some secrets and grant permissions to the SA. Side note: wow, they really don't want you passing these values via the command line. Makes sense for real secrets though.
+
+```
+echo "cheetah_user" | gcloud beta secrets create cheetah-database-user --data-file=- --replication-policy=automatic
+
+echo "TmV2ZXIgcGxheSBwb2tlciB3aXRoIHRoZSB3b3JsZCdzIGZhc3Rlc3QgYW5pbWFsLCBiZWNhdXNlIGhlJ3MgYSBjaGVldGFoLiAtIGNvb2xmdW5ueXF1b3Rlcy5jb20g" | gcloud beta secrets create cheetah-database-pass --data-file=- --replication-policy=automatic
+
+gcloud beta secrets add-iam-policy-binding cheetah-database-user --member serviceAccount:XXXXXXXXX-compute@developer.gserviceaccount.com --role roles/secretmanager.secretAccessor
+
+gcloud beta secrets add-iam-policy-binding cheetah-database-user --member serviceAccount:XXXXXXXXX-compute@developer.gserviceaccount.com --role roles/secretmanager.secretAccessor
 ```
 
 ## Testing in GCP

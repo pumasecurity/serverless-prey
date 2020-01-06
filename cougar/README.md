@@ -21,6 +21,18 @@ terraform plan
 terraform apply
 ```
 
+## Deploying Assets
+
+Create some secrets and grant permissions to the function SA.
+
+```
+az keyvault secret set --vault-name pumaprey-cougar-vault  --name "cougar-database-user" --value "cougar_user"
+
+az keyvault secret set --vault-name pumaprey-cougar-vault  --name "cougar-database-pass" --value "QnV0IHVuaWNvcm5zIGFwcGFyZW50bHkgZG8gZXhpc3Qu"
+
+az keyvault set-policy --name pumaprey-cougar-vault -g pumaprey-cougar --object-id 0cbd41de-55c6-460d-b92b-837eddd0ea0d --secret-permissions get list
+```
+
 ## Testing in Azure
 
 Set up a TCP listener for your reverse shell, such as with [Netcat](http://netcat.sourceforge.net/):

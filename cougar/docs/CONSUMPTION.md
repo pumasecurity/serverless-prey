@@ -233,3 +233,47 @@ TODO: Storage command to pull sensitive file
 
 ```
 ```
+
+## Persistence
+
+Persisting a malware payload into the runtime environment:
+
+```
+echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /tmp/malware.sh
+cat /tmp/malware.sh
+X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
+```
+
+Waiting approximately 1 minute:
+
+```
+cat /tmp/malware.sh
+X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
+```
+
+Waiting approximately 2 minutes:
+
+```
+cat /tmp/malware.sh
+X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
+```
+Waiting approximately 3 minutes:
+
+```
+cat /tmp/malware.sh
+X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
+```
+
+After approximately 15 minutes, still there:
+
+```
+cat /tmp/malware.sh
+X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
+```
+
+Slowly started increasing the inactivity to 2, 3, 4, 5, and so on minutes. Finally, after 6 minutes of inactivity:
+
+```
+cat /tmp/malware.sh
+cat: /tmp/malware.sh: No such file or directory
+```

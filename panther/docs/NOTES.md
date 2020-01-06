@@ -20,16 +20,27 @@ pwd
 ```
 ls -la
 total 236
-drwxr-xr-x  5 root root    163 Jan  5 22:35 .
-drwxr-xr-x 24 root root   4096 Oct 29 14:18 ..
-drwxrwxr-x  2 root root     34 Jan  5 22:35 assets
-drwxrwxr-x  2 root root     31 Jan  5 22:35 docs
+...
+drwxrwxr-x  2 root root     34 Jan  6 16:16 assets
+-rw-r--r--  1 root root    221 Jan  1  1980 config.json
+drwxrwxr-x  2 root root     31 Jan  6 16:16 docs
 -rw-r--r--  1 root root    314 Jan  1  1980 .eslintrc.json
 -rw-r--r--  1 root root   1618 Jan  1  1980 handler.js
-drwxrwxr-x  3 root root     27 Jan  5 22:35 node_modules
+drwxrwxr-x  3 root root     27 Jan  6 16:16 node_modules
 -rw-r--r--  1 root root   1101 Jan  1  1980 package.json
--rw-r--r--  1 root root 229489 Jan  1  1980 package-lock.json
--rw-r--r--  1 root root   2987 Jan  1  1980 README.md
+-rw-r--r--  1 root root   2888 Jan  1  1980 README.md
+```
+
+```
+cat config.json
+{
+    "dev": {
+        "database": {
+            "user": "panther_user",
+            "pass": "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9u4oCZdCBrbm93IGV2aWwgb3IgamVhbG91c3kgb3IgZGlzY29udGVudC4="
+        }
+    }
+}
 ```
 
 ```
