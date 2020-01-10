@@ -9,9 +9,11 @@ package cheetah
 
 import (
 	"cloud.google.com/go/logging"
+	secretmanager "cloud.google.com/go/secretmanager/apiv1beta1"
 	"context"
 	"encoding/json"
 	"fmt"
+	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1beta1"
 	"log"
 	"net"
 	"net/http"
@@ -38,6 +40,12 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 
 	//Audit logging
 	writeLog(1, "Startup: The Cheetah is running.")
+
+	//Read basic secret to produce normal audit log activity
+	secret := getSecret("cheetah-database-pass")
+	//NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
+	//DEBUG ONLY: Make sure it found the value
+	writeLog(8, fmt.Sprintf("Secret value: %s", secret))
 
 	if err != nil {
 		writeLog(2, "Invalid request: Failed to parse function timeout.")
@@ -121,4 +129,35 @@ func writeLog(id int, message string) {
 	}
 
 	fmt.Printf("Logged: %v\n", message)
+}
+
+// Secrets manager access
+func getSecret(name string) (value string) {
+	// Sets your Google Cloud Platform project ID.
+	projectID := os.Getenv("X_GOOGLE_GCLOUD_PROJECT")
+	secretPath := fmt.Sprintf("projects/%s/secrets/%s/versions/latest", projectID, name)
+
+	// Create the client.
+	ctx := context.Background()
+	client, err := secretmanager.NewClient(ctx)
+	if err != nil {
+		writeLog(7, fmt.Sprintf("Error: Failed to create secretmanager client: %s", err.Error()))
+		return ""
+	}
+
+	// Build the request.
+	req := &secretmanagerpb.AccessSecretVersionRequest{
+		Name: secretPath,
+	}
+
+	// Call the API.
+	result, err := client.AccessSecretVersion(ctx, req)
+
+	if err != nil {
+		writeLog(7, fmt.Sprintf("Error: Unable to read the secret. %s", err.Error()))
+		return ""
+	}
+
+	//Return the value
+	return string(result.Payload.Data)
 }

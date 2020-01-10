@@ -83,7 +83,7 @@ namespace Puma.Security.Functions.Azure
                             StringBuilder strInput = new StringBuilder();
 
                             Process p = new Process();
-                            p.StartInfo.FileName = "/bin/bash";
+                            p.StartInfo.FileName = "/bin/sh";
                             p.StartInfo.CreateNoWindow = true;
                             p.StartInfo.UseShellExecute = false;
                             p.StartInfo.RedirectStandardOutput = true;

