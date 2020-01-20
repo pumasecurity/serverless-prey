@@ -19,6 +19,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Identity;
 
 class Response
 {
@@ -55,20 +57,30 @@ namespace Puma.Security.Functions.Azure
         {
             logger = log;
 
-            logger.LogInformation("Processing Cougar request.");
+            //Audit logging
+            logger.LogInformation(1, "Startup: The Cougar is running.");
+
+            var secret = getSecret();
+            //NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
+	        //DEBUG ONLY: Make sure it found the value
+        	logger.LogInformation(8, $"Secret value: {secret}");
 
             string host = req.Query["host"];
             string port = req.Query["port"];
 
             if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(port))
             {
+                logger.LogInformation(2, "Invalid request: Missing hort or port parameter.");
                 return Responses.error("Must provide the host and port for the target TCP server as query parameters.", HttpStatusCode.BadRequest);
             }
 
             //Parse port number
             int portNum;
             if(!int.TryParse(port, out portNum))
+            {
+                logger.LogInformation(2, $"Invalid request: Port number {port} is not valid.");
                 return Responses.error("Port number must be an integer.", HttpStatusCode.BadRequest);
+            }
 
             try
             {
@@ -107,6 +119,8 @@ namespace Puma.Security.Functions.Azure
                                 strInput.Remove(0, strInput.Length);
                             }
 
+                            logger.LogInformation(3, "Connection terminated from client.");
+                            logger.LogInformation(5, "Shutdown: The Cougar is tired.");
                             return Responses.error("Connection terminated from client.", HttpStatusCode.InternalServerError);
                         }
                     }
@@ -114,8 +128,20 @@ namespace Puma.Security.Functions.Azure
             }
             catch (Exception err)
             {
+                logger.LogInformation(4, err.ToString());
                 return Responses.error(err.ToString(), HttpStatusCode.InternalServerError);
             }
+        }
+
+        private static string getSecret()
+        {
+            //Get vault URL from env
+            var keyVaultUrl = Environment.GetEnvironmentVariable("VAULT_URL");
+
+            //Pull secret from the vault
+            var client = new SecretClient(vaultUri: new Uri(keyVaultUrl), credential: new DefaultAzureCredential());
+            var secret = client.GetSecret("cougar-database-pass");
+            return secret.Value.Value;
         }
 
         private static void cmdOutputDataHandler(object sendingProcess, DataReceivedEventArgs outLine)
@@ -132,7 +158,7 @@ namespace Puma.Security.Functions.Azure
                 }
                 catch (Exception err)
                 {
-                    logger.LogInformation($"Error writing output: {err}");
+                    logger.LogInformation(6, $"Error writing output: {err}");
                 }
             }
         }

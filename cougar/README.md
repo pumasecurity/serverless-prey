@@ -9,6 +9,20 @@ Cougar is a C# function that can be deployed to the Azure to establish a TCP rev
 
 ## Deploying the Function
 
+### Native Deployment
+
+Requires the Resource Group, Function App (.NET Core, Linux OS), App Service Plan, App Insights, and Storage Account to be created in US West.
+
+```bash
+func azure functionapp publish pumapreycougar
+```
+
+Then, enable the function identity to use an MSI account during execution.
+
+### Terraform
+
+NOTE: This needs work to deploy assets, etc.
+
 ```bash
 cd src
 dotnet restore
