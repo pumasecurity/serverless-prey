@@ -22,9 +22,9 @@ resource "azurerm_storage_container" "deployments" {
 }
 
 resource "azurerm_storage_blob" "appcode" {
-    name = "functionapp.zip"
+    name = data.archive_file.functionapp.output_path
     storage_account_name = azurerm_storage_account.functionStorageAccount.name
     storage_container_name = azurerm_storage_container.deployments.name
     type = "block"
-    source = "functionapp.zip"
+    source = data.archive_file.functionapp.output_path
 }

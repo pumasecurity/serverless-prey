@@ -39,7 +39,7 @@ resource "azurerm_function_app" "functionApp" {
       https_only = true
       FUNCTIONS_WORKER_RUNTIME = "dotnet"
       FUNCTION_APP_EDIT_MODE = "readonly"
-      HASH = "${base64encode(filesha256("functionapp.zip"))}"
+      HASH = "${base64encode(filesha256(data.archive_file.functionapp.output_path))}"
       WEBSITE_RUN_FROM_PACKAGE = "https://${azurerm_storage_account.functionStorageAccount.name}.blob.core.windows.net/${azurerm_storage_container.deployments.name}/${azurerm_storage_blob.appcode.name}${data.azurerm_storage_account_sas.sas.sas}"
   }
 }
