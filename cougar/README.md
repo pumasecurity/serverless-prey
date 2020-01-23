@@ -5,6 +5,7 @@ Cougar is a C# function that can be deployed to the Azure to establish a TCP rev
 ## Installing Prerequisites
 
 * [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
+* [Azure CLI](https://github.com/Azure/azure-cli)
 * [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 ## Deploying the Function
