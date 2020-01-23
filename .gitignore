@@ -488,3 +488,4 @@ override.tf.json
 # example: *tfplan*
 
 functionapp.zip
+pkg

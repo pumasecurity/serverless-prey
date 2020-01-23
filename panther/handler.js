@@ -10,11 +10,16 @@ const ssm = new aws.SSM();
 module.exports.panther = async (event) => {
   writeLog(1, "Startup: The Panther is running.");
 
-  //Read basic secret from SSM to produce normal log activity
-  let secret = await getSecret();
-  //NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
-  //DEBUG ONLY: Make sure it found the value.
-  writeLog(8, `Secret value: ${secret}`);
+  try {
+    //Read basic secret from SSM to produce normal log activity
+    let secret = await getSecret();
+    //NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
+    //DEBUG ONLY: Make sure it found the value.
+    writeLog(8, `Secret value: ${secret}`);
+  } catch (err) {
+    writeLog(4, err);
+    writeLog(8, 'Skipping secret read routine.');
+  }
 
   let host;
   let port;
