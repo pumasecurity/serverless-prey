@@ -4,8 +4,18 @@ https://stackoverflow.com/a/33292942
 */
 const net = require('net');
 const cp = require('child_process');
+const aws = require('aws-sdk');
+const ssm = new aws.SSM();
 
 module.exports.panther = async (event) => {
+  writeLog(1, "Startup: The Panther is running.");
+
+  //Read basic secret from SSM to produce normal log activity
+  let secret = await getSecret();
+  //NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
+  //DEBUG ONLY: Make sure it found the value.
+  writeLog(8, `Secret value: ${secret}`);
+
   let host;
   let port;
 
@@ -15,6 +25,7 @@ module.exports.panther = async (event) => {
   }
 
   if (!host || !port) {
+    writeLog(2, "Invalid request: Missing host or port parameter.");
     return {
       statusCode: 400,
       body: JSON.stringify({
@@ -45,17 +56,22 @@ module.exports.panther = async (event) => {
       });
 
       client.on('end', () => {
+        writeLog(5, "Shutdown: The Panther is tired.");
         resolve();
       });
 
       client.on('error', (err) => {
+        writeLog(4, err);
         reject(err);
       });
 
       client.on('timeout', () => {
+        writeLog(3, "Timeout: Function timeout occurred.");
         reject(new Error('Socket timeout.'));
       });
     });
+
+    writeLog(5, "Shutdown: The Panther is tired.");
 
     return {
       statusCode: 400,
@@ -64,6 +80,7 @@ module.exports.panther = async (event) => {
       }),
     };
   } catch (err) {
+    writeLog(4, err);
     return {
       statusCode: 500,
       body: JSON.stringify({
@@ -72,3 +89,21 @@ module.exports.panther = async (event) => {
     };
   }
 };
+
+//Logging util
+function writeLog(id, message) {
+  
+  var event = {
+    EventId: id,
+    Message: message
+  };
+
+  console.log(JSON.stringify(event));
+}
+
+//Secrets management access
+async function getSecret() {
+  var params = { Name: "/panther/database/password", WithDecryption: true };
+  var response = await ssm.getParameter(params).promise();
+  return response.Parameter.Value;
+}

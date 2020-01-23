@@ -427,3 +427,13 @@ Instrumenting the function with audit logging statements, such as follows will w
   ```
 
 - For whats it's worth, this anomaly is not detected by the **Security Command Center** threat detection or anomaly detection rules.
+
+### VPC Configuration
+
+### VPC Endpoints
+
+## Cold Start Times
+
+### No VPC Integration
+
+### With VPC Integration

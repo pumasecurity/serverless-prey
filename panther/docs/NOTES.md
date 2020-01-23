@@ -199,3 +199,157 @@ Slowly started increasing the inactivity to 2, 3, 4, 5, and so on minutes. Final
 cat /tmp/malware.sh
 cat: /tmp/malware.sh: No such file or directory
 ```
+
+## Monitoring &amp; Incident Response
+
+### CloudWatch Logs
+
+Logs and telemetry are automatically sent to CloudWatch. The AWSLambdaBasicExecutionRole provides full write access to write log events.
+
+CloudWatch Insights query for function invocations:
+
+```
+fields @timestamp, @message
+| filter EventId = 1
+| sort @timestamp desc
+| limit 20
+```
+
+CloudWatch Insights query for the secret being provisioned to the function:
+
+```
+fields @timestamp, @message
+| filter EventId = 8
+| sort @timestamp desc
+| limit 20
+```
+
+CloudTrail is the audit service providing intel for stolen credentials. Filter events by the user name  `panther-dev-panther`. You will see normal activity from the function executing:
+
+```json
+{
+    "eventVersion": "1.05",
+    "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "ABC123:panther-dev-panther",
+        "arn": "arn:aws:sts::1234567890:assumed-role/panther-dev-us-east-1-lambdaRole/panther-dev-panther",
+        "accountId": "1234567890",
+        "accessKeyId": "ASIA54BL6PJRS2Q3ELOQ",
+        "sessionContext": {
+            "sessionIssuer": {
+                "type": "Role",
+                "principalId": "ABC123",
+                "arn": "arn:aws:iam::1234567890:role/panther-dev-us-east-1-lambdaRole",
+                "accountId": "1234567890",
+                "userName": "panther-dev-us-east-1-lambdaRole"
+            },
+            "webIdFederationData": {},
+            "attributes": {
+                "mfaAuthenticated": "false",
+                "creationDate": "2020-01-22T22:20:50Z"
+            }
+        }
+    },
+    "eventTime": "2020-01-22T22:20:50Z",
+    "eventSource": "ssm.amazonaws.com",
+    "eventName": "GetParameter",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "34.229.167.179",
+    "userAgent": "aws-sdk-nodejs/2.585.0 linux/v12.14.1 exec-env/AWS_Lambda_nodejs12.x promise",
+    "requestParameters": {
+        "name": "/panther/database/password",
+        "withDecryption": true
+    },
+    "responseElements": null,
+    "requestID": "c3ed9570-7ad1-48dc-80a0-b91d294d5c49",
+    "eventID": "7492e9ea-2241-4035-be36-eeed15ccbf0c",
+    "readOnly": true,
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "1234567890"
+}
+```
+
+After stealing and compromising the token, notice the following CloudTrail entry that has 
+
+```json
+{
+    "eventVersion": "1.05",
+    "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "ABC123:panther-dev-panther",
+        "arn": "arn:aws:sts::1234567890:assumed-role/panther-dev-us-east-1-lambdaRole/panther-dev-panther",
+        "accountId": "1234567890",
+        "accessKeyId": "ASIA54BL6PJRS2Q3ELOQ",
+        "sessionContext": {
+            "sessionIssuer": {
+                "type": "Role",
+                "principalId": "ABC123",
+                "arn": "arn:aws:iam::1234567890:role/panther-dev-us-east-1-lambdaRole",
+                "accountId": "1234567890",
+                "userName": "panther-dev-us-east-1-lambdaRole"
+            },
+            "webIdFederationData": {},
+            "attributes": {
+                "mfaAuthenticated": "false",
+                "creationDate": "2020-01-22T22:20:50Z"
+            }
+        }
+    },
+    "eventTime": "2020-01-22T22:22:59Z",
+    "eventSource": "ssm.amazonaws.com",
+    "eventName": "GetParameter",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "95.025.143.109",
+    "userAgent": "aws-cli/1.16.300 Python/3.7.5 Darwin/19.2.0 botocore/1.13.36",
+    "requestParameters": {
+        "name": "/panther/database/password",
+        "withDecryption": true
+    },
+    "responseElements": null,
+    "requestID": "9b789100-5032-4795-906d-1bac5ca43e52",
+    "eventID": "fdc4adce-9499-472b-bba7-b43b716bfe3d",
+    "readOnly": true,
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "1234567890"
+}
+```
+
+Major signs something has gone wrong here. Note the IP address assigned to the function during its execution:
+
+```json
+"userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "ABC123:panther-dev-panther",
+        "arn": "arn:aws:sts::1234567890:assumed-role/panther-dev-us-east-1-lambdaRole/panther-dev-panther",
+        "accountId": "1234567890",
+        "accessKeyId": "ASIA54BL6PJRS2Q3ELOQ",
+},
+"sourceIPAddress": "34.229.167.179",
+"userAgent": "aws-sdk-nodejs/2.585.0 linux/v12.14.1 exec-env/AWS_Lambda_nodejs12.x promise",
+```
+
+Then, minutes later the same user id makes a request from the CLI from a remote IP:
+
+```json
+"userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "ABC123:panther-dev-panther",
+        "arn": "arn:aws:sts::1234567890:assumed-role/panther-dev-us-east-1-lambdaRole/panther-dev-panther",
+        "accountId": "1234567890",
+        "accessKeyId": "ASIA54BL6PJRS2Q3ELOQ",
+},
+"sourceIPAddress": "95.025.143.109",
+"userAgent": "aws-cli/1.16.300 Python/3.7.5 Darwin/19.2.0 botocore/1.13.36",
+```
+
+### VPC Configuration
+
+
+
+### VPC Endpoints
+
+## Cold Start Times
+
+### No VPC Integration
+
+### With VPC Integration

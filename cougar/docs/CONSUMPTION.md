@@ -349,7 +349,7 @@ Viewing all actions taken against the `cougar-database-pass` secret:
 ```
 AzureDiagnostics
 | where ResourceProvider == "MICROSOFT.KEYVAULT"
-| where id_s contains "cougar-database-pass" 
+| where id_s contains "cougar-database-pass"
 | order by TimeGenerated desc
 ```
 
@@ -376,3 +376,37 @@ ResultType: Success
 CallerIPAddress: 95.025.143.109
 clientinfo_s: curl/7.64.1
 ```
+
+Looking for compromised bearer tokens can be accomplished with a query similar to the following:
+
+NOTE: Maintenance will need to be done as the IP ranges from MS change. Or, on function start up, the current IP address could be registered in a backend cache / database. Or, even adjust this query on the fly.
+
+```
+AzureDiagnostics
+| where ResourceProvider == "MICROSOFT.KEYVAULT"
+| where identity_claim_xms_mirid_s contains "/pumaprey-cougar/providers/Microsoft.Web/sites/pumapreycougar"
+| where id_s contains "cougar-database-pass"
+| where CallerIPAddress !contains "40."
+| order by TimeGenerated desc
+```
+
+This only works for resources that have Diagnostics integration with Application Insights. The other resource in our demo, Azure Storage, at the time of this writing does not have native integration with Azure Monitor and Log Analytics. :(
+  
+To make this happen, you have to covert their log format to JSON and post the JSON data into Log Analytics to ingest the data. Projecting Q2 2020 before this is handled by the platform.
+
+- [https://feedback.azure.com/forums/217298-storage/suggestions/33930541-make-it-possible-to-send-storage-analytics-logs](https://feedback.azure.com/forums/217298-storage/suggestions/33930541-make-it-possible-to-send-storage-analytics-logs)
+
+- [https://azure.microsoft.com/en-us/blog/query-azure-storage-analytics-logs-in-azure-log-analytics/](https://azure.microsoft.com/en-us/blog/query-azure-storage-analytics-logs-in-azure-log-analytics/)
+
+### VPC Configuration
+
+
+
+### VPC Endpoints
+
+
+## Cold Start Times
+
+### No VPC Integration
+
+### With VPC Integration
