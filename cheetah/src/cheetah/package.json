@@ -4,7 +4,7 @@
   "description": "Cheetah is a Go function that can be deployed to the Google Cloud Platform to establish a TCP reverse shell for the purposes of introspecting the Cloud Functions container runtime.",
   "main": "cheetah.go",
   "scripts": {
-    "lint": "../../bin/golint",
+    "lint": "`go list -f {{.Target}} golang.org/x/lint/golint`",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

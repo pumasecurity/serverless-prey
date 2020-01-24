@@ -4,10 +4,8 @@ provider:
   name: google
   runtime: go111
   region: us-central1
-  # The GCF credentials can be a little tricky to set up. Luckily we've documented this for you here:
-  # https://serverless.com/framework/docs/providers/google/guide/credentials/
-  project: YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID
-  credentials: /ABSOLUTE/PATH/TO/.gcloud/keyfile.json
+  project: ${env:GCP_PROJECT}
+  credentials: ${env:GCP_CREDENTIALS_FILE}
 
 plugins:
   - serverless-google-cloudfunctions

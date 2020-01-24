@@ -60,10 +60,15 @@ namespace Puma.Security.Functions.Azure
             //Audit logging
             logger.LogInformation(1, "Startup: The Cougar is running.");
 
-            var secret = getSecret();
-            //NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
-	        //DEBUG ONLY: Make sure it found the value
-        	logger.LogInformation(8, $"Secret value: {secret}");
+            try {
+                var secret = getSecret();
+                //NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
+                //DEBUG ONLY: Make sure it found the value
+                logger.LogInformation(8, $"Secret value: {secret}");
+            } catch (Exception err) {
+                logger.LogInformation(4, err.ToString());
+                logger.LogInformation(8, "Skipping secret read routine.");
+            }
 
             string host = req.Query["host"];
             string port = req.Query["port"];

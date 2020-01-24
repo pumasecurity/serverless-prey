@@ -20,8 +20,9 @@ make
 Follow the steps at the top of the `serverless.yml` file to generate a credentials file. Modify the `serverless.yml` file to point to your GCP project ID and the **absolute path** of the credentials file.
 
 ```bash
+cd /PATH/TO/cheetah/src/cheetah
 npm install
-npx serverless deploy
+GCP_PROJECT=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID GCP_CREDENTIALS_FILE=/ABSOLUTE/PATH/TO/.gcloud/keyfile.json npx serverless deploy
 ```
 
 ### Native GCloud Commands
@@ -72,12 +73,15 @@ Your listener will now act as a reverse shell for the duration of the function i
 ## Teardown
 
 ```bash
-npx serverless remove
+cd /PATH/TO/cheetah/src/cheetah
+GCP_PROJECT=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID GCP_CREDENTIALS_FILE=/ABSOLUTE/PATH/TO/.gcloud/keyfile.json npx serverless remove
 ```
 
 ## Linting
 
 ```bash
+cd /PATH/TO/cheetah/src/cheetah
+go get -u golang.org/x/lint/golint
 npm run lint
 ```
 
