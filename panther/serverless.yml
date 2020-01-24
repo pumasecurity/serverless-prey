@@ -149,28 +149,86 @@ resources:
     #       - !Ref privateRouteTable
     #     ServiceName: "com.amazonaws.us-east-1.s3"
     #     VpcId: !Ref lambdaVpc
-    # WTF Amazon - really this isn't supported by CFN yet?
-    # ssmEndpoint:
-    #   Type: AWS::EC2::VPCEndpoint
+    # # WTF Amazon - really this isn't supported by CFN yet?
+    # # ssmEndpoint:
+    # #   Type: AWS::EC2::VPCEndpoint
+    # #   Properties:
+    # #     PolicyDocument:
+    # #       Version: 2012-10-17
+    # #       Statement:
+    # #       - Effect: Allow
+    # #         Principal: "*"
+    # #         Action:
+    # #           - "ssm:*"
+    # #         Resource:
+    # #           - "*"
+    # #     RouteTableIds:
+    # #       - !Ref privateRouteTable
+    # #     ServiceName: !Sub "com.amazonaws.${self:provider.region}.ssm"
+    # #     VpcId: !Ref lambdaVpc
+    # securityGroup:
+    #   Type: "AWS::EC2::SecurityGroup"
     #   Properties:
-    #     PolicyDocument:
-    #       Version: 2012-10-17
-    #       Statement:
-    #       - Effect: Allow
-    #         Principal: "*"
-    #         Action:
-    #           - "ssm:*"
-    #         Resource:
-    #           - "*"
-    #     RouteTableIds:
-    #       - !Ref privateRouteTable
-    #     ServiceName: !Sub "com.amazonaws.${self:provider.region}.ssm"
     #     VpcId: !Ref lambdaVpc
-    securityGroup:
-      Type: "AWS::EC2::SecurityGroup"
-      Properties:
-        VpcId: !Ref lambdaVpc
-        GroupDescription: "Security group for panther."
+    #     GroupDescription: "Security group for panther."
+    #     SecurityGroupEgress:
+    #       - CidrIp: "0.0.0.0/0"
+    #         IpProtocol: "TCP"
+    #         FromPort: 443
+    #         ToPort: 443
+    #         Description: "Outbound 443 only."
+    # flowLog:
+    #   Type: AWS::EC2::FlowLog
+    #   Properties:
+    #     DeliverLogsPermissionArn: !GetAtt flowLogRole.Arn
+    #     LogGroupName: !Sub "/aws/lambda/vpc/panther/flowlog"
+    #     ResourceId: !Ref lambdaVpc
+    #     ResourceType: "VPC"
+    #     TrafficType: "REJECT"
+    # flowLogRole:
+    #   Type: AWS::IAM::Role
+    #   Properties:
+    #     Path: "/"
+    #     AssumeRolePolicyDocument: |
+    #       {
+    #           "Statement": [{
+    #               "Effect": "Allow",
+    #               "Principal": { "Service": [ "vpc-flow-logs.amazonaws.com" ]},
+    #               "Action": [ "sts:AssumeRole" ]
+    #           }]
+    #       }
+    #     Policies:
+    #       - PolicyName: "panther-dev-flowlog"
+    #         PolicyDocument:
+    #           Version: "2012-10-17"
+    #           Statement:
+    #             - Action:
+    #                 - "logs:CreateLogGroup"
+    #                 - "logs:CreateLogStream"
+    #                 - "logs:DescribeLogGroups"
+    #                 - "logs:DescribeLogStreams"
+    #                 - "logs:PutLogEvents"
+    #               Effect: "Allow"
+    #               Resource: "*"
+    # bucketPolicy:
+    #   Type: "AWS::S3::BucketPolicy"
+    #   Properties:
+    #     Bucket: !Ref bucket
+    #     PolicyDocument:
+    #       Version: "2012-10-17"
+    #       Statement:
+    #         - Effect: "Deny"
+    #           Principal: 
+    #             AWS:
+    #               - Fn::GetAtt: [ "IamRoleLambdaExecution", "Arn" ]
+    #           Action:
+    #             - "s3:*"
+    #           Resource: 
+    #             - Fn::Join: ["", ["arn:aws:s3:::", !Ref bucket ] ]
+    #             - Fn::Join: ["", ["arn:aws:s3:::", !Ref bucket, "/*"] ]
+    #           Condition:
+    #             StringNotEquals:
+    #               "aws:sourceVpce": !Ref lambdaVpc
 
 functions:
   panther:

@@ -342,14 +342,193 @@ Then, minutes later the same user id makes a request from the CLI from a remote 
 "userAgent": "aws-cli/1.16.300 Python/3.7.5 Darwin/19.2.0 botocore/1.13.36",
 ```
 
-### VPC Configuration
+## VPC Configuration
 
+Uncommenting the remaining VPC resources in the serverless.yml file allows us to connect the function to a VPC and apply network controls to the serverless function's traffic. By default, if you do not use a NAT Gateway to manage outbound traffic, the function is completely shielded from the outside world. However, this kills all interaction w/ AWS services as well. For example: CloudWatch logging stops because the function cannot reach the AWS logs API. Fun fact: There isn't a private endpoint for logging!?!?
 
+Let's be honest, very few functions can operate disconnected. So, we hook up the NAT Gateway and bite the bullet on the $30 / month for this appliance. Now everything is network controlled. So let's see how we can start to monitor the function for our payload.
+
+### VPC Flow Logs
+
+Uncomment (if not already) the VPC Flow log resources at the bottom of the serverless.yml file:
+
+```
+flowLog:
+  Type: AWS::EC2::FlowLog
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt flowLogRole.Arn
+      LogGroupName: !Sub "/aws/lambda/vpc/panther/flowlog"
+      ResourceId: !Ref lambdaVpc
+      ResourceType: "VPC"
+      TrafficType: "REJECT"
+flowLogRole:
+  Type: AWS::IAM::Role
+    Properties:
+      Path: "/"
+      AssumeRolePolicyDocument: |
+        {
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": { "Service": [ "vpc-flow-logs.amazonaws.com" ]},
+                "Action": [ "sts:AssumeRole" ]
+            }]
+        }
+      Policies:
+        - PolicyName: "panther-dev-flowlog"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+            - Action:
+                - "logs:CreateLogGroup"
+                - "logs:CreateLogStream"
+                - "logs:DescribeLogGroups"
+                - "logs:DescribeLogStreams"
+                - "logs:PutLogEvents"
+                Effect: "Allow"
+                Resource: "*"  
+```
+
+### Security Group Egress Filtering
+
+The default egress rule allows all traffic on all ports. The following security group egress filter attached to our function's network interface definitely stops the original `nc` command:
+
+```
+securityGroup:
+  Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      VpcId: !Ref lambdaVpc
+      GroupDescription: "Security group for panther."
+      SecurityGroupEgress:
+        - CidrIp: "0.0.0.0/0"
+          IpProtocol: "TCP"
+          FromPort: 443
+          ToPort: 443
+          Description: "Outbound 443 only."
+```
+
+Try to stand up the function's reverse shell again on port 1042. The function will eventually timeout. Open CloudWatch and run the following CloudWatch Insights query to find the rejected packets:
+
+```
+fields @timestamp, @message
+| filter dstPort = 1042
+| sort @timestamp desc
+| limit 20
+```
+
+Notice we have now detected the malicious traffic blocked by the security group:
+
+```
+@ingestionTime 1579821761717
+@log 953574914659:/aws/lambda/vpc/panther/flowlog
+@logStream eni-0cf6d68d132b7eb99-reject
+@message 2 953574914659 eni-0cf6d68d132b7eb99 10.42.2.114 18.191.152.201 58812 1042 6 2 120 1579821675 1579821684 REJECT OK
+@timestamp 1579821675000
+accountId 953574914659
+action REJECT
+bytes 120
+dstAddr 18.191.152.201
+dstPort 1042
+end 1579821684
+interfaceId eni-0cf6d68d132b7eb99
+logStatus OK
+packets 2
+protocol 6
+srcAddr 10.42.2.114
+srcPort 58812
+start 1579821675
+version 2
+```
 
 ### VPC Endpoints
 
+But, that doesn't get us too far. As you can just switch the `nc` command to bind on port `443` (the allowed port) and the attack is working again. Plus we have a filter on the VPC flow for reject packets only, so we won't even see the 443 successful connection. VPC Endpoints will allow us to shield resources used by the function from being consumed from outside of the VPC.
+
+Take a look at the VPC Endpoint in the yml:
+
+```
+s3Endpoint:
+  Type: AWS::EC2::VPCEndpoint
+  Properties:
+    PolicyDocument: |
+      {
+        "Statement": [{
+          "Effect": "Allow",
+          "Principal": "*",
+          "Action": [ "s3:*" ]
+        }]
+      }
+    RouteTableIds:
+        - !Ref privateRouteTable
+    ServiceName: "com.amazonaws.us-east-1.s3"
+    VpcId: !Ref lambdaVpc
+```
+
+We are creating an internal route to the S3 service from inside our VPC. This allows connections without going out over the public Internet into the public facing S3 service.
+
+### VPC Endpoint Bucket Policy
+
+To fully protect our panther bucket, we need to force requests coming from the function execution role to originate from the VPC. Otherwise, it's safe to assume the credential is compromised.
+
+Enter the last resource, the bucket policy:
+
+```
+bucketPolicy:
+  Type: "AWS::S3::BucketPolicy"
+  Properties:
+    Bucket: !Ref bucket
+    PolicyDocument:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: "Deny"
+          Principal: 
+            AWS:
+              - Fn::GetAtt: [ "IamRoleLambdaExecution", "Arn" ]
+            Action:
+              - "s3:*"
+            Resource: 
+              - Fn::Join: ["", ["arn:aws:s3:::", !Ref bucket ] ]
+              - Fn::Join: ["", ["arn:aws:s3:::", !Ref bucket, "/*"] ]
+            Condition:
+              StringNotEquals:
+                "aws:sourceVpce": !Ref lambdaVpc
+```
+
+Replay the token pivoting attack again, extract the credentials to your machine, set your environment variables, and observe the response from S3 this time:
+
+```bash
+aws s3api list-objects --bucket panther-4dad894892ce
+An error occurred (AccessDenied) when calling the ListObjects operation: Access Denied
+```
+
+```bash
+aws s3 cp s3://panther-4dad894892ce/assets/panther.jpg .
+fatal error: An error occurred (403) when calling the HeadObject operation: Forbidden
+```
+
 ## Cold Start Times
+
+This is just for fun. Running the following command a few times to see the cold versus warm start metrics. This will invoke the function without any reverse shell data (simulating starting and stopping the function), and retrieve the response time.
+
+```bash
+curl "https://YOUR_API_GATEWAY_ID.execute-api.us-east-1.amazonaws.com/dev/api/Panther" -s -o /dev/null -w "%{time_starttransfer}\n"  -H "X-API-Key: YOUR_API_KEY"
+```
 
 ### No VPC Integration
 
+Cold to warm metrics:
+
+```
+Request 1: 0.787140
+Request 2: 0.229080
+Request 3: 0.221466
+```
+
 ### With VPC Integration
+
+Cold to warm metrics:
+
+```
+Request 1: 1.333965
+Request 2: 0.391702
+Request 3: 0.303685
+```

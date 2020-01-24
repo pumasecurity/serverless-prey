@@ -434,6 +434,22 @@ Instrumenting the function with audit logging statements, such as follows will w
 
 ## Cold Start Times
 
+Running the following command a few times to see the cold versus warm start metrics. This will invoke the function without any reverse shell data (simulating starting and stopping the function), and retrieve the response time.
+
+```bash
+curl "http://us-central1-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.net/Cheetah" -s -o /dev/null -w "%{time_starttransfer}\n"
+```
+
 ### No VPC Integration
+
+
+Cold to warm metrics:
+
+```
+Request 1: 2.730960
+Request 2: 0.504486
+Request 3: 0.464685
+Request 4: 0.531443
+```
 
 ### With VPC Integration
