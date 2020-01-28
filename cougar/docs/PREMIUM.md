@@ -808,3 +808,23 @@ cat /home/site/wwwroot/Cougar/function.json
 Seriously, why?
 
 https://social.msdn.microsoft.com/Forums/azure/en-US/a4b49641-00f8-4f2a-a4ea-187b87b36e06/decrypt-the-machine-key-from-inside-a-function-app?forum=AzureFunctions
+
+## VPC Endpoints
+
+### Cold Start Times
+
+This is not really an issue in this environment becase the premium app service stays warm the entire time. But, let's see about the launch times before and after attaching the network interface to the function environemn.
+
+```
+Reqeust 1: 0.623724
+Request 2: 0.308747
+Reqeust 3: 0.299407
+Request 4: 0.300875
+```
+
+### VPC Integrated Start Times
+
+Feature is in beta for Linux environments at the time of this writing. But, out of the box here are some numbers for the 1st invocation connected to a VNet (wow) versus after the service is up and running. Again, not much of an issue because your deployment pipeline would likely smoke test the function and customers would not see the initial request.
+
+No data available. Function does not run enabled.
+

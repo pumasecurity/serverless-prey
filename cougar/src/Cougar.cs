@@ -143,6 +143,9 @@ namespace Puma.Security.Functions.Azure
             //Get vault URL from env
             var keyVaultUrl = Environment.GetEnvironmentVariable("VAULT_URL");
 
+            if(string.IsNullOrEmpty(keyVaultUrl))
+                return string.Empty;
+
             //Pull secret from the vault
             var client = new SecretClient(vaultUri: new Uri(keyVaultUrl), credential: new DefaultAzureCredential());
             var secret = client.GetSecret("cougar-database-pass");

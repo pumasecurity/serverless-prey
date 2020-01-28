@@ -409,7 +409,7 @@ To make this happen, you have to covert their log format to JSON and post the JS
 Running the following command a few times to see the cold versus warm start metrics. This will invoke the function without any reverse shell data (simulating starting and stopping the function), and retrieve the response time.
 
 ```bash
-curl "http://us-central1-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.net/Cheetah" -s -o /dev/null -w "%{time_starttransfer}\n"
+curl "https://cougar$TF_VAR_UniqueString.azurewebsites.net/api/cougar?code=YOUR_API_KEY" -s -o /dev/null -w "%{time_starttransfer}\n"
 ```
 
 ### No VPC Integration
@@ -430,3 +430,4 @@ Request 4: 0.284055
 
 ### With VPC Integration
 
+This is not possible using the consumption plan. See the [Premium Plan][./PREMIUM.md] notes for load times in that environment.
