@@ -179,7 +179,7 @@ scopes
 token
 ```
 
-Querying the metadata service for the valid scopes:
+Querying the metadata service for the valid scopes. Wow, this is an insane amount of scopes available by default:
 
 ```bash
 curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/scopes
