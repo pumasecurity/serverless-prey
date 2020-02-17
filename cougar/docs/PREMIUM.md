@@ -824,7 +824,4 @@ Request 4: 0.300875
 
 ### VPC Integrated Start Times
 
-Feature is in beta for Linux environments at the time of this writing. But, out of the box here are some numbers for the 1st invocation connected to a VNet (wow) versus after the service is up and running. Again, not much of an issue because your deployment pipeline would likely smoke test the function and customers would not see the initial request.
-
-No data available. Function does not run enabled.
-
+Feature is in beta for Linux environments at the time of this writing. No data available. Function does not run after enabling the VPC integration feature.

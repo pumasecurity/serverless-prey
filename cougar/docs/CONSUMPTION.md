@@ -309,6 +309,7 @@ Waiting approximately 2 minutes:
 cat /tmp/malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 ```
+
 Waiting approximately 3 minutes:
 
 Slowly started increasing the inactivity to 2, 3, 4, 5, and so on minutes. Finally, after 6 minutes of inactivity:
@@ -398,11 +399,13 @@ To make this happen, you have to covert their log format to JSON and post the JS
 
 - [https://azure.microsoft.com/en-us/blog/query-azure-storage-analytics-logs-in-azure-log-analytics/](https://azure.microsoft.com/en-us/blog/query-azure-storage-analytics-logs-in-azure-log-analytics/)
 
-### VPC Configuration
+## VPC Configuration
 
-
+Unable to configure the consumption based function to connect to a VPC on start up.
 
 ### VPC Endpoints
+
+Unable to configure the consumption based function to connect to a VPC on start up.
 
 ## Cold Start Times
 
@@ -419,6 +422,7 @@ Cold hits:
 ```
 Request 1: 6.098226
 Request 2: 4.072225
+```
 
 Warm hits:
 

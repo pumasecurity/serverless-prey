@@ -148,7 +148,7 @@ aws s3 cp s3://panther-$BUCKET_SUFFIX/assets/panther.jpg .
 aws ssm get-parameter --name /panther/database/password --with-decryption --region us-east-1
 ```
 
-Running the following `watch` command to test how long the keys are valid for:
+Running the following test once per hour for expired keys:
 
 ```bash
 while true; do aws ssm get-parameter --name /panther/database/password --with-decryption --region us-east-1; date; sleep 3600; done
@@ -503,6 +503,16 @@ An error occurred (AccessDenied) when calling the ListObjects operation: Access 
 ```bash
 aws s3 cp s3://panther-4dad894892ce/assets/panther.jpg .
 fatal error: An error occurred (403) when calling the HeadObject operation: Forbidden
+```
+
+Streaming the CloudTrail logs to Athena is the easiest way to query the audit data from this attack. The following query will display the function execution audit activity:
+
+```
+SELECT
+ eventsource, eventname, errorcode, sourceipaddress, eventtime, vpcendpointid
+FROM cloudtrail_logs_audit_logging
+WHERE useridentity.arn LIKE '%panther-dev-panther'
+ORDER BY eventtime desc
 ```
 
 ## Cold Start Times

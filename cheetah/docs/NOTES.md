@@ -428,9 +428,13 @@ Instrumenting the function with audit logging statements, such as follows will w
 
 - For whats it's worth, this anomaly is not detected by the **Security Command Center** threat detection or anomaly detection rules.
 
-### VPC Configuration
+## VPC Configuration
+
+Attempted this in the Web UI. Crashed...
 
 ### VPC Endpoints
+
+Unable to configure this due to the error connecting the function to a VPC network interface.
 
 ## Cold Start Times
 
@@ -442,7 +446,6 @@ curl "http://us-central1-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.ne
 
 ### No VPC Integration
 
-
 Cold to warm metrics:
 
 ```
@@ -453,3 +456,5 @@ Request 4: 0.531443
 ```
 
 ### With VPC Integration
+
+Unable to test due to the configuration error above.
