@@ -13,7 +13,14 @@ Panther is a Node.js function that can be deployed to the AWS to establish a TCP
 cd /PATH/TO/panther
 aws configure
 npm install
+
+# Optional: Run the Lambda in a VPC.
+export IN_VPC=true
+
+# Optional: Create protected S3 bucket that the Lambda execution role has access to.
+export WITH_BUCKET=true
 export BUCKET_SUFFIX=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
+
 npx serverless deploy
 ```
 
