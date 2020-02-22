@@ -4,6 +4,8 @@ Serverless Prey is a collection of serverless functions (FaaS) for GCP Functions
 
 This repository also contains research performed using these functions, including documentation on where secrets are stored, how to extract sensitive data, and identify monitoring / incident response data points.
 
+![Diagram](diagram.png "Diagram")
+
 ## Disclaimer
 
 **Serverless Prey functions are intended for research purposes only and should not be deployed to production accounts.** By their nature, they provide shell access to your runtime environment, which can be abused by a malicious actor to exfiltrate sensitive data or gain unauthorized access to related cloud services.
