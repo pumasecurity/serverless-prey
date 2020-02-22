@@ -10,12 +10,13 @@ provider:
 plugins:
   - serverless-google-cloudfunctions
 
-# needs more granular excluding in production as only the serverless provider npm
-# package should be excluded (and not the whole node_modules directory)
 package:
   exclude:
-    - .gitignore
-    - .git/**
+    - '**'
+  include:
+    - cheetah.go
+    - go.mod
+    - go.sum
 
 functions:
   cheetah:
