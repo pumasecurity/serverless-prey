@@ -152,6 +152,7 @@ do
 
     if ! [[ -z "$LOOP" ]]
     then
+        rm /tmp/curl_output.txt
         echo 'Restarting...'
     fi
 done

