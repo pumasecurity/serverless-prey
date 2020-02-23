@@ -13,7 +13,9 @@ Panther is a Node.js function that can be deployed to the AWS to establish a TCP
 cd /PATH/TO/panther
 aws configure
 npm install
-export BUCKET_SUFFIX=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
+export AWS_PROFILE=[Choose your profile]
+export BUCKET_SUFFIX=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for 
+future sessions.
 npx serverless deploy
 ```
 
@@ -37,7 +39,7 @@ To store a secret in the aforementioned Parameter Store path, run the following:
 
 ```bash
 aws ssm put-parameter --name /panther/database/user --value "panther_user" --type SecureString
-aws ssm put-parameter --name /panther/database/password --value "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9u4oCZdCBrbm93IGV2aWwgb3IgamVhbG91c3kgb3IgZGlzY29udGVudC4=" --type SecureString
+aws ssm put-parameter --name /panther/database/password --value "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9uJ3Qga25vdyBldmlsIG9yIGplYWxvdXN5IG9yIGRpc2NvbnRlbnQu" --type SecureString
 ```
 
 ## Testing in AWS
