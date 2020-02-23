@@ -17,6 +17,7 @@ package:
     - cheetah.go
     - go.mod
     - go.sum
+    - cheetah.yaml
 
 functions:
   cheetah:

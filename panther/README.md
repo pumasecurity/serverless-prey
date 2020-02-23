@@ -14,6 +14,9 @@ cd /PATH/TO/panther
 aws configure
 npm install
 
+# AWS profile to use
+export AWS_PROFILE=default
+
 # Optional: Run the Lambda in a VPC.
 export IN_VPC=true
 
@@ -44,7 +47,7 @@ To store a secret in the aforementioned Parameter Store path, run the following:
 
 ```bash
 aws ssm put-parameter --name /panther/database/user --value "panther_user" --type SecureString
-aws ssm put-parameter --name /panther/database/password --value "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9u4oCZdCBrbm93IGV2aWwgb3IgamVhbG91c3kgb3IgZGlzY29udGVudC4=" --type SecureString
+aws ssm put-parameter --name /panther/database/password --value "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9uJ3Qga25vdyBldmlsIG9yIGplYWxvdXN5IG9yIGRpc2NvbnRlbnQu" --type SecureString
 ```
 
 ## Testing in AWS
