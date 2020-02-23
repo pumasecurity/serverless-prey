@@ -35,5 +35,8 @@
     "serverless": "1.60.4",
     "serverless-offline": "5.12.1",
     "serverless-s3-sync": "1.9.2"
+  },
+  "dependencies": {
+    "aws-sdk": "2.624.0"
   }
 }
