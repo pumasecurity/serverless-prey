@@ -80,7 +80,7 @@ fi
 case $MODE in
     cheetah)
     REGION=${REGION:-us-central1}
-    URL="http://$REGION-$URL_ID.cloudfunctions.net/Cheetah?host=$NGROK_HOST&port=$NGROK_PORT"
+    URL="https://$REGION-$URL_ID.cloudfunctions.net/Cheetah?host=$NGROK_HOST&port=$NGROK_PORT"
     ;;
 
     cougar)

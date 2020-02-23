@@ -17,7 +17,7 @@ cd /PATH/TO/cheetah/src/cheetah
 make
 ```
 
-Follow the steps at the top of the `serverless.yml` file to generate a credentials file. Modify the `serverless.yml` file to point to your GCP project ID and the **absolute path** of the credentials file.
+Follow [these steps](https://serverless.com/framework/docs/providers/google/guide/credentials/) to generate a credentials file. Deploy the function by specifying your GCP project ID and the **absolute path** of the credentials file.
 
 ```bash
 cd /PATH/TO/cheetah/src/cheetah
@@ -71,7 +71,7 @@ ngrok tcp 4444
 Finally, invoke your function, supplying your connection details:
 
 ```bash
-curl 'http://us-central1-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.net/Cheetah?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER'
+curl 'https://us-central1-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.net/Cheetah?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER'
 ```
 
 Your listener will now act as a reverse shell for the duration of the function invocation. You can adjust the function timeout in the serverless.yml file.
