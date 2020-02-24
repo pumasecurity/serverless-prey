@@ -329,21 +329,40 @@ Insights query for Cougar invocations via the shutdown event:
 
 ```
 traces
+| where timestamp > ago(7d)
 | where customDimensions.['EventId'] == "5"
 | order by timestamp desc
 | limit 50
 ```
 
-Insights query for access the secret being provisioned to the function:
+Insights query for function access to the secret selecting only a few columns:
 
 ```
-traces
-| where customDimensions.['EventId'] == "8"
-| order by timestamp desc
-| limit 50
+traces | where timestamp > ago(7d) | where customDimensions.["EventId"] == "8" | order by timestamp desc | project timestamp, cloud_RoleName, operation_Name, customDimensions ["EventId"], customDimensions["InvocationId"]
 ```
 
-From what I can tell, there is no centralized "CloudTrail / IAM Audit Log" service in Azure. At least in a non-enterprise AD account. Querying the key vault monitoring log, which is not enabled by default you will find this. NOTE: Azure Security Center did recommend enabling logging on the key vault to generate this data.
+Counting the number of in
+
+This can be run from the command line by installing the application insights and log analytics extensions:
+
+```
+az extension add -n application-insights
+az extension add -n log-analytics
+```
+
+Then, run your query for normal function secret access using the following insights log query:
+
+```
+az monitor app-insights query -g pumaprey-cougar --app pumapreycougar20191219172 --analytics-query 'traces | where timestamp > ago(7d) | where customDimensions.["EventId"] == "8" | order by timestamp desc | project timestamp, cloud_RoleName, operation_Name, customDimensions ["EventId"], customDimensions["InvocationId"]' --offset 7D
+```
+
+Counting the number of standard function secret access logs can help identify anomalies as well. Appending a jq query to count the number of results returned:
+
+```
+az monitor app-insights query -g pumaprey-cougar --app pumapreycougar20191219172 --analytics-query 'traces | where timestamp > ago(7d) | where customDimensions.["EventId"] == "8" | order by timestamp desc | project timestamp, cloud_RoleName, operation_Name, customDimensions ["EventId"], customDimensions["InvocationId"]' --offset 7D | jq '.tables[0].rows | length'
+```
+
+Now we need to get to the heart of the audit data and find number to secret reads from ALL sources. From what I can tell, there is no centralized "CloudTrail / IAM Audit Log" service in Azure. At least in a non-enterprise AD account. Querying the key vault monitoring log, which is not enabled by default you will find this. NOTE: Azure Security Center did recommend enabling logging on the key vault to generate this data.
 
 Viewing all actions taken against the `cougar-database-pass` secret:
 
@@ -376,6 +395,18 @@ OperationName: SecretGet
 ResultType: Success
 CallerIPAddress: 95.025.143.109
 clientinfo_s: curl/7.64.1
+```
+
+From the `az` CLI, this command will search the logs for `GetSecret` actions from the managed service identity.
+
+```
+az monitor log-analytics query --workspace 34ab64fe-8eab-4e31-9e85-7c1daaae020a --analytics-query 'AzureDiagnostics | where TimeGenerated > ago(7d) | where ResourceProvider == "MICROSOFT.KEYVAULT" | where id_s contains "cougar-database-pass" | where identity_claim_http_schemas_microsoft_com_identity_claims_objectidentifier_g == "0cbd41de-55c6-460d-b92b-837eddd0ea0d" | order by TimeGenerated desc | project TimeGenerated, OperationName, CallerIPAddress, clientInfo_s, ResultType'
+```
+
+Counting the total number of invocations using `jq`:
+
+```
+az monitor log-analytics query --workspace 34ab64fe-8eab-4e31-9e85-7c1daaae020a --analytics-query 'AzureDiagnostics | where TimeGenerated > ago(7d) | where ResourceProvider == "MICROSOFT.KEYVAULT" | where id_s contains "cougar-database-pass" | where identity_claim_http_schemas_microsoft_com_identity_claims_objectidentifier_g == "0cbd41de-55c6-460d-b92b-837eddd0ea0d"' | jq '. | length'
 ```
 
 Looking for compromised bearer tokens can be accomplished with a query similar to the following:
