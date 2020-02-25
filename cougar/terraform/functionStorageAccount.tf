@@ -1,3 +1,7 @@
+provider "archive" {
+  version = "=1.3.0"
+}
+
 resource "azurerm_storage_account" "functionStorageAccount" {
   name                     = "cougar${var.UniqueString}"
   location                 = var.ResourceGroupLocation

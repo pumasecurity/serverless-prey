@@ -11,12 +11,6 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 
 ### Serverless Framework
 
-```bash
-export GOPATH=/PATH/TO/cheetah
-cd /PATH/TO/cheetah/src/cheetah
-make
-```
-
 Follow [these steps](https://serverless.com/framework/docs/providers/google/guide/credentials/) to generate a credentials file. Deploy the function by specifying your GCP project ID and the **absolute path** of the credentials file.
 
 ```bash

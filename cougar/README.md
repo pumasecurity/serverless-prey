@@ -26,13 +26,11 @@ NOTE: This needs work to deploy assets, etc.
 
 ```bash
 cd src
-dotnet restore
-dotnet build
 dotnet publish
 cd ../terraform
 terraform init
 export TF_VAR_UniqueString=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
-terraform plan
+az login
 terraform apply
 ```
 
