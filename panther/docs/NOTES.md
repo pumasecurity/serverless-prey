@@ -531,7 +531,7 @@ ORDER BY eventtime desc
 From the AWS CLI, run the following command to see all activity from the function execution role:
 
 ```
-aws athena start-query-execution --query-execution-context "Database=default" --result-configuration "OutputLocation=s3://[YOUR_OUTPUT_BUCKET]/" --query-string "SELECT eventsource, eventname, errorcode, sourceipaddress, eventtime, vpcendpointid FROM cloudtrail_logs_sans_sec540_audit_logging WHERE useridentity.arn LIKE '%panther-dev-panther' ORDER BY eventtime desc"
+aws athena start-query-execution --query-execution-context "Database=default" --result-configuration "OutputLocation=s3://[YOUR_OUTPUT_BUCKET]/" --query-string "SELECT eventsource, eventname, errorcode, sourceipaddress, eventtime, vpcendpointid FROM cloudtrail_logs_sans_sec540_audit_logging WHERE useridentity.arn LIKE '%panther-dev-panther' ORDER BY eventtime"
 
 aws athena get-query-results --query-execution-id [EXECUTION_ID] | jq '.ResultSet.Rows[].Data | select(.[2].VarCharValue == "AccessDenied")'
 ```
