@@ -509,12 +509,12 @@ bucketPolicy:
 Replay the token pivoting attack again, extract the credentials to your machine, set your environment variables, and observe the response from S3 this time:
 
 ```bash
-aws s3api list-objects --bucket panther-4dad894892ce
+aws s3api list-objects --bucket panther-[BUCKET_UUID]
 An error occurred (AccessDenied) when calling the ListObjects operation: Access Denied
 ```
 
 ```bash
-aws s3 cp s3://panther-4dad894892ce/assets/panther.jpg .
+aws s3 cp s3://panther-[BUCKET_UUID]/assets/panther.jpg .
 fatal error: An error occurred (403) when calling the HeadObject operation: Forbidden
 ```
 
