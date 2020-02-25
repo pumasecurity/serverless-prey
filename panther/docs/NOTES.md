@@ -143,7 +143,7 @@ export AWS_SESSION_TOKEN=<ENTER SESSION TOKEN>
 Run the following commands:
 
 ```bash
-aws s3 sync s3://panther-5fb50fef1d73 ~/panther
+aws s3 sync s3://panther-[BUCKET_UUID] ~/panther
 aws ssm get-parameter --name /panther/database/password --with-decryption --region us-east-1
 ```
 
@@ -268,7 +268,7 @@ CloudTrail is the audit service providing intel for stolen credentials. Filter e
 }
 ```
 
-After stealing and compromising the token, notice the following CloudTrail entry that has 
+After stealing and compromising the token, notice the following CloudTrail entry that has an interesting IP address and user agent.
 
 ```json
 {
@@ -349,7 +349,13 @@ Let's be honest, very few functions can operate disconnected. So, we hook up the
 
 ### VPC Flow Logs
 
-Uncomment (if not already) the VPC Flow log resources at the bottom of the serverless.yml file:
+Redeploy your function stack with the following environment variable set:
+
+```
+export IN_VPC=true
+```
+
+Notice that it enables a VPC connected function with flow logging enabled:
 
 ```
 flowLog:
@@ -405,13 +411,21 @@ securityGroup:
           Description: "Outbound 443 only."
 ```
 
-Try to stand up the function's reverse shell again on port 1042. The function will eventually timeout. Open CloudWatch and run the following CloudWatch Insights query to find the rejected packets:
+Try to stand up the function's reverse shell again on port 1042. The function will eventually timeout. Open CloudWatch and run the following CloudWatch Insights query to find the rejected packets in the function's VPC:
 
 ```
 fields @timestamp, @message
-| filter dstPort = 1042
+| filter srcAddr like "10.42"
 | sort @timestamp desc
 | limit 20
+```
+
+From the AWS CLI, you can run the following command to view all traffic for the function's VPC:
+
+```
+aws logs start-query --log-group-name "/aws/lambda/vpc/panther/flowlog" --start-time $(date -v -7d +"%s") --end-time $(date +%s) --query-string 'fields @timestamp, @message | filter srcAddr like "10.42"'
+
+aws logs get-query-results --query-id [ENTER_QUERY_ID]
 ```
 
 Notice we have now detected the malicious traffic blocked by the security group:
@@ -512,6 +526,14 @@ SELECT
 FROM cloudtrail_logs_audit_logging
 WHERE useridentity.arn LIKE '%panther-dev-panther'
 ORDER BY eventtime desc
+```
+
+From the AWS CLI, run the following command to see all activity from the function execution role:
+
+```
+aws athena start-query-execution --query-execution-context "Database=default" --result-configuration "OutputLocation=s3://[YOUR_OUTPUT_BUCKET]/" --query-string "SELECT eventsource, eventname, errorcode, sourceipaddress, eventtime, vpcendpointid FROM cloudtrail_logs_sans_sec540_audit_logging WHERE useridentity.arn LIKE '%panther-dev-panther' ORDER BY eventtime desc"
+
+aws athena get-query-results --query-execution-id [EXECUTION_ID] | jq '.ResultSet.Rows[].Data | select(.[2].VarCharValue == "AccessDenied")'
 ```
 
 ## Cold Start Times
