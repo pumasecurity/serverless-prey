@@ -3,6 +3,6 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "cougar" {
-  name     = "var.ResourceGroupName"
+  name     = var.ResourceGroupName
   location = var.ResourceGroupLocation
 }
