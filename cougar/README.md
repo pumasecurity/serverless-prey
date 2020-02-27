@@ -34,9 +34,9 @@ az login
 terraform apply
 ```
 
-TODO: Upload cougar.png to the images blob.
-TODO: Needs to create an identity and attach the function to the service principal created.
-TODO: Grant read, container read to the blob created.
+* TODO: Upload cougar.png to the images blob.
+* TODO: Needs to create an identity and attach the function to the service principal created.
+* TODO: Grant read, container read to the blob created.
 
 ## Deploying Assets
 

@@ -442,7 +442,7 @@ Unable to configure this due to the error connecting the function to a VPC netwo
 Running the following command a few times to see the cold versus warm start metrics. This will invoke the function without any reverse shell data (simulating starting and stopping the function), and retrieve the response time.
 
 ```bash
-curl "http://us-central1-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.net/Cheetah" -s -o /dev/null -w "%{time_starttransfer}\n"
+curl "http://$GCP_REGION-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.net/Cheetah" -s -o /dev/null -w "%{time_starttransfer}\n"
 ```
 
 ### No VPC Integration

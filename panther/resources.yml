@@ -133,7 +133,7 @@ s3Endpoint:
       }
     RouteTableIds:
       - !Ref privateRouteTable
-    ServiceName: "com.amazonaws.${env:AWS_REGION}.s3"
+    ServiceName: "com.amazonaws.${self:provider.region}.s3"
     VpcId: !Ref lambdaVpc
 
 # Not yet supported by CloudFormation:

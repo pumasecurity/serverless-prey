@@ -2,10 +2,6 @@
 
 Running under a consumption based Azure function (cold starts). Included a SP attached identity to the function for MSI testing.
 
-## Function Invocation
-
-https://pumapreycougar.azurewebsites.net/api/cougar?code=XXXXX&host=&port=
-
 ## Execution Environment
 
 ```

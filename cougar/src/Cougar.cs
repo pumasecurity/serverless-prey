@@ -7,13 +7,10 @@ using System;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using System.ComponentModel;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
@@ -102,7 +99,7 @@ namespace Puma.Security.Functions.Azure
                             StringBuilder strInput = new StringBuilder();
 
                             Process p = new Process();
-                            p.StartInfo.FileName = "/bin/sh";
+                            p.StartInfo.FileName = File.Exists("/bin/sh") ? "/bin/sh" : "cmd.exe";
                             p.StartInfo.CreateNoWindow = true;
                             p.StartInfo.UseShellExecute = false;
                             p.StartInfo.RedirectStandardOutput = true;

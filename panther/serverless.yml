@@ -2,7 +2,7 @@ service: panther
 
 provider:
   name: aws
-  region: ${env:AWS_REGION}
+  region: ${env:AWS_REGION, 'us-east-1'}
   runtime: nodejs12.x
   apiKeys:
     - panther

@@ -1,18 +1,6 @@
 # Azure Execution Environment
 
-First crack at this. Running under a premium Azure function (always on - no cold starts). No SP in this run.
-
-## Function Invocation
-
-Deployment completed successfully.
-Functions in pumapreycougar:
-    Cougar - [httpTrigger]
-
-Invoke URL:
-
-```
-https://pumapreycougar.azurewebsites.net/api/cougar?code=[insert random code here]
-```
+Running under a premium Azure function (always on - no cold starts). No SP in this run.
 
 ## Execution Environment
 
