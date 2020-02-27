@@ -15,3 +15,7 @@ This repository also contains research performed using these functions, includin
 [Eric Johnson](https://github.com/ejohn20) - Principal Security Engineer, Puma Security
 
 [Brandon Evans](https://github.com/BrandonE) - Senior Application Security Engineer, Asurion
+
+## Learning More
+
+* Watch Eric Johnson discuss the motivation and results of this research at RSAConference2020 in ["Defending Serverless Infrastructure in the Cloud"](https://www.youtube.com/watch?v=tlZ2PIXTHxc).

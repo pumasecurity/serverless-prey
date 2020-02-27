@@ -73,7 +73,7 @@ ngrok tcp 4444
 Invoke your function, supplying your connection details and API key:
 
 ```bash
-curl 'https://YOUR_API_GATEWAY_ID.execute-api.us-east-1.amazonaws.com/dev/api/Panther?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER' -H 'X-API-Key: YOUR_API_KEY'
+curl "https://YOUR_API_GATEWAY_ID.execute-api.$AWS_REGION.amazonaws.com/dev/api/Panther?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER" -H 'X-API-Key: YOUR_API_KEY'
 ```
 
 Your listener will now act as a reverse shell for the duration of the function invocation. You can adjust the function timeout in the serverless.yml file, though it cannot be extended past 30 seconds as it is attached to an API Gateway.
