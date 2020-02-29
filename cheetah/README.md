@@ -50,6 +50,8 @@ If you have [Netcat](http://netcat.sourceforge.net/) and [ngrok](https://ngrok.c
 script/cheetah --url-id YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID
 ```
 
+See [here](../script/USAGE.md) for more details on how to use this script.
+
 Alternatively, you can do this manually by setting up a Netcat listener like so:
 
 ```bash
@@ -85,6 +87,10 @@ go get -u golang.org/x/lint/golint
 npm run lint
 ```
 
+## Learning More
+
+Read [documentation](docs) on what you can accomplish once you connect to the runtime via Cheetah.
+
 ## Serverless Go Template
 
 Creating the original function template using the serverless framework.
@@ -94,6 +100,6 @@ cd src
 serverless create --template google-go --path cheetah
 ```
 
-## Exploring Further
+## Exploring Serverless
 
 Refer to [Serverless Docs](https://serverless.com/framework/docs/providers/google/) for more information.
