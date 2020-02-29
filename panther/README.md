@@ -58,6 +58,8 @@ If you have [Netcat](http://netcat.sourceforge.net/) and [ngrok](https://ngrok.c
 script/panther --url-id YOUR_API_GATEWAY_ID --api-key YOUR_API_KEY
 ```
 
+See [here](../script/USAGE.md) for more details on how to use this script.
+
 Alternatively, you can do this manually by setting up a Netcat listener like so:
 
 ```bash
@@ -99,9 +101,12 @@ curl 'http://localhost:3000/api/Panther?host=YOUR_ACCESSIBLE_HOST&port=YOUR_PORT
 ## Linting
 
 ```bash
-go get -u golang.org/x/lint/golint
 npm run lint
 ```
+
+## Learning More
+
+Read [documentation](docs) on what you can accomplish once you connect to the runtime via Panther.
 
 ## Serverless AWS NodeJS Template
 
@@ -112,6 +117,6 @@ cd src
 serverless create --template aws-nodejs --path panther
 ```
 
-## Exploring Further
+## Exploring Serverless
 
 Refer to [Serverless Docs](https://serverless.com/framework/docs/providers/aws/) for more information.

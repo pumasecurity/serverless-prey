@@ -60,6 +60,8 @@ If you have [Netcat](http://netcat.sourceforge.net/) and [ngrok](https://ngrok.c
 script/cougar --url-id "cougar$TF_VAR_UniqueString" --api-key YOUR_API_KEY
 ```
 
+See [here](../script/USAGE.md) for more details on how to use this script.
+
 Alternatively, you can do this manually by setting up a Netcat listener like so:
 
 ```bash
@@ -102,6 +104,10 @@ func start
 ```bash
 curl 'http://localhost:7071/api/Cougar?host=YOUR_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER'
 ```
+
+## Learning More
+
+Read [documentation](docs) on what you can accomplish once you connect to the runtime via Cougar.
 
 ## Azure Function C# Template
 
