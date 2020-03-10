@@ -1,4 +1,4 @@
-# Puma Scan Serverless Prey
+# Puma Security Serverless Prey
 
 Serverless Prey is a collection of serverless functions (FaaS), that, once launched to a cloud environment and invoked, establish a TCP reverse shell, enabling the user to introspect the underlying container:
 
@@ -8,7 +8,7 @@ Serverless Prey is a collection of serverless functions (FaaS), that, once launc
 
 This repository also contains research performed using these functions, including documentation on where secrets are stored, how to extract sensitive data, and identify monitoring / incident response data points.
 
-![Diagram](diagram.png "Diagram")
+![Diagram](docs/diagram.png "Diagram")
 
 ## Disclaimer
 
@@ -22,6 +22,9 @@ This repository also contains research performed using these functions, includin
 
 ## Learning More
 
-* Watch Eric Johnson discuss the motivation and results of this research at RSAConference2020 in ["Defending Serverless Infrastructure in the Cloud"](https://www.youtube.com/watch?v=tlZ2PIXTHxc).
+### Featured At
 
-* Download the RSAConference2020 [Defending Serverless Infrastructure in the Cloud](https://published-prd.lanyonevents.com/published/rsaus20/sessionsFiles/17433/2020_USA20_CSV-T12_01_Defending%20Serverless%20Infrastructure%20in%20the%20Cloud.pdf) slides.
+RSA Conference 2020                                                                                                                                                                     |  serverlessDays Nashville 2020
+:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------:
+![[Defending Serverless Infrastructure in the Cloud - Eric Johnson](docs/rsac-2020-defending-serverless-infrastructure-in-the-cloud.png)](https://www.youtube.com/watch?v=tlZ2PIXTHxc)  |  [![Attacking Serverless Servers - Brandon Evans](docs/serverlessdays-nashville-2020-attacking-serverless-servers.jpg)](https://www.youtube.com/watch?v=SV69iUrYlTQ)
+[Video](https://www.youtube.com/watch?v=tlZ2PIXTHxc) | [Slide Deck](docs/serverlessdays-nashville-2020-attacking-serverless-servers.pdf)                                                        [Video](https://www.youtube.com/watch?v=SV69iUrYlTQ) | [Slide Deck](docs/serverlessdays-nashville-2020-attacking-serverless-servers.pdf)

@@ -2,7 +2,7 @@
 
 This is a command-line interface for establishing a TCP reverse shell connection to a Serverless Prey function. With it, you can accomplish steps 2 through 4 on the below diagram with a single command:
 
-![Diagram](../diagram.png "Diagram")
+![Diagram](../docs/diagram.png "Diagram")
 
 ## Usage
 
