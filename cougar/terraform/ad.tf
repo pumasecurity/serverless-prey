@@ -6,7 +6,7 @@ locals {
 }
 
 resource "azurerm_role_definition" "cougar" {
-  name              = "cougar"
+  name              = "cougar${var.UniqueString}"
   scope             = local.scope
 
   permissions {
