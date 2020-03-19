@@ -29,7 +29,7 @@ data "azurerm_storage_account_sas" "sas" {
 
 resource "azurerm_function_app" "functionApp" {
   name                      = "cougar${var.UniqueString}"
-  location                  = var.ResourceGroupLocation
+  location                  = azurerm_resource_group.cougar.location
   resource_group_name       = azurerm_resource_group.cougar.name
   app_service_plan_id       = azurerm_app_service_plan.appServicePlan.id
   storage_connection_string = azurerm_storage_account.functionStorageAccount.primary_connection_string
@@ -41,5 +41,9 @@ resource "azurerm_function_app" "functionApp" {
       FUNCTION_APP_EDIT_MODE = "readonly"
       HASH = "${base64encode(filesha256(data.archive_file.functionapp.output_path))}"
       WEBSITE_RUN_FROM_PACKAGE = "https://${azurerm_storage_account.functionStorageAccount.name}.blob.core.windows.net/${azurerm_storage_container.deployments.name}/${azurerm_storage_blob.appcode.name}${data.azurerm_storage_account_sas.sas.sas}"
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 }

