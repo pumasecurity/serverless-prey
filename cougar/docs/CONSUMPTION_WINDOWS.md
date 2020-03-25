@@ -8,16 +8,19 @@ When connecting to Cougar, we start out in `cmd.exe`.
 
 ```
 echo %USERDOMAIN%\%USERNAME%
+
 WORKGROUP\RD281878EF37E3$
 ```
 
 ```
 pwd
+
 D:\Program Files (x86)\SiteExtensions\Functions\3.0.13139\32bit
 ```
 
 ```
 dir
+
  Volume in drive D is Windows
  Volume Serial Number is E83B-C639
  Directory of D:\Program Files (x86)\SiteExtensions\Functions\3.0.13139\32bit
@@ -160,7 +163,7 @@ dir
 
 ```
 set
-D:\Program Files (x86)\SiteExtensions\Functions\3.0.13139\32bit>set
+
 APP_POOL_CONFIG=C:\DWASFiles\Sites\cougar3a3451e97680\Config\applicationhost.config
 APP_POOL_ID=cougar3a3451e97680
 ASPNETCORE_IIS_HTTPAUTH=anonymous;
@@ -174,9 +177,11 @@ ProgramW6432=D:\Program Files
 PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 79 Stepping 1, GenuineIntel
 TMP=D:\local\Temp
 PROCESSOR_ARCHITECTURE=x86
-Path=D:\Python27;D:\Program Files (x86)\PHP\v5.6;D:\Program Files (x86)\nodejs;D:\Windows\system32;D:\Windows;D:\Windows\System32\Wbem;D:\Windows\System32\WindowsPowerShell\v1.0\;D:\Program Files\Git\cmd;D:\Program Files\Microsoft Network Monitor 3\;D:\Users\Administrator\AppData\Roaming\npm;D:\Program Files (x86)\nodejs\;D:\Program Files (x86)\Mercurial\;d:\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v1.0\;D:\Program Files (x86)\dotnet;D:\Program Files\dotnet;D:\Windows\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;E:\base\x64;E:\base\x86;D:\Packages\GuestAgent\GuestAgent\LegacyRuntime\x64;D:\Packages\GuestAgent\GuestAgent\LegacyRuntime\x86;D:\Program Files\Java\zulu8.36.0.1-jre8.0.202-win_x64\bin;
+Path=D:\Python27;D:\Program Files (x86)\PHP\v5.6;D:\Program Files (x86)\nodejs;D:\Windows\sys
+tem32;D:\Windows;D:\Windows\System32\Wbem;D:\Windows\System32\WindowsPowerShell\v1.0\;D:\Progr
+am Files\Git\cmd;D:\Program Files\Microsoft Network Monitor 3\;D:\Users\Administrator\AppData\Roaming\npm;D:\Program Files (x86)\nodejs\;D:\Program Files (x86)\Mercurial\;d:\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v1.0\;;D:\Program Files (x86)\dotnet;D:\Program Files\dotnet;D:\Windows\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;E:\base\x64;E:\base\x86;D:\Packages\GuestAgent\GuestAgent\LegacyRuntime\x64;D:\Packages\GuestAgent\GuestAgent\LegacyRuntime\x86;D:\Program Files\Java\zulu8.38.0.13-jre8.0.212-win_x64\bin;
 AZURE_TOMCAT7_CMDLINE=-Dport.http=%HTTP_PLATFORM_PORT% -Djava.util.logging.config.file="D:\Program Files (x86)\apache-tomcat-7.0.94\conf\logging.properties" -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Dsite.logdir="d:/home/LogFiles/" -Dsite.tempdir="d:\home\site\workdir" -classpath "D:\Program Files (x86)\apache-tomcat-7.0.94\bin\bootstrap.jar;D:\Program Files (x86)\apache-tomcat-7.0.94\bin\tomcat-juli.jar" -Dcatalina.base="D:\Program Files (x86)\apache-tomcat-7.0.94" -Djava.io.tmpdir="d:\home\site\workdir" org.apache.catalina.startup.Bootstrap
-AZURE_TOMCAT90_HOME=D:\Program Files (x86)\apache-tomcat-9.0.14
+AZURE_TOMCAT90_HOME=D:\Program Files (x86)\apache-tomcat-9.0.21
 PROCESSOR_REVISION=4f01
 TEMP=D:\local\Temp
 USERPROFILE=D:\local\UserProfile
@@ -192,7 +197,7 @@ COMPUTERNAME=RD281878EF37E3
 ALLUSERSPROFILE=D:\local\ProgramData
 CommonProgramW6432=D:\Program Files\Common Files
 AZURE_JETTY9_HOME=D:\Program Files (x86)\jetty-distribution-9.1.0.v20131115
-AZURE_TOMCAT90_CMDLINE=-noverify -Djava.net.preferIPv4Stack=true -Dcatalina.instance.name=%WEBSITE_INSTANCE_ID% -Dport.http=%HTTP_PLATFORM_PORT% -Djava.util.logging.config.file="D:\Program Files (x86)\apache-tomcat-9.0.14\conf\logging.properties" -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Dsite.logdir="d:/home/LogFiles/" -Dsite.tempdir="d:\home\site\workdir" -classpath "D:\Program Files (x86)\apache-tomcat-9.0.14\bin\bootstrap.jar;D:\Program Files (x86)\apache-tomcat-9.0.14\bin\tomcat-juli.jar" -Dcatalina.base="D:\Program Files (x86)\apache-tomcat-9.0.14" -Djava.io.tmpdir="d:\home\site\workdir" org.apache.catalina.startup.Bootstrap
+AZURE_TOMCAT90_CMDLINE=-noverify -Djava.net.preferIPv4Stack=true -Dcatalina.instance.name=%WEBSITE_INSTANCE_ID% -Dport.http=%HTTP_PLATFORM_PORT% -Djava.util.logging.config.file="D:\Program Files (x86)\apache-tomcat-9.0.21\conf\logging.properties" -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Dsite.logdir="d:/home/LogFiles/" -Dsite.tempdir="d:\home\site\workdir" -classpath "D:\Program Files (x86)\apache-tomcat-9.0.21\bin\bootstrap.jar;D:\Program Files (x86)\apache-tomcat-9.0.21\bin\tomcat-juli.jar" -Dcatalina.base="D:\Program Files (x86)\apache-tomcat-9.0.21" -Djava.io.tmpdir="d:\home\site\workdir" org.apache.catalina.startup.Bootstrap
 AZURE_JETTY93_CMDLINE=-Djava.net.preferIPv4Stack=true -Djetty.port=%HTTP_PLATFORM_PORT% -Djetty.base="D:\Program Files (x86)\jetty-distribution-9.3.25.v20180904" -Djetty.webapps="d:\home\site\wwwroot\webapps" -jar "D:\Program Files (x86)\jetty-distribution-9.3.25.v20180904\start.jar" etc\jetty-logging.xml
 CommonProgramFiles(x86)=D:\Program Files (x86)\Common Files
 windir=D:\Windows
@@ -255,13 +260,12 @@ WEBSITE_SCM_ALWAYS_ON_ENABLED=0
 WEBSITE_ISOLATION=pico
 WEBSITE_OS=windows
 WEBSITE_DEPLOYMENT_ID=cougar3a3451e97680
-WEBSITE_COMPUTE_MODE=Dynamic
-WEBSITE_SKU=Dynamic
+WEBSITE_COMPUTE_MODE=Dedicated
+WEBSITE_SKU=Basic
 WEBSITE_ELASTIC_SCALING_ENABLED=0
-WEBSITE_PRIVATE_EXTENSIONS=0
 WEBSITE_SCM_SEPARATE_STATUS=1
 WEBSITE_IIS_SITE_NAME=cougar3a3451e97680
-JAVA_HOME=D:\Program Files\Java\zulu8.36.0.1-jre8.0.202-win_x64
+JAVA_HOME=D:\Program Files\Java\zulu8.38.0.13-jre8.0.212-win_x64
 SITE_BITNESS=x86
 WEBSITE_AUTH_ENCRYPTION_KEY=XXXXX
 WEBSITE_AUTH_SIGNING_KEY=XXXXX
@@ -269,26 +273,30 @@ WEBSITE_CORS_ALLOWED_ORIGINS=https://functions.azure.com,https://functions-stagi
 WEBSITE_CORS_SUPPORT_CREDENTIALS=False
 WEBSITE_PROACTIVE_AUTOHEAL_ENABLED=True
 WEBSITE_PROACTIVE_STACKTRACING_ENABLED=True
-WEBSITE_DYNAMIC_CACHE=0
+WEBSITE_DYNAMIC_CACHE=1
 WEBSITE_FRAMEWORK_JIT=1
 WEBSITE_HOME_STAMPNAME=waws-prod-dm1-153
 WEBSITE_CURRENT_STAMPNAME=waws-prod-dm1-153
-WEBSOCKET_CONCURRENT_REQUEST_LIMIT=35
-WEBSITE_VOLUME_TYPE=AzureFiles
+WEBSOCKET_CONCURRENT_REQUEST_LIMIT=350
+WEBSITE_VOLUME_TYPE=PrimaryStorageVolume
 WEBSITE_OWNER_NAME=47d488d2-f662-46c2-8183-8fce2aefa6aa+Cougar-CentralUSwebspace
 WEBSITE_RESOURCE_GROUP=cougar
 WEBSITE_CONTAINER_READY=1
 REMOTEDEBUGGINGPORT=
 REMOTEDEBUGGINGBITVERSION=vx86
 WEBSITE_LOCALCACHE_ENABLED=False
-WEBSITE_MEMORY_LIMIT_MB=1536
 WEBSITE_HOSTNAME=cougar3a3451e97680.azurewebsites.net
 WEBSITE_RELAYS=
 WEBSITE_REWRITE_TABLE=
+MSI_ENDPOINT=http://127.0.0.1:41155/MSI/token/
+MSI_SECRET=ABC123
+IDENTITY_ENDPOINT=http://127.0.0.1:41155/MSI/token/
+IDENTITY_HEADER=ABC123
 ```
 
 ```
 dir \home\ASP.NET
+
  Volume in drive D is Windows
  Volume Serial Number is E83B-C639
  Directory of D:\home\ASP.NET
@@ -296,11 +304,36 @@ dir \home\ASP.NET
 02/27/2020  05:08 AM    <DIR>          ..
 02/27/2020  05:08 AM    <DIR>          DataProtection-Keys
                0 File(s)              0 bytes
-               3 Dir(s)  5,497,558,073,344 bytes free
+               3 Dir(s)  10,737,332,224 bytes free
 ```
 
 ```
-type \home\ASP.NET\DataProtection-Keys\key-7187fd37-1a8a-44dc-9bd6-c57d996ba2f5.xml
+dir \home\site\wwwroot
+
+ Volume in drive D is Windows
+ Volume Serial Number is EA8C-FC9E
+ Directory of D:\home\site\wwwroot
+01/01/2049  12:00 AM    <DIR>          Cougar
+01/01/2049  12:00 AM           128,384 Cougar.deps.json
+01/01/2049  12:00 AM               158 appsettings.json
+01/01/2049  12:00 AM    <DIR>          bin
+01/01/2049  12:00 AM                26 host.json
+               3 File(s)        128,568 bytes
+               2 Dir(s)               0 bytes free
+```
+dir \home\ASP.NET\DataProtection-Keys
+
+ Volume in drive D is Windows
+ Volume Serial Number is EA8C-FC9E
+ Directory of D:\home\ASP.NET\DataProtection-Keys
+03/25/2020  06:03 AM    <DIR>          .
+03/25/2020  06:03 AM    <DIR>          ..
+03/25/2020  06:03 AM             1,015 key-6938ec56-d1f0-40ba-a61f-94dd10f3d1b3.xml
+               1 File(s)          1,015 bytes
+               2 Dir(s)  10,737,332,224 bytes free
+```
+type \home\ASP.NET\DataProtection-Keys\key-*.xml
+
 ï»¿<?xml version="1.0" encoding="utf-8"?>
 <key id="7187fd37-1a8a-44dc-9bd6-c57d996ba2f5" version="1">
   <creationDate>2020-02-27T05:08:21.7166856Z</creationDate>
