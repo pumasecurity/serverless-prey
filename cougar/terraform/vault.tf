@@ -32,7 +32,7 @@ resource "azurerm_key_vault_secret" "db_user" {
   depends_on   = [azurerm_key_vault_access_policy.owner]
 
   name         = "cougar-database-user"
-  value        = "panther_user"
+  value        = "cougar_user"
   key_vault_id = azurerm_key_vault.vault.id
 }
 
@@ -40,6 +40,6 @@ resource "azurerm_key_vault_secret" "db_password" {
   depends_on   = [azurerm_key_vault_access_policy.owner]
 
   name         = "cougar-database-password"
-  value        = "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9uJ3Qga25vdyBldmlsIG9yIGplYWxvdXN5IG9yIGRpc2NvbnRlbnQu"
+  value        = "QnV0IHVuaWNvcm5zIGFwcGFyZW50bHkgZG8gZXhpc3Qu"
   key_vault_id = azurerm_key_vault.vault.id
 }

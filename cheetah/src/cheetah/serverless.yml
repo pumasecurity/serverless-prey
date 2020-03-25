@@ -10,6 +10,14 @@ provider:
 plugins:
   - serverless-google-cloudfunctions
 
+custom:
+  withBucketResources:
+    # WITH_BUCKET
+    true: ${file(./resources.yml)}
+    false: ''
+
+resources: ${self:custom.withBucketResources.${env:WITH_BUCKET, 'false'}}
+
 package:
   exclude:
     - '**'

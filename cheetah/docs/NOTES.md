@@ -266,7 +266,7 @@ By default this returns a *403* from the service account running the function:
 }
 ```
 
-It appears this is not included the default editor role permissions. You have to explicitly grant the service account the Secret Manager Secret Accessor (secretmanager.versions.access) permission to view the secret value. Then, running the command returns the following:
+It appears this is not included the default editor role permissions. You have to explicitly grant the service account the "Secret Manager Secret Accessor" (secretmanager.versions.access) role to view the secret value. Then, running the command returns the following:
 
 
 ```bash

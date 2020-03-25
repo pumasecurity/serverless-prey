@@ -4,6 +4,7 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 
 ## Installing Prerequisites
 
+* [Google Cloud SDK](https://cloud.google.com/sdk/install)
 * [Node.js / NPM](https://nodejs.org/en/download/)
 * [Function Deployment Service Account](https://cloud.google.com/functions/docs/concepts/iam#cloud_functions_service_account)
 
@@ -16,7 +17,36 @@ Follow [these steps](https://serverless.com/framework/docs/providers/google/guid
 ```bash
 cd /PATH/TO/cheetah/src/cheetah
 npm install
+
+# Optional: Create protected storage bucket that the function role has access to.
+export WITH_BUCKET=true
+export BUCKET_SUFFIX=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
+
 GCP_PROJECT=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID GCP_CREDENTIALS_FILE=/ABSOLUTE/PATH/TO/.gcloud/keyfile.json npx serverless deploy
+```
+
+In addition to deploying the function, if `WITH_BUCKET=true` and `BUCKET_SUFFIX` is set, this will create a private storage bucket. The function role will have unnecessary permissions to access the bucket.
+
+To upload a secret image to the bucket, run the following:
+
+```bash
+gcloud auth activate-service-account --key-file /PATH/TO/.gcloud/keyfile.json
+gsutil cp /PATH/TO/assets/* "gs://cheetah-$BUCKET_SUFFIX"
+```
+
+You can also use Cheetah to demonstrate how a compromised function could be used to access the GCP Secret Manager. In order to set this up:
+
+* Enable "Secret Manager API" in the [API dashboard](https://console.cloud.google.com/apis/dashboard).
+* Recreate your service account and add the "Secret Manager Admin" role.
+* As [the Serverless Framework always uses the App Engine default service account](https://github.com/serverless/serverless-google-cloudfunctions/issues/161), 
+* Run the following:
+
+```bash
+gcloud config set project YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID # If you receive a warning like the following, you can just ignore it: WARNING: You do not appear to have access to project [...] or it does not exist.
+
+gcloud secrets create cheetah-database-password --replication-policy automatic
+echo -n 'RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9uJ3Qga25vdyBldmlsIG9yIGplYWxvdXN5IG9yIGRpc2NvbnRlbnQu' | gcloud secrets versions add cheetah-database-password --data-file="-"
+gcloud secrets add-iam-policy-binding cheetah-database-password --member serviceAccount:YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID@appspot.gserviceaccount.com --role roles/secretmanager.secretAccessor
 ```
 
 ### Native GCloud Commands
@@ -25,21 +55,7 @@ To deploy natively without the serverless framework, configure `gcloud` in the T
 
 ```bash
 gcloud auth activate-service-account --key-file ~/.gcloud/keyfile.json
-gcloud functions deploy cheetah --entry-point Cheetah --runtime go111 --trigger-http --service-account=XXXXXXXXX-compute@developer.gserviceaccount.com
-```
-
-## Deploying Assets
-
-Create some secrets and grant permissions to the SA. Side note: wow, they really don't want you passing these values via the command line. Makes sense for real secrets though.
-
-```
-echo "cheetah_user" | gcloud beta secrets create cheetah-database-user --data-file=- --replication-policy=automatic
-
-echo "TmV2ZXIgcGxheSBwb2tlciB3aXRoIHRoZSB3b3JsZCdzIGZhc3Rlc3QgYW5pbWFsLCBiZWNhdXNlIGhlJ3MgYSBjaGVldGFoLiAtIGNvb2xmdW5ueXF1b3Rlcy5jb20g" | gcloud beta secrets create cheetah-database-pass --data-file=- --replication-policy=automatic
-
-gcloud beta secrets add-iam-policy-binding cheetah-database-user --member serviceAccount:XXXXXXXXX-compute@developer.gserviceaccount.com --role roles/secretmanager.secretAccessor
-
-gcloud beta secrets add-iam-policy-binding cheetah-database-user --member serviceAccount:XXXXXXXXX-compute@developer.gserviceaccount.com --role roles/secretmanager.secretAccessor
+gcloud functions deploy cheetah --entry-point Cheetah --runtime go111 --trigger-http --service-account=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID@appspot.gserviceaccount.com
 ```
 
 ## Testing in GCP

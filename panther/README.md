@@ -41,7 +41,7 @@ api keys:
   panther: YOUR_API_KEY
 ```
 
-In addition to deploying the function, this will create a private S3 Bucket with an image. The Lambda role will have unnecessary permissions to access these resources as well as to an AWS Parameter Store path to demonstrate the damage that can be done by exfiltrating credentials from the runtime environment.
+In addition to deploying the function, if `WITH_BUCKET=true` and `BUCKET_SUFFIX` is set, this will create a private S3 Bucket with an image. The Lambda role will have unnecessary permissions to access these resources as well as to an AWS Parameter Store path to demonstrate the damage that can be done by exfiltrating credentials from the runtime environment.
 
 To store a secret in the aforementioned Parameter Store path, run the following:
 
