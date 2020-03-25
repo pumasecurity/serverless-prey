@@ -266,7 +266,7 @@ By default this returns a *403* from the service account running the function:
 }
 ```
 
-It appears this is not included the default editor role permissions. You have to explicitly grant the service account the Secret Manager Secret Accessor (secretmanager.versions.access) permission to view the secret value. Then, running the command returns the following:
+It appears this is not included the default editor role permissions. You have to explicitly grant the service account the "Secret Manager Secret Accessor" (secretmanager.versions.access) role to view the secret value. Then, running the command returns the following:
 
 
 ```bash
@@ -282,11 +282,31 @@ curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" https://secretmanager.googleapi
 
 ## Persistence
 
-Persisting a malware payload into the runtime environment:
+Persisting a malware payload into the runtime environment. Unlike AWS, some directories other than `/tmp` are writable while the source directory is not:
 
 ```
-echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /tmp/malware.sh
-cat /tmp/malware.sh
+mount
+
+none on / type overlayfs (rw)
+none on /dev type overlayfs (rw)
+none on /proc type proc (rw)
+none on /sys type sysfs (rw)
+none on /tmp type tmpfs (rw)
+none on /cloudsql type 9p (rw)
+none on /var/log type overlayfs (rw)
+
+echo "Malware" > /srv/files/malware.sh
+
+/bin/sh: 9: cannot create /srv/files/malware.sh: Read-only file system
+
+echo "Malware" > /root/malware.sh
+ls /root/malware.sh
+
+/root/malware.sh
+
+echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /root/malware.sh
+cat /root/malware.sh
+
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 ```
 

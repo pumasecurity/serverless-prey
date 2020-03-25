@@ -33,7 +33,7 @@ package:
   include:
     - config.json
     - handler.js
-  
+
 functions:
   panther:
     handler: handler.panther

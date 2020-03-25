@@ -22,32 +22,18 @@ Then, enable the function identity to use an MSI account during execution.
 
 ### Terraform
 
-NOTE: This needs work to deploy assets, etc.
-
 ```bash
 cd src
 dotnet publish
 cd ../terraform
 terraform init
 export TF_VAR_UniqueString=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
+
+# Optional: Use a Windows runtime (defaults to Linux).
+export TF_VAR_AppServicePlanKind=Windows
+
 az login
 terraform apply
-```
-
-* TODO: Upload cougar.png to the images blob.
-* TODO: Needs to create an identity and attach the function to the service principal created.
-* TODO: Grant read, container read to the blob created.
-
-## Deploying Assets
-
-Create some secrets and grant permissions to the function SA.
-
-```
-az keyvault secret set --vault-name pumaprey-cougar-vault  --name "cougar-database-user" --value "cougar_user"
-
-az keyvault secret set --vault-name pumaprey-cougar-vault  --name "cougar-database-pass" --value "QnV0IHVuaWNvcm5zIGFwcGFyZW50bHkgZG8gZXhpc3Qu"
-
-az keyvault set-policy --name pumaprey-cougar-vault -g pumaprey-cougar --object-id 0cbd41de-55c6-460d-b92b-837eddd0ea0d --secret-permissions get list
 ```
 
 ## Testing in Azure

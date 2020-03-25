@@ -1,6 +1,6 @@
 resource "azurerm_storage_account" "assetStorageAccount" {
   name                     = "cougarassets${var.UniqueString}"
-  location                 = var.ResourceGroupLocation
+  location                 = azurerm_resource_group.cougar.location
   resource_group_name      = azurerm_resource_group.cougar.name
   account_tier             = "Standard"
   account_replication_type = "LRS"

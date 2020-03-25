@@ -24,7 +24,7 @@ variable "AppServicePlanName" {
 }
 
 variable "AppServicePlanKind" {
-  description = "The kind of service plan to use for the app. Defaults to Linux. Use 'FunctionApp' for a Windows runtime."
+  description = "The kind of service plan to use for the app. Defaults to Linux. Use 'Windows' for a Windows runtime."
   type = string
   default = "Linux"
 }
