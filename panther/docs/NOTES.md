@@ -157,9 +157,18 @@ Expiration does not appear to occur until 12 hours after extracting the token.
 
 ## Persistence
 
-Persisting a malware payload into the runtime environment:
+Persisting a malware payload into the runtime environment. Only the `/tmp` directory is writable:
 
 ```
+echo "Malware" > malware.sh
+
+/bin/sh: line 2: malware.sh: Read-only file system
+
+echo "Malware" > /tmp/malware.sh
+ls /tmp/malware.sh
+
+/tmp/malware.sh
+
 echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /tmp/malware.sh
 cat /tmp/malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*

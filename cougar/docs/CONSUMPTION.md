@@ -8,6 +8,10 @@ Running under a consumption based Azure function (cold starts). Included a SP at
 id
 
 uid=0(root) gid=0(root) groups=0(root)
+
+# This varies as an older deployment had this result:
+
+uid=1000(app) gid=1000(app) groups=1000(app)
 ```
 
 ```
@@ -331,25 +335,91 @@ curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "
 
 ## Persistence
 
-Persisting a malware payload into the runtime environment:
+Persisting a malware payload into the runtime environment. Unlike AWS, some directories other than `/tmp` are writable while the source directory is not:
 
 ```bash
-echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /tmp/malware.sh
-cat /tmp/malware.sh
+mount
+
+none on / type aufs (rw,relatime,si=3885b43376db3940,dio,dirperm1)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev type tmpfs (rw,nosuid,nodev,size=65536k,mode=755,uid=231072,gid=231072)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=231077,mode=620,ptmxmode=666)
+sysfs on /sys type sysfs (ro,nosuid,nodev,noexec,relatime)
+tmpfs on /sys/fs/cgroup type tmpfs (rw,nosuid,nodev,noexec,relatime,mode=755,uid=231072,gid=231072)
+cgroup on /sys/fs/cgroup/systemd type cgroup (rw,nosuid,nodev,noexec,relatime,xattr,release_agent=/lib/systemd/systemd-cgroups-agent,name=systemd)
+cgroup on /sys/fs/cgroup/cpu,cpuacct type cgroup (rw,nosuid,nodev,noexec,relatime,cpu,cpuacct)
+cgroup on /sys/fs/cgroup/perf_event type cgroup (rw,nosuid,nodev,noexec,relatime,perf_event)
+cgroup on /sys/fs/cgroup/devices type cgroup (rw,nosuid,nodev,noexec,relatime,devices)
+cgroup on /sys/fs/cgroup/freezer type cgroup (rw,nosuid,nodev,noexec,relatime,freezer)
+cgroup on /sys/fs/cgroup/blkio type cgroup (rw,nosuid,nodev,noexec,relatime,blkio)
+cgroup on /sys/fs/cgroup/memory type cgroup (rw,nosuid,nodev,noexec,relatime,memory)
+cgroup on /sys/fs/cgroup/net_cls,net_prio type cgroup (rw,nosuid,nodev,noexec,relatime,net_cls,net_prio)
+cgroup on /sys/fs/cgroup/hugetlb type cgroup (rw,nosuid,nodev,noexec,relatime,hugetlb)
+cgroup on /sys/fs/cgroup/cpuset type cgroup (rw,nosuid,nodev,noexec,relatime,cpuset)
+cgroup on /sys/fs/cgroup/pids type cgroup (rw,nosuid,nodev,noexec,relatime,pids)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+shm on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=65536k,uid=231072,gid=231072)
+/dev/sda1 on /appsvctmp type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+//10.0.176.14/volume-5-default/35c6e87611d499b626dd/4837afd00de2424f847ae0d4cd8b7402 on /home type cifs (rw,relatime,vers=3.0,sec=ntlmssp,cache=strict,username=dummyadmin,domain=RD281878EC704F,uid=0,noforceuid,gid=0,noforcegid,addr=10.0.176.14,file_mode=0777,dir_mode=0777,nounix,serverino,mapposix,mfsymlinks,noperm,rsize=1048576,wsize=1048576,echo_interval=60,actimeo=1)
+/dev/sda1 on /home/site/wwwroot type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+/dev/sda1 on /var/ssl type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+/dev/loop0p1 on /etc/resolv.conf type ext4 (rw,relatime,data=ordered)
+/dev/loop0p1 on /etc/hostname type ext4 (rw,relatime,data=ordered)
+/dev/loop0p1 on /etc/hosts type ext4 (rw,relatime,data=ordered)
+fuse-zip on /home/site/wwwroot type fuse.fuse-zip (ro,nosuid,nodev,relatime,user_id=0,group_id=0,allow_other)
+/dev/sda1 on /var/log/functionsLogs type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+/dev/sda1 on /var/log/diagnosticLogs type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+udev on /dev/null type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /dev/random type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /dev/full type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /dev/tty type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /dev/zero type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /dev/urandom type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+proc on /proc/bus type proc (ro,nodev,relatime)
+proc on /proc/fs type proc (ro,nodev,relatime)
+proc on /proc/irq type proc (ro,nodev,relatime)
+proc on /proc/sys type proc (ro,nodev,relatime)
+proc on /proc/sysrq-trigger type proc (ro,nodev,relatime)
+tmpfs on /proc/acpi type tmpfs (ro,nodev,relatime,uid=231072,gid=231072)
+udev on /proc/kcore type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /proc/keys type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /proc/timer_list type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /proc/timer_stats type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+udev on /proc/sched_debug type devtmpfs (rw,nosuid,relatime,size=959488k,nr_inodes=239872,mode=755)
+tmpfs on /proc/scsi type tmpfs (ro,nodev,relatime,uid=231072,gid=231072)
+tmpfs on /sys/firmware type tmpfs (ro,nodev,relatime,uid=231072,gid=231072)
+
+cat "Malware" > /home/site/wwwroot/malware.sh # Silently fails.
+cat /home/site/wwwroot/malware.sh # Nothing.
+ls /home/site/wwwroot
+
+Cougar
+Cougar.deps.json
+appsettings.json
+bin
+host.json
+
+echo "Malware" > /malware.sh
+ls /malware.sh
+
+/malware.sh
+
+echo "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" > /malware.sh
+cat /malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 ```
 
 Waiting approximately 1 minute:
 
 ```bash
-cat /tmp/malware.sh
+cat /malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 ```
 
 Waiting approximately 2 minutes:
 
 ```bash
-cat /tmp/malware.sh
+cat /malware.sh
 X5O!P%@AP[4\PZX54(P^)7CC)7}-STANDARD-ANTIVIRUS-TEST-FILE!+H*
 ```
 
@@ -358,8 +428,8 @@ Waiting approximately 3 minutes:
 Slowly started increasing the inactivity to 2, 3, 4, 5, and so on minutes. Finally, after 6 minutes of inactivity:
 
 ```bash
-cat /tmp/malware.sh
-cat: /tmp/malware.sh: No such file or directory
+cat /malware.sh
+cat: /malware.sh: No such file or directory
 ```
 
 ## Monitoring &amp; Incident Response
