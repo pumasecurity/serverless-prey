@@ -2,7 +2,7 @@ service: cheetah
 
 provider:
   name: google
-  runtime: go111
+  runtime: go113
   region: ${env:GCP_REGION, 'us-central1'}
   project: ${env:GCP_PROJECT}
   credentials: ${env:GCP_CREDENTIALS_FILE}

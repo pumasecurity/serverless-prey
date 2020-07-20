@@ -36,7 +36,6 @@ resource "azurerm_function_app" "functionApp" {
   version                   = "beta"
 
   app_settings = {
-      https_only = true
       FUNCTIONS_WORKER_RUNTIME = "dotnet"
       FUNCTION_APP_EDIT_MODE = "readonly"
       HASH = "${base64encode(filesha256(data.archive_file.functionapp.output_path))}"

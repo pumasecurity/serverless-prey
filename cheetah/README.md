@@ -22,7 +22,9 @@ npm install
 export WITH_BUCKET=true
 export BUCKET_SUFFIX=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
 
-GCP_PROJECT=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID GCP_CREDENTIALS_FILE=/ABSOLUTE/PATH/TO/.gcloud/keyfile.json npx serverless deploy
+GCP_PROJECT=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID
+GCP_CREDENTIALS_FILE=/ABSOLUTE/PATH/TO/.gcloud/keyfile.json
+npx serverless deploy
 ```
 
 In addition to deploying the function, if `WITH_BUCKET=true` and `BUCKET_SUFFIX` is set, this will create a private storage bucket. The function role will have unnecessary permissions to access the bucket.
@@ -92,7 +94,9 @@ Your listener will now act as a reverse shell for the duration of the function i
 
 ```bash
 cd /PATH/TO/cheetah/src/cheetah
-GCP_PROJECT=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID GCP_CREDENTIALS_FILE=/ABSOLUTE/PATH/TO/.gcloud/keyfile.json npx serverless remove
+GCP_PROJECT=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID
+GCP_CREDENTIALS_FILE=/ABSOLUTE/PATH/TO/.gcloud/keyfile.json
+npx serverless remove
 ```
 
 ## Linting
