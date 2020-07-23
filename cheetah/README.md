@@ -94,6 +94,8 @@ Your listener will now act as a reverse shell for the duration of the function i
 
 ```bash
 cd /PATH/TO/cheetah/src/cheetah
+export SERVERLESS_CHEETAH_BUCKET=$(gsutil ls gs://sls-cheetah-dev*)
+gsutil rm $SERVERLESS_CHEETAH_BUCKET**
 GCP_PROJECT=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID
 GCP_CREDENTIALS_FILE=/ABSOLUTE/PATH/TO/.gcloud/keyfile.json
 npx serverless remove
