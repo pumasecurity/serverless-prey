@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "
   @@@@@@@@((.                                                        ((@@@@@@@@
@@ -88,7 +88,7 @@ fi
 ngrok tcp "$LISTENER_PORT" --log stdout > "$TMP_SUBDIR/ngrok_output.txt" 2>&1 &
 sleep 3
 
-if ! ps -p $! >&-
+if ! [[ -n $(pgrep ngrok) ]]
 then
     echo "Error: ngrok failed to start properly."
     exit 1
@@ -148,7 +148,7 @@ do
     fi
 
     # Exit if the curl command failed altogether.
-    if ! ps -p $! >&-
+    if ! [[ -n $(pgrep curl) ]]
     then
         echo "Error: curl command failed."
         exit 1
