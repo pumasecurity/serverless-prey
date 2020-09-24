@@ -32,35 +32,43 @@ shift
 while [[ "$#" -gt 0 ]]
 do
     key="$1"
+    shift
+    value="$1"
+
+    if [[ -z "$value" ]]
+    then
+        echo "Error: Missing value for flag $key" >&2
+        exit 1
+    fi
 
     case $key in
         -u|--url)
-        URL="$2"
-        shift 2
+        URL="$value"
+        shift
         ;;
 
         -a|--api-key)
-        API_KEY="$2"
-        shift 2
+        API_KEY="$value"
+        shift
         ;;
 
         -p|--port)
-        LISTENER_PORT="$2"
-        shift 2
+        LISTENER_PORT="$value"
+        shift
         ;;
 
         -c|--command)
-        COMMAND="$2"
-        shift 2
+        COMMAND="$value"
+        shift
         ;;
 
         -l|--loop)
-        LOOP="$2"
-        shift 2
+        LOOP="$value"
+        shift
         ;;
 
         -*|--*=) # unsupported flags
-        echo "Error: Unsupported flag $1" >&2
+        echo "Error: Unsupported flag $key" >&2
         exit 1
         ;;
 
