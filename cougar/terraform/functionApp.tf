@@ -2,8 +2,8 @@
 data "azurerm_storage_account_sas" "sas" {
     connection_string = "${azurerm_storage_account.functionStorageAccount.primary_connection_string}"
     https_only = true
-    start = "2019-01-01"
-    expiry = "2021-12-31"
+    start = formatdate("YYYY-MM-DD", timestamp())
+    expiry = formatdate("YYYY-MM-DD", timeadd(timestamp(), "24h"))
     resource_types {
         object = true
         container = false
