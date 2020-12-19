@@ -2,7 +2,7 @@
 data "azurerm_storage_account_sas" "sas" {
   connection_string = "${azurerm_storage_account.functionStorageAccount.primary_connection_string}"
   https_only = true
-  formatdate("YYYY-MM-DD", timeadd(timestamp(), "-48h"))
+  start = formatdate("YYYY-MM-DD", timeadd(timestamp(), "-48h"))
   expiry = formatdate("YYYY-MM-DD", timeadd(timestamp(), "17520h"))
 
   resource_types {
