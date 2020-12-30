@@ -20,15 +20,15 @@ data "archive_file" "functionapp" {
 # Reference: https://adrianhall.github.io/typescript/2019/10/23/terraform-functions/
 
 resource "azurerm_storage_container" "deployments" {
-    name = "function-releases"
-    storage_account_name = azurerm_storage_account.functionStorageAccount.name
-    container_access_type = "private"
+  name = "function-releases"
+  storage_account_name = azurerm_storage_account.functionStorageAccount.name
+  container_access_type = "private"
 }
 
 resource "azurerm_storage_blob" "appcode" {
-    name = data.archive_file.functionapp.output_path
-    storage_account_name = azurerm_storage_account.functionStorageAccount.name
-    storage_container_name = azurerm_storage_container.deployments.name
-    type = "block"
-    source = data.archive_file.functionapp.output_path
+  name = data.archive_file.functionapp.output_path
+  storage_account_name = azurerm_storage_account.functionStorageAccount.name
+  storage_container_name = azurerm_storage_container.deployments.name
+  type = "block"
+  source = data.archive_file.functionapp.output_path
 }
