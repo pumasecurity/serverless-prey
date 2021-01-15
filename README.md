@@ -18,7 +18,7 @@ This repository also contains research performed using these functions, includin
 
 [Eric Johnson](https://github.com/ejohn20) - Principal Security Engineer, Puma Security
 
-[Brandon Evans](https://github.com/BrandonE) - Senior Application Security Engineer, Asurion
+[Brandon Evans](https://github.com/BrandonE) - Certified Instructor, SANS Institute
 
 ## Learning More
 
