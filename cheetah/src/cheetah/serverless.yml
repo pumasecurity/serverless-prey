@@ -1,4 +1,5 @@
-service: cheetah
+frameworkVersion: 1.83.0
+service: cheetah-${env:BUCKET_SUFFIX, ''}
 
 provider:
   name: google

@@ -45,7 +45,7 @@ publicRouteTable:
 publicRoute:
   Type: AWS::EC2::Route
   Condition: InVpc
-  DependsOn: internetGateway
+  DependsOn: [internetGateway]
   Properties:
     RouteTableId: !Ref publicRouteTable
     DestinationCidrBlock: 0.0.0.0/0
@@ -61,7 +61,7 @@ publicSubnet1RouteTableAssociation:
 natGateway:
   Type: AWS::EC2::NatGateway
   Condition: InVpc
-  DependsOn: natPublicIP
+  DependsOn: [natPublicIP]
   Properties:
     AllocationId: !GetAtt natPublicIP.AllocationId
     SubnetId: !Ref publicSubnet
@@ -69,7 +69,7 @@ natGateway:
 natPublicIP:
   Type: AWS::EC2::EIP
   Condition: InVpc
-  DependsOn: lambdaVpc
+  DependsOn: [lambdaVpc]
   Properties:
     Domain: vpc
 

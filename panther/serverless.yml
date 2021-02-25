@@ -1,3 +1,4 @@
+frameworkVersion: 1.83.0
 service: panther
 
 provider:

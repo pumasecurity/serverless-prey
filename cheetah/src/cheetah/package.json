@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/pumasecurity/serverless-prey#readme",
   "devDependencies": {
-    "serverless": "1.64.0",
+    "serverless": "1.83.0",
     "serverless-google-cloudfunctions": "3.1.0"
   }
 }
