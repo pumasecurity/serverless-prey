@@ -16,7 +16,7 @@ panther/script/panther --url-id AMAZON_API_GATEWAY_ID --api-key AMAZON_API_GATEW
 
 ### Options
 
-* `--url-id`, `-u`: The identifier used for the function endpoint. This is the Google Project ID for Cheetah, the Azure Function App ID for Cougar, and the API Gateway ID for Panther.
+* `--url`, `-u`: The base URL for the vulnerable endpoint. This is the function URL in the Serverless Framework deployment output for Panther and Cheetah, and `http://$COUGAR_FUNCTION_HOST/api/Cougar` for Cougar.
 * `--api-key`, `-a`: The API key for the function. This is required for all platforms except for Google (Cheetah).
 * `--port`, `-p` (Optional): The port that the Netcat server will listen on. Defaults to 4444.
 * `--region`, `-r` (Optional): The region in which the function is hosted. Defaults to `us-central1` for Google (Cheetah) and `us-east-1` for AWS (Panther). You do not need to provide the region in the request for Azure Function Apps, so this is not needed for Cougar.
