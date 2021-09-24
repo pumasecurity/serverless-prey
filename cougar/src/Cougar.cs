@@ -74,7 +74,7 @@ namespace Puma.Security.Functions.Azure
 
             if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(port))
             {
-                logger.LogInformation(2, "Invalid request: Missing hort or port parameter.");
+                logger.LogInformation(2, "Invalid request: Missing host or port parameter.");
                 return Responses.error("Must provide the host and port for the target TCP server as query parameters.", HttpStatusCode.BadRequest);
             }
 

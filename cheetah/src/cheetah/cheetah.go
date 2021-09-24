@@ -63,7 +63,7 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	port := r.URL.Query().Get("port")
 
 	if host == "" || port == "" {
-		writeLog(2, "Invalid request: Missing hort or port parameter.")
+		writeLog(2, "Invalid request: Missing host or port parameter.")
 		respondWithError(w, "Must provide the host and port for the target TCP server as query parameters.", 400)
 		return
 	}
