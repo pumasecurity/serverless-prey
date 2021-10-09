@@ -36,7 +36,7 @@ resource "azurerm_function_app" "functionApp" {
   resource_group_name       = azurerm_resource_group.cougar.name
   app_service_plan_id       = azurerm_app_service_plan.appServicePlan.id
   storage_connection_string = azurerm_storage_account.functionStorageAccount.primary_connection_string
-  version                   = "beta"
+  version                   = "~3"
 
   app_settings = {
     FUNCTIONS_WORKER_RUNTIME = "dotnet"
