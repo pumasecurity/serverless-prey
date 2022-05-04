@@ -18,6 +18,6 @@ resource "azurerm_storage_blob" "cougar" {
   name = "cougar.jpg"
   storage_account_name = azurerm_storage_account.assetStorageAccount.name
   storage_container_name = azurerm_storage_container.assets.name
-  type = "block"
+  type = "Block"
   source = "../assets/cougar.jpg"
 }

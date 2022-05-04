@@ -31,12 +31,13 @@ data "azurerm_storage_account_sas" "sas" {
 }
 
 resource "azurerm_function_app" "functionApp" {
-  name                      = "cougar${var.UniqueString}"
-  location                  = azurerm_resource_group.cougar.location
-  resource_group_name       = azurerm_resource_group.cougar.name
-  app_service_plan_id       = azurerm_app_service_plan.appServicePlan.id
-  storage_connection_string = azurerm_storage_account.functionStorageAccount.primary_connection_string
-  version                   = "~3"
+  name                       = "cougar${var.UniqueString}"
+  location                   = azurerm_resource_group.cougar.location
+  resource_group_name        = azurerm_resource_group.cougar.name
+  app_service_plan_id        = azurerm_app_service_plan.appServicePlan.id
+  storage_account_name       = azurerm_storage_account.functionStorageAccount.name
+  storage_account_access_key = azurerm_storage_account.functionStorageAccount.primary_access_key
+  version                    = "~3"
 
   app_settings = {
     FUNCTIONS_WORKER_RUNTIME = "dotnet"

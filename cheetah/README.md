@@ -5,7 +5,7 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 ## Installing Prerequisites
 
 * [Google Cloud SDK](https://cloud.google.com/sdk/install)
-* [Node.js / NPM](https://nodejs.org/en/download/)
+* [Node.js v14.15.4 / NPM](https://nodejs.org/en/download/)
 * [Function Deployment Service Account](https://cloud.google.com/functions/docs/concepts/iam#cloud_functions_service_account)
 
 ## Deploying The Function

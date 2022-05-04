@@ -1,7 +1,3 @@
-provider "archive" {
-  version = "=1.3.0"
-}
-
 resource "azurerm_storage_account" "functionStorageAccount" {
   name                     = "cougar${var.UniqueString}"
   location                 = var.ResourceGroupLocation
@@ -29,6 +25,6 @@ resource "azurerm_storage_blob" "appcode" {
   name = data.archive_file.functionapp.output_path
   storage_account_name = azurerm_storage_account.functionStorageAccount.name
   storage_container_name = azurerm_storage_container.deployments.name
-  type = "block"
+  type = "Block"
   source = data.archive_file.functionapp.output_path
 }
