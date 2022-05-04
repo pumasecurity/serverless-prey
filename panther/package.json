@@ -37,6 +37,6 @@
     "serverless-s3-sync": "1.9.2"
   },
   "dependencies": {
-    "aws-sdk": "2.624.0"
+    "aws-sdk": "2.814.0"
   }
 }
