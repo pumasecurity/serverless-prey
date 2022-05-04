@@ -21,6 +21,6 @@ resource "azurerm_role_definition" "cougar" {
 
 resource "azurerm_role_assignment" "cougar" {
   scope              = local.scope
-  role_definition_id = azurerm_role_definition.cougar.id
+  role_definition_id = azurerm_role_definition.cougar.role_definition_resource_id
   principal_id       = azurerm_function_app.functionApp.identity[0].principal_id
 }

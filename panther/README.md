@@ -5,7 +5,7 @@ Panther is a Node.js function that can be deployed to the AWS to establish a TCP
 ## Installing Prerequisites
 
 * [AWS Command Line Interface](https://aws.amazon.com/cli/)
-* [Node.js / NPM](https://nodejs.org/en/download/)
+* [Node.js v14.15.4 / NPM](https://nodejs.org/en/download/)
 
 ## Deploying The Function and Resources
 
