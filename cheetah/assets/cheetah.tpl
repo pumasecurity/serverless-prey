@@ -6,9 +6,9 @@ server:
 # Database credentials
 database:
   user: "cheetah_user"
-  pass: "CloudWars{5ee4be74-a087-fe32-a551-c2562e52d26e}"
+  pass: "${database_password}"
 
 # Storage bucket
 gcs:
-  bucket: "cheetah-b34d15a2-a9cb-d28f-74dd-12e27a238625"
+  bucket: "${bucket_name}"
   object: "cheetah.jpg"

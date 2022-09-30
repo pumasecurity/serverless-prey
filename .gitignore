@@ -489,3 +489,4 @@ override.tf.json
 
 functionapp.zip
 pkg
+cheetah/src/cheetah/cheetah.yaml
