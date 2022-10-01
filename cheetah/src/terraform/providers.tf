@@ -2,7 +2,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "4.7.0"
+      version = "4.38.0"
     }
 
     null = {
@@ -12,7 +12,7 @@ terraform {
 
     random = {
       source  = "hashicorp/random"
-      version = "3.1.0"
+      version = "3.4.3"
     }
 
     template = {
@@ -27,7 +27,7 @@ terraform {
 
     local = {
       source  = "hashicorp/local"
-      version = "2.1.0"
+      version = "2.2.3"
     }
   }
 }
