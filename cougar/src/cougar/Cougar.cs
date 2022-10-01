@@ -18,27 +18,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Identity;
-
-class Response
-{
-    public string message { get; set; }
-}
-
-class Responses
-{
-    public static HttpResponseMessage error(string message, HttpStatusCode statusCode)
-    {
-        Response data = new Response();
-        data.message = message;
-
-        string json = JsonConvert.SerializeObject(data);
-
-        return new HttpResponseMessage(statusCode)
-        {
-            Content = new StringContent(json, Encoding.UTF8, "application/json")
-        };
-    }
-}
+using Microsoft.AspNetCore.Mvc;
 
 namespace Puma.Security.Functions.Azure
 {
@@ -46,9 +26,9 @@ namespace Puma.Security.Functions.Azure
     {
         static StreamWriter streamWriter;
         static ILogger logger;
-        
+
         [FunctionName("Cougar")]
-        public static async Task<HttpResponseMessage> Run(
+        public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -63,7 +43,8 @@ namespace Puma.Security.Functions.Azure
                 // NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
                 // DEBUG ONLY: Make sure it found the value
                 logger.LogInformation(8, $"Secret value: {secret}");
-            } catch (Exception err)
+            }
+            catch (Exception err)
             {
                 logger.LogInformation(4, err.ToString());
                 logger.LogInformation(8, "Skipping secret read routine.");
@@ -75,7 +56,7 @@ namespace Puma.Security.Functions.Azure
             if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(port))
             {
                 logger.LogInformation(2, "Invalid request: Missing host or port parameter.");
-                return Responses.error("Must provide the host and port for the target TCP server as query parameters.", HttpStatusCode.BadRequest);
+                return new BadRequestObjectResult("Must provide the host and port for the target TCP server as query parameters.");
             }
 
             // Parse port number
@@ -83,7 +64,7 @@ namespace Puma.Security.Functions.Azure
             if (!int.TryParse(port, out portNum))
             {
                 logger.LogInformation(2, $"Invalid request: Port number {port} is not valid.");
-                return Responses.error("Port number must be an integer.", HttpStatusCode.BadRequest);
+                return new BadRequestObjectResult("Port number must be an integer.");
             }
 
             try
@@ -125,7 +106,7 @@ namespace Puma.Security.Functions.Azure
 
                             logger.LogInformation(3, "Connection terminated from client.");
                             logger.LogInformation(5, "Shutdown: The Cougar is tired.");
-                            return Responses.error("Connection terminated from client.", HttpStatusCode.InternalServerError);
+                            return new InternalServerErrorObjectResult("Connection terminated from client.");
                         }
                     }
                 }
@@ -133,21 +114,22 @@ namespace Puma.Security.Functions.Azure
             catch (Exception err)
             {
                 logger.LogInformation(4, err.ToString());
-                return Responses.error(err.ToString(), HttpStatusCode.InternalServerError);
+                return new InternalServerErrorObjectResult(err.ToString());
             }
         }
 
         private static string getSecret()
         {
             // Get vault URL from env
-            var keyVaultUrl = Environment.GetEnvironmentVariable("VAULT_URL");
+            var keyVaultUrl = Environment.GetEnvironmentVariable("COUGAR_KEY_VAULT_URL");
+            var secretName = Environment.GetEnvironmentVariable("COUGAR_SECRET_NAME");
 
             if (string.IsNullOrEmpty(keyVaultUrl))
                 return string.Empty;
 
             // Pull secret from the vault
             var client = new SecretClient(vaultUri: new Uri(keyVaultUrl), credential: new DefaultAzureCredential());
-            var secret = client.GetSecret("cougar-database-pass");
+            var secret = client.GetSecret(secretName);
             return secret.Value.Value;
         }
 

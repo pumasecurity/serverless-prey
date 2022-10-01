@@ -36,9 +36,23 @@ az login
 terraform apply
 ```
 
-## Testing in Azure
+## Function Testing
 
-Retrieve the API key in the Azure Portal by searching for "Function App", clicking on the new Function App resource, clicking "Manage", and clicking "Click to show" next to the default function key.
+Retrieve the Function Id, Host, and API key via the CLI.
+
+```
+export COUGAR_FUNCTION_ID=$(terraform output --json | jq -r '.cougar_function_id.value')
+export COUGAR_FUNCTION_HOST=$(terraform output --json | jq -r '.cougar_function_host.value')
+export COUGAR_API_KEY=$(az rest --method post --uri "$COUGAR_FUNCTION_ID/host/default/listKeys?api-version=2018-11-01" | jq -r .functionKeys.default)
+export COUGAR_FUNCTION_URL=http://$COUGAR_FUNCTION_HOST/api/Cougar
+curl "$COUGAR_FUNCTION_URL?code=$COUGAR_API_KEY"
+```
+
+The result should show an error message indicating required parameters are missing:
+
+```
+{"message":"Must provide the host and port for the target TCP server as query parameters."}%
+```
 
 If you have [Netcat](http://netcat.sourceforge.net/) and [ngrok](https://ngrok.com/) installed, you can use this script:
 

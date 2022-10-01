@@ -86,6 +86,6 @@ resource "google_storage_bucket_object" "cheetah" {
   source = "${path.module}/../../assets/cheetah.jpg"
 
   metadata = {
-    "flag" = "${var.flag_prefix}{${random_uuid.cheetah_storage_flag[0].id}}"
+    flag = "${var.flag_prefix}{${random_uuid.cheetah_storage_flag[0].id}}"
   }
 }

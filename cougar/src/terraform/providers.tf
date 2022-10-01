@@ -1,8 +1,8 @@
 terraform {
   required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "4.38.0"
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "3.25.0"
     }
 
     null = {
@@ -32,8 +32,11 @@ terraform {
   }
 }
 
-provider "google" {
-  project         = var.project_id
-  region          = var.region
-  request_timeout = "120s"
+provider "azurerm" {
+  features {
+    key_vault {
+      purge_soft_delete_on_destroy    = false
+      recover_soft_deleted_key_vaults = true
+    }
+  }
 }
