@@ -53,7 +53,7 @@ resource "null_resource" "cougar_build" {
   provisioner "local-exec" {
     working_dir = "${path.module}/../cougar"
     command     = <<-EOT
-        dotnet publish --output "./../publish" --configuration "Release" /p:GenerateRuntimeConfigurationFiles=true --runtime linux-x64 --self-contained false
+        dotnet publish --output "./../publish" --configuration "Release" /p:GenerateRuntimeConfigurationFiles=true --self-contained false
     EOT
   }
 

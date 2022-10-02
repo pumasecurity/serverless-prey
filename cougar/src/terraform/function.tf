@@ -31,17 +31,16 @@ data "azurerm_storage_account_sas" "sas" {
   }
 }
 
-resource "azurerm_linux_function_app" "function_linux" {
+resource "azurerm_linux_function_app" "function" {
   count = var.app_service_os_type == "Linux" ? 1 : 0
 
   name                = "cougar${var.unique_identifier}"
   location            = azurerm_resource_group.cougar.location
   resource_group_name = azurerm_resource_group.cougar.name
 
-  service_plan_id            = azurerm_service_plan.plan.id
-  storage_account_name       = azurerm_storage_account.function.name
-  storage_account_access_key = azurerm_storage_account.function.primary_access_key
-
+  service_plan_id             = azurerm_service_plan.plan.id
+  storage_account_name        = azurerm_storage_account.function.name
+  storage_account_access_key  = azurerm_storage_account.function.primary_access_key
   functions_extension_version = "~4"
 
   site_config {
@@ -65,7 +64,35 @@ resource "azurerm_linux_function_app" "function_linux" {
   }
 }
 
-#TODO: UPDATE FOR WINDOWS
-# resource "azurerm_windows_function_app" "function_linux" {
-#     count = var.app_service_os_type == "Windows" ? 1 : 0
-# }
+resource "azurerm_windows_function_app" "function" {
+  count = var.app_service_os_type == "Windows" ? 1 : 0
+
+  name                = "cougar${var.unique_identifier}"
+  location            = azurerm_resource_group.cougar.location
+  resource_group_name = azurerm_resource_group.cougar.name
+
+  service_plan_id             = azurerm_service_plan.plan.id
+  storage_account_name        = azurerm_storage_account.function.name
+  storage_account_access_key  = azurerm_storage_account.function.primary_access_key
+  functions_extension_version = "~4"
+
+  site_config {
+    ftps_state = "Disabled"
+
+    application_stack {
+      dotnet_version = "6"
+    }
+  }
+
+  app_settings = {
+    FUNCTION_APP_EDIT_MODE   = "readonly"
+    HASH                     = data.archive_file.cougar_build.output_base64sha256
+    WEBSITE_RUN_FROM_PACKAGE = "https://${azurerm_storage_account.function.name}.blob.core.windows.net/${azurerm_storage_container.function_cougar.name}/${azurerm_storage_blob.function_cougar.name}${data.azurerm_storage_account_sas.sas.sas}"
+    COUGAR_KEY_VAULT_URL     = ""
+    COUGAR_SECRET_NAME       = ""
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+}

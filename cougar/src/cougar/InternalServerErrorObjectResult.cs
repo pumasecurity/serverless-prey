@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Puma.Security.Functions.Azure
 {
-    public class InternalServerErrorObjectResult : ObjectResult
+    public class InternalServerErrorObjectResult : JsonResult
     {
         public InternalServerErrorObjectResult(object value) : base(value)
         {

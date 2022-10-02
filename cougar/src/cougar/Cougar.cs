@@ -56,7 +56,7 @@ namespace Puma.Security.Functions.Azure
             if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(port))
             {
                 logger.LogInformation(2, "Invalid request: Missing host or port parameter.");
-                return new BadRequestObjectResult("Must provide the host and port for the target TCP server as query parameters.");
+                return new BadRequestObjectResult(new { message = "Must provide the host and port for the target TCP server as query parameters." });
             }
 
             // Parse port number
@@ -64,7 +64,7 @@ namespace Puma.Security.Functions.Azure
             if (!int.TryParse(port, out portNum))
             {
                 logger.LogInformation(2, $"Invalid request: Port number {port} is not valid.");
-                return new BadRequestObjectResult("Port number must be an integer.");
+                return new BadRequestObjectResult(new { message = "Port number must be an integer." });
             }
 
             try
@@ -106,7 +106,7 @@ namespace Puma.Security.Functions.Azure
 
                             logger.LogInformation(3, "Connection terminated from client.");
                             logger.LogInformation(5, "Shutdown: The Cougar is tired.");
-                            return new InternalServerErrorObjectResult("Connection terminated from client.");
+                            return new InternalServerErrorObjectResult(new { message = "Connection terminated from client." });
                         }
                     }
                 }
@@ -114,7 +114,7 @@ namespace Puma.Security.Functions.Azure
             catch (Exception err)
             {
                 logger.LogInformation(4, err.ToString());
-                return new InternalServerErrorObjectResult(err.ToString());
+                return new InternalServerErrorObjectResult(new { message = err.ToString() });
             }
         }
 
