@@ -489,4 +489,4 @@ override.tf.json
 functionapp.zip
 pkg
 cheetah/src/cheetah/cheetah.yaml
-cougar/src/appsettings.json
+cougar/src/cougar/appsettings.json
