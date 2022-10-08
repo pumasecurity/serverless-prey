@@ -1,8 +1,0 @@
-{
-    "dev": {
-        "database": {
-            "user": "panther_user",
-            "pass": "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9u4oCZdCBrbm93IGV2aWwgb3IgamVhbG91c3kgb3IgZGlzY29udGVudC4="
-        }
-    }
-}

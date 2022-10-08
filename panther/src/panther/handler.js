@@ -6,7 +6,12 @@ const net = require('net');
 const cp = require('child_process');
 const aws = require('aws-sdk');
 
-const ssm = new aws.SSM();
+const secrets = new aws.SecretsManager();
+
+function isApiTokenValid(token) {
+  const apiToken = process.env.PANTHER_API_KEY;
+  return token == apiToken
+}
 
 // Logging util
 function writeLog(id, message) {
@@ -21,16 +26,31 @@ function writeLog(id, message) {
 
 // Secrets management access
 async function getSecret() {
-  const params = { Name: '/panther/database/password', WithDecryption: true };
-  const response = await ssm.getParameter(params).promise();
-  return response.Parameter.Value;
+  const name = process.env.PANTHER_SECRET_ARN;
+  if (!name)
+    return "";
+
+  const params = { SecretId: name };
+  const response = await secrets.getSecretValue(params).promise();
+  return response.SecretString;
 }
 
 module.exports.panther = async (event) => {
   writeLog(1, 'Startup: The Panther is running.');
 
+  //validate API token
+  if (!isApiTokenValid(event.headers["x-api-key"])) {
+    writeLog(2, 'Invalid API key.');
+    return {
+      statusCode: 403,
+      body: JSON.stringify({
+        message: 'Forbidden',
+      }),
+    };
+  }
+
   try {
-    // Read basic secret from SSM to produce normal log activity
+    // Read basic secret from secrets manager to produce normal log activity
     const secret = await getSecret();
     // NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
     // DEBUG ONLY: Make sure it found the value.

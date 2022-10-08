@@ -4,16 +4,16 @@ Cougar is a C# function that can be deployed to the Azure to establish a TCP rev
 
 ## Installing Prerequisites
 
-* [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
+* [.NET 6 SDK](https://dotnet.microsoft.com/download)
 * [Azure CLI](https://github.com/Azure/azure-cli)
 * [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-### Terraform Deployment
+## Deploying The Function
 
 ```bash
 az login
-export TF_VAR_unique_identifier=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
-cd cougar/src/terraform/
+export TF_VAR_unique_identifier=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}')
+cd ./cougar/src/terraform/
 terraform init
 terraform apply --auto-approve
 ```

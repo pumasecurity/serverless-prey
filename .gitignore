@@ -490,3 +490,5 @@ functionapp.zip
 pkg
 cheetah/src/cheetah/cheetah.yaml
 cougar/src/cougar/appsettings.json
+panther/src/panther.zip
+panther/src/panther/config.json
