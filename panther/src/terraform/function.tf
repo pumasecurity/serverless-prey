@@ -24,19 +24,17 @@ resource "local_file" "panther_config" {
 }
 
 data "archive_file" "panther_build" {
+  depends_on = [
+    local_file.panther_config
+  ]
+
   type        = "zip"
   source_dir  = "${path.module}/../panther"
   output_path = "${path.module}/../panther.zip"
-
-  excludes = [
-    "${path.module}/../panther/.eslintrc.json",
-    "${path.module}/../panther/package-lock.json",
-  ]
 }
 
 resource "aws_lambda_function" "panther" {
   depends_on = [
-    //aws_s3_bucket.panther,
     aws_secretsmanager_secret_version.panther
   ]
 
