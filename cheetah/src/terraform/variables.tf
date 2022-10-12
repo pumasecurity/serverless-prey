@@ -11,6 +11,7 @@ variable "project_id" {
 variable "region" {
   description = "The Google Cloud Platform region for all the resources."
   type        = string
+  default     = "us-east1"
 }
 
 variable "configure_ctf" {

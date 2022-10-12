@@ -1,3 +1,12 @@
+# Function API key
+resource "random_string" "cheetah_api_key" {
+  length  = 32
+  special = false
+  upper   = true
+  lower   = true
+  numeric = true
+}
+
 # Function service account
 resource "google_service_account" "cheetah" {
   count = var.configure_ctf ? 1 : 0
@@ -64,6 +73,7 @@ resource "google_cloudfunctions_function" "cheetah" {
   source_archive_object = "${data.archive_file.function_cheetah.output_md5}.zip"
 
   environment_variables = {
+    CHEETAH_API_KEY          = random_string.cheetah_api_key.id
     CHEETAH_PROJECT_ID       = var.project_id
     CHEETAH_SECRET_NAME      = var.configure_ctf ? google_secret_manager_secret.cheetah[0].secret_id : ""
     CHEETAH_LOG_NAME         = "serverless-prey-cheetah-${var.unique_identifier}"
@@ -79,5 +89,5 @@ resource "google_cloudfunctions_function_iam_member" "cheetah" {
   cloud_function = google_cloudfunctions_function.cheetah.name
 
   role   = "roles/cloudfunctions.invoker"
-  member = "${length(regexall("^.*gserviceaccount\\.com$", data.google_client_openid_userinfo.this.email)) > 0 ? "serviceAccount" : "user"}:${data.google_client_openid_userinfo.this.email}"
+  member = "allUsers"
 }

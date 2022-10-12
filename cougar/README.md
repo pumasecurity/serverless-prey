@@ -12,7 +12,8 @@ Cougar is a C# function that can be deployed to the Azure to establish a TCP rev
 
 ```bash
 az login
-export TF_VAR_unique_identifier=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}')
+export TF_VAR_unique_identifier=$(uuidgen | cut -b 25-34 | awk '{print tolower($0)}')
+export TF_VAR_resource_group=serverless-prey-cougar-${TF_VAR_unique_identifier}
 cd ./cougar/src/terraform/
 terraform init
 terraform apply --auto-approve
