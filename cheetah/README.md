@@ -14,7 +14,6 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 gcloud auth application-default login
 export TF_VAR_unique_identifier=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}')
 export TF_VAR_project_id=YOUR_PROJECT_ID
-export TF_VAR_region=YOUR_REGION
 cd ./cougar/src/terraform/
 terraform init
 terraform apply --auto-approve
@@ -26,8 +25,8 @@ Retrieve the Function URL:
 
 ```bash
 export CHEETAH_FUNCTION_URL=$(terraform output --json | jq -r '.cheetah_function_url.value')
-export CHEETAH_API_KEY=$(gcloud auth print-identity-token)
-curl -H "Authorization: Bearer $CHEETAH_API_KEY" "$CHEETAH_FUNCTION_URL"
+export CHEETAH_API_KEY=$(terraform output --json | jq -r '.cheetah_api_key.value')
+curl -H "X-API-Key: $CHEETAH_API_KEY" "$CHEETAH_FUNCTION_URL"
 ```
 
 The result should show an error message indicating required C2 parameters are missing:
