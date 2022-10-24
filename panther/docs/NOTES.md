@@ -34,11 +34,13 @@ drwxrwxr-x  3 root root     27 Jan  6 16:16 node_modules
 ```
 cat config.json
 {
-    "dev": {
-        "database": {
-            "user": "panther_user",
-            "pass": "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9u4oCZdCBrbm93IGV2aWwgb3IgamVhbG91c3kgb3IgZGlzY29udGVudC4="
-        }
+    "database": {
+        "user": "panther_user",
+        "pass": "RG9ncyBhcmUgb3VyIGxpbmsgdG8gcGFyYWRpc2UuIFRoZXkgZG9u4oCZdCBrbm93IGV2aWwgb3IgamVhbG91c3kgb3IgZGlzY29udGVudC4="
+    },
+    "storage": {
+        "bucket": "panther",
+        "object": "panther.jpg"
     }
 }
 ```
@@ -140,11 +142,13 @@ export AWS_SECRET_ACCESS_KEY=<ENTER SECRET ACCESS KEY>
 export AWS_SESSION_TOKEN=<ENTER SESSION TOKEN>
 ```
 
-Run the following commands:
+Run the following commands to exfiltrate S3 object data and secrets manager data:
 
 ```bash
-aws s3 sync "s3://panther-$BUCKET_SUFFIX" ~/panther
-aws ssm get-parameter --name /panther/database/password --with-decryption --region "$AWS_REGION"
+aws s3api get-object --bucket panther-$UNIQUE_ID --key panther.jpg ~/Downloads
+aws s3api get-object-tagging --bucket panther-fgageo0q --key panther.jpg
+
+aws secretsmanager get-secret-value --secret-id $PANTHER_SECRET_ARN
 ```
 
 Running the following test once per hour for expired keys:

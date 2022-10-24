@@ -230,23 +230,23 @@ echo
 List the secrets:
 
 ```bash
-export BEARER_TOKEN=<SET TOKEN VALUE>
-export VAULT_NAME=cougar$TF_VAR_UniqueString
-curl -s -H "Authorization: Bearer $BEARER_TOKEN" "https://$VAULT_NAME.vault.azure.net/secrets?api-version=7.0"
+export AZURE_VAULT_TOKEN="<SET_TOKEN_VALUE>"
+export KEY_VAULT_URI="<SET_VAULT_URI>"
+export KEY_VAULT_SECRET="<SET_SECRET_NAME>"
+curl -s -H "Authorization: Bearer $AZURE_VAULT_TOKEN" "${KEY_VAULT_URI}secrets?api-version=7.0" | jq
 ```
 
-List the versions for the secret:
+Get the latest secret version for the secret:
 
 ```bash
-export COUGAR_DB_PASS=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "https://$VAULT_NAME.vault.azure.net/secrets?api-version=7.0" | jq -r '.value[0].id' )
-curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$COUGAR_DB_PASS/versions?api-version=7.0"
+KEY_VAULT_SECRET_VERSION=$(curl -s -H "Authorization: Bearer $AZURE_VAULT_TOKEN" "${KEY_VAULT_URI}secrets/${KEY_VAULT_SECRET}/versions?api-version=7.0" | jq -r '.value[-1].id')
+echo $KEY_VAULT_SECRET_VERSION
 ```
 
-Read a secret value:
+Read the secret value:
 
 ```bash
-export COUGAR_DB_PASS_V0=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$COUGAR_DB_PASS/versions?api-version=7.0" | jq -r '.value[0].id')
-curl -H "Authorization: Bearer $BEARER_TOKEN" "$COUGAR_DB_PASS_V0?api-version=7.0"
+curl -s -H "Authorization: Bearer $AZURE_VAULT_TOKEN" "$KEY_VAULT_SECRET_VERSION?api-version=7.0" | jq
 ```
 
 ### Azure Storage
@@ -263,9 +263,12 @@ echo
 List the storage account containers:
 
 ```bash
-export BEARER_TOKEN=<SET TOKEN VALUE>
-export STORAGE_ACCOUNT="cougarassets$TF_VAR_UniqueString"
-curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/?comp=list" | xmllint --format -
+export AZURE_STORAGE_TOKEN="<SET TOKEN VALUE>"
+export STORAGE_ACCOUNT="<SET_STORAGE_ACCOUNT_NAME"
+export STORAGE_CONTAINER="<SET_CONTAINER_NAME>"
+export BLOB_NAME="<SET_BLOB_OBJECT_NAME>"
+
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $AZURE_STORAGE_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/?comp=list" | xmllint --format -
 ```
 
 ```xml
@@ -324,13 +327,19 @@ curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "
 List the blobs in the assets container:
 
 ```bash
-curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/assets?restype=container&comp=list"
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $AZURE_STORAGE_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/$STORAGE_CONTAINER?restype=container&comp=list"
 ```
 
-Download our target cougar image:
+Get target cougar image blob properties:
 
 ```bash
-curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/assets/cougar.jpg" --output ~/Downloads/cougar.jpg
+curl -s --head -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $AZURE_STORAGE_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/$STORAGE_CONTAINER/$BLOB_NAME"
+```
+
+Download our target cougar image blob:
+
+```bash
+curl -s -H "x-ms-version: 2017-11-09" -H "Authorization: Bearer $BEARER_TOKEN" "https://$STORAGE_ACCOUNT.blob.core.windows.net/$STORAGE_CONTAINER/$BLOB_NAME" --output ~/Downloads/cougar.jpg
 ```
 
 ## Persistence
