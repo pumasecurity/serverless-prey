@@ -66,4 +66,4 @@ terraform destroy
 
 ## Learning More
 
-Read [documentation](docs) on what you can accomplish once you connect to the runtime via Panther.
+Read [documentation](./docs/NOTES.md) on what you can accomplish once you connect to the runtime via Panther.

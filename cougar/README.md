@@ -73,4 +73,4 @@ terraform destroy
 
 ## Learning More
 
-Read [documentation](docs) on what you can accomplish once you connect to the runtime via Cougar.
+Read [documentation](./docs/CONSUMPTION.md) on what you can accomplish once you connect to the runtime via Cougar.
