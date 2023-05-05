@@ -80,7 +80,7 @@ resource "azurerm_windows_function_app" "function" {
     ftps_state = "Disabled"
 
     application_stack {
-      dotnet_version = "6"
+      dotnet_version = "v7.0"
     }
   }
 
