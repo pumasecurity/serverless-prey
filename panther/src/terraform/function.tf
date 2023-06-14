@@ -32,9 +32,7 @@ data "archive_file" "panther_build" {
   source_dir  = "${path.module}/../panther"
   output_path = "${path.module}/../panther.zip"
 
-  excludes = [
-    "${path.module}/../panther/node_modules"
-  ]
+  excludes = fileset("${path.module}/../panther", "node_modules/**")
 }
 
 resource "aws_lambda_function" "panther" {
