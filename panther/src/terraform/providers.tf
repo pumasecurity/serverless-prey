@@ -33,5 +33,5 @@ terraform {
 }
 
 provider "aws" {
-  profile = "$(var.profile}"
+  profile = var.profile
 }
