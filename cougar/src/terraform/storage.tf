@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "function" {
-  name                     = "serverlessprey${var.unique_identifier}"
+  name                     = "cougar${var.unique_identifier}"
   location                 = var.location
   resource_group_name      = azurerm_resource_group.cougar.name
   account_tier             = "Standard"
