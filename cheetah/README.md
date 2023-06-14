@@ -14,7 +14,7 @@ Cheetah is a Go function that can be deployed to the Google Cloud Platform to es
 gcloud auth application-default login
 export TF_VAR_unique_identifier=$(uuidgen | cut -b 25-36 | awk '{print tolower($0)}')
 export TF_VAR_project_id=YOUR_PROJECT_ID
-cd ./cougar/src/terraform/
+cd ./cheetah/src/terraform/
 terraform init
 terraform apply --auto-approve
 ```
