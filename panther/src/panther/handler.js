@@ -4,13 +4,14 @@ https://stackoverflow.com/a/33292942
 */
 const net = require('net');
 const cp = require('child_process');
-const aws = require('aws-sdk');
+// eslint-disable-next-line import/no-unresolved
+const { SecretsManagerClient } = require('@aws-sdk/client-secrets-manager');
 
-const secrets = new aws.SecretsManager();
+const secrets = new SecretsManagerClient();
 
 function isApiTokenValid(token) {
   const apiToken = process.env.PANTHER_API_KEY;
-  return token == apiToken
+  return token === apiToken;
 }
 
 // Logging util
@@ -27,8 +28,10 @@ function writeLog(id, message) {
 // Secrets management access
 async function getSecret() {
   const name = process.env.PANTHER_SECRET_ARN;
-  if (!name)
-    return "";
+
+  if (!name) {
+    return '';
+  }
 
   const params = { SecretId: name };
   const response = await secrets.getSecretValue(params).promise();
@@ -38,8 +41,8 @@ async function getSecret() {
 module.exports.panther = async (event) => {
   writeLog(1, 'Startup: The Panther is running.');
 
-  //validate API token
-  if (!isApiTokenValid(event.headers["x-api-key"])) {
+  // Validate API token.
+  if (!isApiTokenValid(event.headers['x-api-key'])) {
     writeLog(2, 'Invalid API key.');
     return {
       statusCode: 403,
