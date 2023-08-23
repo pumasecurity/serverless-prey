@@ -3,7 +3,7 @@ service: cheetah-${env:BUCKET_SUFFIX, ''}
 
 provider:
   name: google
-  runtime: go111
+  runtime: go116
   region: ${env:GCP_REGION, 'us-central1'}
   project: ${env:GCP_PROJECT}
   credentials: ${env:GCP_CREDENTIALS_FILE}
@@ -15,13 +15,13 @@ custom:
   withBucketResources:
     # WITH_BUCKET
     true: ${file(./resources.yml)}
-    false: ''
+    false: ""
 
 resources: ${self:custom.withBucketResources.${env:WITH_BUCKET, 'false'}}
 
 package:
   exclude:
-    - '**'
+    - "**"
   include:
     - cheetah.go
     - go.mod
@@ -34,3 +34,5 @@ functions:
     events:
       - http: http
     timeout: 60s
+    environment:
+      CHEETAH_PROJECT_ID: ${env:GCP_PROJECT}

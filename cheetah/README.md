@@ -57,7 +57,7 @@ To deploy natively without the serverless framework, configure `gcloud` in the T
 
 ```bash
 gcloud auth activate-service-account --key-file ~/.gcloud/keyfile.json
-gcloud functions deploy cheetah --entry-point Cheetah --runtime go111 --trigger-http --service-account=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID@appspot.gserviceaccount.com
+gcloud functions deploy cheetah --entry-point Cheetah --runtime go116 --trigger-http --service-account=YOUR_GOOGLE_CLOUD_PLATFORM_PROJECT_ID@appspot.gserviceaccount.com
 ```
 
 ## Testing in GCP

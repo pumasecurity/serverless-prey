@@ -9,12 +9,9 @@ https://gist.github.com/yougg/b47f4910767a74fcfe1077d21568070e
 package cheetah
 
 import (
-	"cloud.google.com/go/logging"
-	secretmanager "cloud.google.com/go/secretmanager/apiv1beta1"
 	"context"
 	"encoding/json"
 	"fmt"
-	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1beta1"
 	"log"
 	"net"
 	"net/http"
@@ -22,6 +19,10 @@ import (
 	"os/exec"
 	"strconv"
 	"time"
+
+	"cloud.google.com/go/logging"
+	secretmanager "cloud.google.com/go/secretmanager/apiv1"
+	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
 func respondWithError(w http.ResponseWriter, errMsg string, statusCode int) {
@@ -40,14 +41,8 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	// Audit logging
 	writeLog(1, "Startup: The Cheetah is running.")
 
-	// Grab the function timeout
-	timeout, err := strconv.ParseUint(os.Getenv("X_GOOGLE_FUNCTION_TIMEOUT_SEC"), 10, 64)
-
-	if err != nil {
-		writeLog(2, "Invalid request: Failed to parse function timeout.")
-		respondWithError(w, err.Error(), 500)
-		return
-	}
+	// function timeout
+	timeout := 60
 
 	// Read basic secret to produce normal audit log activity
 	secret := getSecret("cheetah-database-pass")
@@ -89,7 +84,7 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	timedOut := false
 
 	// Close the connection 1 second before the function times out.
-	time.AfterFunc((time.Duration(timeout-1)*time.Second), func() {
+	time.AfterFunc((time.Duration(timeout-1) * time.Second), func() {
 		timedOut = true
 		conn.Close()
 	})
@@ -98,7 +93,7 @@ func Cheetah(w http.ResponseWriter, r *http.Request) {
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = conn, conn, conn
 	cmd.Run()
 
-	if (timedOut == true) {
+	if timedOut == true {
 		respondWithError(w, "Timeout: Function timeout occurred.", 500)
 	} else {
 		respondWithError(w, "Connection terminated from client.", 500)
@@ -113,7 +108,7 @@ func writeLog(id int, message string) {
 	ctx := context.Background()
 
 	// Sets your Google Cloud Platform project ID.
-	projectID := os.Getenv("X_GOOGLE_GCLOUD_PROJECT")
+	projectID := os.Getenv("CHEETAH_PROJECT_ID")
 
 	// Creates a client.
 	client, err := logging.NewClient(ctx, projectID)
@@ -142,7 +137,7 @@ func writeLog(id int, message string) {
 // Secrets manager access
 func getSecret(name string) (value string) {
 	// Sets your Google Cloud Platform project ID.
-	projectID := os.Getenv("X_GOOGLE_GCLOUD_PROJECT")
+	projectID := os.Getenv("CHEETAH_PROJECT_ID")
 	secretPath := fmt.Sprintf("projects/%s/secrets/%s/versions/latest", projectID, name)
 
 	// Create the client.
