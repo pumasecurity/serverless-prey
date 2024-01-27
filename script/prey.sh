@@ -152,11 +152,10 @@ panther)
     ;;
 esac
 
-JOB=2
-
-while ! [[ -z "$LOOP" ]] || [[ $JOB -eq 2 ]]; do
+while ! [[ -z "$LOOP" ]] || [[ $NC_JOB == "" ]]; do
     if [[ -z "$COMMAND" ]]; then
         nc -l "$LISTENER_PORT" &
+        NC_JOB=$(jobs | wc -l)
     else
         mkfifo "$TMP_SUBDIR/fifo"
         tail -f "$TMP_SUBDIR/fifo" | nc -l "$LISTENER_PORT" >"$TMP_SUBDIR/command_output.txt" &
@@ -194,7 +193,7 @@ while ! [[ -z "$LOOP" ]] || [[ $JOB -eq 2 ]]; do
     if [[ -z "$COMMAND" ]]; then
         # Bring the Netcat listener back to the foreground.
         printf '> '
-        fg $JOB >/dev/null
+        fg $NC_JOB >/dev/null
 
         # Break out of the loop on CTRL-C.
         test $? -gt 128 && break
@@ -208,7 +207,6 @@ while ! [[ -z "$LOOP" ]] || [[ $JOB -eq 2 ]]; do
 
     echo
     echo "Connection terminated."
-    JOB=$(($JOB + 2))
 
     if ! [[ -z "$LOOP" ]]; then
         rm "$CURL_OUTPUT_FILE"
