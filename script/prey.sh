@@ -21,7 +21,7 @@ CURL_OUTPUT_FILE="$TMP_SUBDIR/curl_output.txt"
 
 cleanup() {
     rm -r "$TMP_SUBDIR"
-    kill $(jobs -p) 2>/dev/null
+    pkill -P $$ 2>/dev/null
 }
 
 # Kill all subprocesses and clean up files on exit.
