@@ -17,9 +17,6 @@ set -m
 TMP_SUBDIR="/tmp/$(uuidgen)"
 mkdir "$TMP_SUBDIR"
 
-NGROK_LOG_FILE="$TMP_SUBDIR/ngrok_output.json"
-touch "$NGROK_LOG_FILE"
-
 CURL_OUTPUT_FILE="$TMP_SUBDIR/curl_output.txt"
 
 cleanup() {
@@ -70,6 +67,11 @@ while [[ "$#" -gt 0 ]]; do
         shift
         ;;
 
+    -n | --no-ngrok)
+        NO_NGROK="$value"
+        shift
+        ;;
+
     -d | --debug)
         DEBUG="$value"
         shift
@@ -94,48 +96,59 @@ if [[ -z "$URL" ]]; then
     exit 1
 fi
 
-# Run ngrok and derive the public-facing host and port it is using.
-ngrok tcp "$LISTENER_PORT" --log stdout --log-format json >"$NGROK_LOG_FILE" &
-sleep 3
+if [[ -z "$NO_NGROK" ]]; then
+    NGROK_LOG_FILE="$TMP_SUBDIR/ngrok_output.json"
+    touch "$NGROK_LOG_FILE"
 
-if ! [[ -n $(pgrep ngrok) ]]; then
-    echo "Error: ngrok failed to start properly."
+    # Run ngrok and derive the public-facing host and port it is using.
+    ngrok tcp "$LISTENER_PORT" --log stdout --log-format json >"$NGROK_LOG_FILE" &
+    sleep 3
 
-    if ! [[ -z "$DEBUG" ]]; then
-        cat "$NGROK_LOG_FILE"
+    if ! [[ -n $(pgrep ngrok) ]]; then
+        echo "Error: ngrok failed to start properly."
+
+        if ! [[ -z "$DEBUG" ]]; then
+            cat "$NGROK_LOG_FILE"
+        fi
+
+        exit 1
     fi
 
-    exit 1
-fi
+    NGROK_HOST_AND_PORT=$(cat "$NGROK_LOG_FILE" | jq -r 'select(.msg == "started tunnel").url' | awk 'BEGIN { FS="tcp://" }; { print $2 }')
+    NGROK_HOST=$(echo $NGROK_HOST_AND_PORT | awk 'BEGIN { FS=":" }; { print $1 }')
+    NGROK_PORT=$(echo $NGROK_HOST_AND_PORT | awk 'BEGIN { FS=":" }; { print $2 }')
 
-NGROK_HOST_AND_PORT=$(cat "$NGROK_LOG_FILE" | jq -r 'select(.msg == "started tunnel").url' | awk 'BEGIN { FS="tcp://" }; { print $2 }')
-NGROK_HOST=$(echo $NGROK_HOST_AND_PORT | awk 'BEGIN { FS=":" }; { print $1 }')
-NGROK_PORT=$(echo $NGROK_HOST_AND_PORT | awk 'BEGIN { FS=":" }; { print $2 }')
+    if [[ -z $NGROK_HOST || -z $NGROK_PORT ]]; then
+        echo "Error: Failed to get host or port from ngrok. Host: $NGROK_HOST_AND_PORT"
 
-if [[ -z $NGROK_HOST || -z $NGROK_PORT ]]; then
-    echo "Error: Failed to get host or port from ngrok. Host: $NGROK_HOST_AND_PORT"
+        if ! [[ -z "$DEBUG" ]]; then
+            cat "$NGROK_LOG_FILE"
+        fi
 
-    if ! [[ -z "$DEBUG" ]]; then
-        cat "$NGROK_LOG_FILE"
+        exit 1
     fi
 
-    exit 1
+    TARGET_HOST="$NGROK_HOST"
+    TARGET_PORT="$NGROK_PORT"
+else
+    TARGET_HOST="$(curl -s ipinfo.io/ip)"
+    TARGET_PORT="$LISTENER_PORT"
 fi
 
 case $MODE in
 cheetah)
     HEADER="X-API-Key: $API_KEY"
-    URL="$URL?host=$NGROK_HOST&port=$NGROK_PORT"
+    URL="$URL?host=$TARGET_HOST&port=$TARGET_PORT"
     ;;
 
 cougar)
     HEADER=""
-    URL="$URL?host=$NGROK_HOST&port=$NGROK_PORT&code=$API_KEY"
+    URL="$URL?host=$TARGET_HOST&port=$TARGET_PORT&code=$API_KEY"
     ;;
 
 panther)
     HEADER="X-API-Key: $API_KEY"
-    URL="$URL?host=$NGROK_HOST&port=$NGROK_PORT"
+    URL="$URL?host=$TARGET_HOST&port=$TARGET_PORT"
     ;;
 esac
 
