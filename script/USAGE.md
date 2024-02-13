@@ -21,3 +21,5 @@ panther/script/panther --url-id AMAZON_API_GATEWAY_ID --api-key AMAZON_API_GATEW
 * `--port`, `-p` (Optional): The port that the Netcat server will listen on. Defaults to 4444.
 * `--command`, `-c` (Optional): If provided, this command will be executed as soon as the connection to the Serverless container is established. The connection will be terminated one second later, and the results will be displayed. Example: `panther/script/panther --url-id AMAZON_API_GATEWAY_ID --api-key AMAZON_API_GATEWAY_API_KEY --command id # uid=496(sbx_user1051) gid=495 groups=495`
 * `--loop`, `-l` (Optional): If set to true, whenever a successful connection times out, the CLI will attempt to automatically reconnect. This option is ignored if `--command` is set.
+* `--no-ngrok`, `-n` (Optional): If set to true, do not run ngrok. Instead, route through the public IP address of the machine running this script.
+* `--debug`, `-d` (Optional): Print debug messages.

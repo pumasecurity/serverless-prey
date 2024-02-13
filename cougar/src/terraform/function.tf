@@ -53,7 +53,7 @@ resource "azurerm_linux_function_app" "function" {
 
   app_settings = {
     FUNCTION_APP_EDIT_MODE   = "readonly"
-    HASH                     = data.archive_file.cougar_build.output_base64sha256
+    HASH                     = filebase64sha256("${path.module}/../functionapp.zip")
     WEBSITE_RUN_FROM_PACKAGE = "https://${azurerm_storage_account.function.name}.blob.core.windows.net/${azurerm_storage_container.function_cougar.name}/${azurerm_storage_blob.function_cougar.name}${data.azurerm_storage_account_sas.sas.sas}"
     COUGAR_KEY_VAULT_URL     = var.configure_ctf ? azurerm_key_vault.vault[0].vault_uri : ""
     COUGAR_SECRET_NAME       = var.configure_ctf ? azurerm_key_vault_secret.cougar[0].name : ""
@@ -86,7 +86,7 @@ resource "azurerm_windows_function_app" "function" {
 
   app_settings = {
     FUNCTION_APP_EDIT_MODE   = "readonly"
-    HASH                     = data.archive_file.cougar_build.output_base64sha256
+    HASH                     = filebase64sha256("${path.module}/../functionapp.zip")
     WEBSITE_RUN_FROM_PACKAGE = "https://${azurerm_storage_account.function.name}.blob.core.windows.net/${azurerm_storage_container.function_cougar.name}/${azurerm_storage_blob.function_cougar.name}${data.azurerm_storage_account_sas.sas.sas}"
     COUGAR_KEY_VAULT_URL     = ""
     COUGAR_SECRET_NAME       = ""
