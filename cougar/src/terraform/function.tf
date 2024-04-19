@@ -47,7 +47,7 @@ resource "azurerm_linux_function_app" "function" {
     ftps_state = "Disabled"
 
     application_stack {
-      dotnet_version = "6.0"
+      dotnet_version = "v7.0"
     }
   }
 
