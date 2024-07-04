@@ -155,7 +155,7 @@ esac
 while ! [[ -z "$LOOP" ]] || [[ $NC_JOB == "" ]]; do
     if [[ -z "$COMMAND" ]]; then
         nc -l "$LISTENER_PORT" &
-        NC_JOB=$(jobs | wc -l)
+        NC_JOB=$(jobs | awk -F '[][]' '{print $2}' | tail -1)
     else
         mkfifo "$TMP_SUBDIR/fifo"
         tail -f "$TMP_SUBDIR/fifo" | nc -l "$LISTENER_PORT" >"$TMP_SUBDIR/command_output.txt" &
