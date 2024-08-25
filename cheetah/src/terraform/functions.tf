@@ -9,8 +9,6 @@ resource "random_string" "cheetah_api_key" {
 
 # Function service account
 resource "google_service_account" "cheetah" {
-  count = var.configure_ctf ? 1 : 0
-
   account_id   = "cheetah-${var.unique_identifier}"
   display_name = "serverless-prey-cheetah-${var.unique_identifier}"
   description  = "Serverless Prey Cheetah service account"
@@ -18,11 +16,10 @@ resource "google_service_account" "cheetah" {
 
 # Function access to logging
 resource "google_project_iam_member" "cheetah_logging" {
-  count = var.configure_ctf ? 1 : 0
 
   project = var.project_id
   role    = "roles/logging.logWriter"
-  member  = "serviceAccount:${google_service_account.cheetah[0].email}"
+  member  = "serviceAccount:${google_service_account.cheetah.email}"
 }
 
 # Function secrets accessor
@@ -32,7 +29,7 @@ resource "google_secret_manager_secret_iam_member" "cheetah_secret" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.cheetah[0].secret_id
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.cheetah[0].email}"
+  member    = "serviceAccount:${google_service_account.cheetah.email}"
 }
 
 # Function storage bucket access
@@ -41,7 +38,7 @@ resource "google_storage_bucket_iam_member" "cheetah_storage" {
 
   bucket = google_storage_bucket.cheetah[0].name
   role   = "roles/storage.objectViewer"
-  member = "serviceAccount:${google_service_account.cheetah[0].email}"
+  member = "serviceAccount:${google_service_account.cheetah.email}"
 }
 
 resource "google_cloudfunctions_function" "cheetah" {
@@ -66,7 +63,7 @@ resource "google_cloudfunctions_function" "cheetah" {
   project               = var.project_id
   region                = var.region
   runtime               = "go122"
-  service_account_email = var.configure_ctf ? google_service_account.cheetah[0].email : "${var.project_id}@appspot.gserviceaccount.com"
+  service_account_email = google_service_account.cheetah.email
   timeout               = 60
   trigger_http          = true
   source_archive_bucket = google_storage_bucket.function.name
