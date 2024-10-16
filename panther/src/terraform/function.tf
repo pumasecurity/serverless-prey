@@ -42,7 +42,7 @@ resource "aws_lambda_function" "panther" {
 
   function_name    = "serverless-prey-panther-${var.unique_identifier}"
   description      = "Serverless Prey function for execution environment inspection."
-  runtime          = "nodejs16.x"
+  runtime          = "nodejs20.x"
   timeout          = 60
   memory_size      = 512
   handler          = "handler.panther"

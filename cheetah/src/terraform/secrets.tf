@@ -8,7 +8,7 @@ resource "google_secret_manager_secret" "cheetah" {
   secret_id = "cheetah-${random_uuid.cheetah_secret_name[0].id}"
 
   replication {
-    automatic = true
+    auto {}
   }
 }
 
