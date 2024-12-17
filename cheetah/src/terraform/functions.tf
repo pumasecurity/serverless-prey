@@ -62,7 +62,7 @@ resource "google_cloudfunctions_function" "cheetah" {
   name                  = "serverless-prey-cheetah-${var.unique_identifier}"
   project               = var.project_id
   region                = var.region
-  runtime               = "go122"
+  runtime               = "go121"
   service_account_email = google_service_account.cheetah.email
   timeout               = 60
   trigger_http          = true
