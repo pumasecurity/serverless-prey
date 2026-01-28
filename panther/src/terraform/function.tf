@@ -64,3 +64,9 @@ resource "aws_lambda_function_url" "panther" {
   function_name      = aws_lambda_function.panther.function_name
   authorization_type = "NONE"
 }
+
+resource "aws_lambda_permission" "allow_public_invocation" {
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.panther.function_name
+  principal     = "*"
+}
