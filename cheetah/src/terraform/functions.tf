@@ -41,7 +41,7 @@ resource "google_storage_bucket_iam_member" "cheetah_storage" {
   member = "serviceAccount:${google_service_account.cheetah.email}"
 }
 
-resource "google_cloudfunctions_function" "cheetah" {
+resource "google_cloudfunctions2_function" "cheetah" {
   depends_on = [
     google_project_service.iam,
     google_project_service.cloudkms,
@@ -55,36 +55,43 @@ resource "google_cloudfunctions_function" "cheetah" {
     google_storage_bucket.cheetah,
   ]
 
-  available_memory_mb = "256"
-  entry_point         = "Cheetah"
-  ingress_settings    = "ALLOW_ALL"
+  name     = "serverless-prey-cheetah-gen2-${var.unique_identifier}"
+  project  = var.project_id
+  location = var.region
 
-  name                  = "serverless-prey-cheetah-${var.unique_identifier}"
-  project               = var.project_id
-  region                = var.region
-  runtime               = "go121"
-  service_account_email = google_service_account.cheetah.email
-  timeout               = 60
-  trigger_http          = true
-  source_archive_bucket = google_storage_bucket.function.name
-  source_archive_object = "${data.archive_file.function_cheetah.output_md5}.zip"
+  build_config {
+    runtime     = "go126"
+    entry_point = "Cheetah"
 
-  environment_variables = {
-    CHEETAH_API_KEY          = random_string.cheetah_api_key.id
-    CHEETAH_PROJECT_ID       = var.project_id
-    CHEETAH_SECRET_NAME      = var.configure_ctf ? google_secret_manager_secret.cheetah[0].secret_id : ""
-    CHEETAH_LOG_NAME         = "serverless-prey-cheetah-${var.unique_identifier}"
-    CHEETAH_FUNCTION_TIMEOUT = 60
+    source {
+      storage_source {
+        bucket = google_storage_bucket.function.name
+        object = "${data.archive_file.function_cheetah.output_md5}.zip"
+      }
+    }
+  }
+
+  service_config {
+    available_memory      = "256M"
+    timeout_seconds       = 60
+    ingress_settings      = "ALLOW_ALL"
+    service_account_email = google_service_account.cheetah.email
+
+    environment_variables = {
+      CHEETAH_API_KEY          = random_string.cheetah_api_key.id
+      CHEETAH_PROJECT_ID       = var.project_id
+      CHEETAH_SECRET_NAME      = var.configure_ctf ? google_secret_manager_secret.cheetah[0].secret_id : ""
+      CHEETAH_LOG_NAME         = "serverless-prey-cheetah-${var.unique_identifier}"
+      CHEETAH_FUNCTION_TIMEOUT = 60
+    }
   }
 }
 
-# IAM Configuration. This allows authenticated access to the TF identity
-# Change this if you require more (or less) access
-resource "google_cloudfunctions_function_iam_member" "cheetah" {
-  project        = var.project_id
-  region         = var.region
-  cloud_function = google_cloudfunctions_function.cheetah.name
+resource "google_cloud_run_service_iam_member" "cheetah" {
+  project  = var.project_id
+  location = var.region
+  service  = google_cloudfunctions2_function.cheetah.name
 
-  role   = "roles/cloudfunctions.invoker"
+  role   = "roles/run.invoker"
   member = "allUsers"
 }

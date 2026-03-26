@@ -1,6 +1,6 @@
 output "cheetah_function_url" {
   description = "Cheetah HTTP Url"
-  value       = google_cloudfunctions_function.cheetah.https_trigger_url
+  value       = google_cloudfunctions2_function.cheetah.url
 }
 
 output "cheetah_api_key" {
