@@ -78,6 +78,7 @@ resource "google_cloudfunctions2_function" "cheetah" {
     service_account_email = google_service_account.cheetah.email
 
     environment_variables = {
+      LOG_EXECUTION_ID         = "true"
       CHEETAH_API_KEY          = random_string.cheetah_api_key.id
       CHEETAH_PROJECT_ID       = var.project_id
       CHEETAH_SECRET_NAME      = var.configure_ctf ? google_secret_manager_secret.cheetah[0].secret_id : ""
