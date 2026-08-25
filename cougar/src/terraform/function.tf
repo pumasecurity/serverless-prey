@@ -38,7 +38,7 @@ resource "azurerm_linux_function_app" "function" {
   location            = azurerm_resource_group.cougar.location
   resource_group_name = azurerm_resource_group.cougar.name
 
-  service_plan_id             = azurerm_service_plan.plan.id
+  service_plan_id             = length(var.app_service_plan_id) > 0 ? var.app_service_plan_id : azurerm_service_plan.plan[0].id
   storage_account_name        = azurerm_storage_account.function.name
   storage_account_access_key  = azurerm_storage_account.function.primary_access_key
   functions_extension_version = "~4"
@@ -71,7 +71,7 @@ resource "azurerm_windows_function_app" "function" {
   location            = azurerm_resource_group.cougar.location
   resource_group_name = azurerm_resource_group.cougar.name
 
-  service_plan_id             = azurerm_service_plan.plan.id
+  service_plan_id             = length(var.app_service_plan_id) > 0 ? var.app_service_plan_id : azurerm_service_plan.plan[0].id
   storage_account_name        = azurerm_storage_account.function.name
   storage_account_access_key  = azurerm_storage_account.function.primary_access_key
   functions_extension_version = "~4"

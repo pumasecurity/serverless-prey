@@ -21,6 +21,12 @@ variable "app_service_plan_sku" {
   default     = "Y1"
 }
 
+variable "app_service_plan_id" {
+  description = "Reuses an existing app service plan."
+  type        = string
+  default     = ""
+}
+
 variable "app_service_os_type" {
   description = "The kind of service plan to use for the app. Defaults to Linux. Use 'Windows' for a Windows runtime."
   type        = string

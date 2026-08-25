@@ -1,4 +1,6 @@
 resource "azurerm_service_plan" "plan" {
+  count = length(var.app_service_plan_id) == 0 ? 1 : 0
+
   name                = "serverless-prey-cougar-${var.unique_identifier}"
   location            = azurerm_resource_group.cougar.location
   resource_group_name = azurerm_resource_group.cougar.name
